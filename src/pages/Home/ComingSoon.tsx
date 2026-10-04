@@ -2,7 +2,7 @@ import { useRef } from "react";
 
 import benin from "../../assets/images/hero/benin1.jpg";
 import fela from "../../assets/images/hero/fela3.jpg";
-// import lagos from "../../assets/images/exhibitions/lagos.jpg";
+import lagos from "../../assets/images/hero/lagos3.jpg";
 
 type Upcoming = {
   title: string;
@@ -18,10 +18,10 @@ const upcoming: Upcoming[] = [
     title: "Fela & the Politics of Music",
     image: fela,
   },
-  // {
-  //   title: "Lagos: A City in Motion",
-  //   image: lagos,
-  // },
+  {
+    title: "Lagos: A City in Motion",
+    image: lagos,
+  },
 ];
 
 export default function ComingSoon() {
@@ -112,10 +112,16 @@ export default function ComingSoon() {
                 "
               />
 
-              <div className="absolute inset-0 bg-linear-to-t from-ink/85 via-ink/10 to-transparent" />
+              {/* Consistent overlay for the upcoming state */}
+              <div className="absolute inset-0 bg-ink/45 transition-colors duration-500 group-hover:bg-ink/35" />
 
-              <div className="absolute inset-x-0 bottom-0 p-5 lg:p-6">
-                <h3 className="max-w-[90%] font-display text-heading-m leading-[1.05]">
+              {/* Editorial overlay */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+                <span className="text-label font-medium tracking-[0.2em] text-sand">
+                  COMING SOON
+                </span>
+
+                <h3 className="mt-4 max-w-[90%] font-display text-heading-m leading-[1.05]">
                   {item.title}
                 </h3>
               </div>

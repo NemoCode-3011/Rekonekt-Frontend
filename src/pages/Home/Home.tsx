@@ -3,6 +3,9 @@ import Hero from './Hero'
 import AboutReko from './AboutReko'
 import FeaturedExhibition from './FeaturedExhibition'
 import ComingSoon from './ComingSoon'
+import HiddenWonders from './HiddenWonders'
+import DiscoverDifferently from './DiscoverDifferently'
+import CinematicInterlude from './CinematicInterlude'
 
 const Home = () => {
   return (
@@ -11,6 +14,9 @@ const Home = () => {
    <AboutReko/>
    <FeaturedExhibition/>
    <ComingSoon/>
+   <HiddenWonders/>
+   <DiscoverDifferently/>
+   <CinematicInterlude/>
    </>
   )
 }
