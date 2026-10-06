@@ -2,7 +2,7 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
-import { signUp } from "../../services/api/auth";
+import { signUp } from "../../features/auth/api";
 import type { ApiError } from "../../services/api/client";
 
 export default function SignUp() {

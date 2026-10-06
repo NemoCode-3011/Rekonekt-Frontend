@@ -1,5 +1,5 @@
 import { Link, Outlet, Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../features/auth/auth-context";
 
 export default function AuthLayout() {
   const { user, loading } = useAuth();

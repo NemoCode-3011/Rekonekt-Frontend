@@ -2,14 +2,14 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
-import { clearLastUser, getLastUser, saveLastUser } from "../../lib/lastUser";
-import { signIn } from "../../services/api/auth";
+import { clearLastUser, getLastUser, saveLastUser } from "../../features/auth/lastUser";
+import { signIn } from "../../features/auth/api";
 import type { ApiError } from "../../services/api/client";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../features/auth/auth-context";
 
 export default function SignIn() {
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { setUser, showToast } = useAuth();
   const state = useLocation().state as {
     email?: string;
     verified?: boolean;
@@ -45,6 +45,7 @@ export default function SignIn() {
       const user = await signIn(email, form.password);
       setUser(user);
       saveLastUser({ name: user.name, email: user.email });
+      showToast("You're signed in.");
       navigate("/");
     } catch (err) {
       const { status, message } = err as ApiError;
@@ -90,7 +91,11 @@ export default function SignIn() {
         </p>
       )}
 
-      <form onSubmit={handleSubmit} className="mt-10 space-y-5">
+      <form
+        onSubmit={handleSubmit}
+        aria-busy={loading}
+        className="mt-10 space-y-5"
+      >
         {!returning && (
           <Input
             label="Email"
@@ -129,7 +134,12 @@ export default function SignIn() {
           </p>
         )}
 
-        <Button type="submit" disabled={loading} className="w-full">
+        <Button
+          type="submit"
+          disabled={loading}
+          aria-busy={loading}
+          className="w-full"
+        >
           {loading ? "Signing in…" : "Sign in"}
         </Button>
       </form>

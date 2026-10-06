@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import ArrowLink from "../../components/ui/ArrowLink";
-import { getExhibitions } from "../../services/api/exhibitions";
+import { getExhibitions } from "../../features/exhibitions/api/exhibitions";
 import aburiImage from "../../assets/images/hero/aburi.jpg";
 
 export default function FeaturedExhibition() {
@@ -19,7 +19,7 @@ export default function FeaturedExhibition() {
   const href = slug ? `/exhibitions/${slug}` : "/explore/exhibitions";
 
   return (
-    <section className="bg-ivory pb-24 lg:pb-40">
+    <section className="bg-sand/25 pb-24 lg:pb-40">
       <div className="container">
         <div className="border-t border-line" />
 

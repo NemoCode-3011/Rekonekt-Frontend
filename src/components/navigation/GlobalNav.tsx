@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../features/auth/auth-context";
 
 const links = [
   { to: "/explore", label: "Explore" },
@@ -76,11 +76,12 @@ function MenuIcon({ open }: { open: boolean }) {
 }
 
 export default function GlobalNav() {
-  const { user, loading, logout } = useAuth();
+  const { user, loading, logout, showToast } = useAuth();
   const location = useLocation();
   const isHome = location.pathname === "/";
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -105,10 +106,25 @@ export default function GlobalNav() {
   }, [menuOpen, accountOpen]);
 
   async function handleLogout() {
-    setAccountOpen(false);
-    setMenuOpen(false);
-    await logout();
-    navigate("/");
+    if (signingOut) return;
+
+    setSigningOut(true);
+    try {
+      await logout();
+      setAccountOpen(false);
+      setMenuOpen(false);
+      showToast("You've signed out.");
+      navigate("/");
+    } catch (error) {
+      showToast(
+        error instanceof Error
+          ? error.message
+          : "Couldn't sign out. Please try again.",
+        "error"
+      );
+    } finally {
+      setSigningOut(false);
+    }
   }
 
   return (
@@ -205,9 +221,11 @@ export default function GlobalNav() {
                           <button
                             type="button"
                             onClick={handleLogout}
-                            className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-error transition-colors hover:bg-error/5"
+                            disabled={signingOut}
+                            aria-busy={signingOut}
+                            className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-error transition-colors hover:bg-error/5 disabled:cursor-wait disabled:opacity-60"
                           >
-                            <span>Sign out</span>
+                            <span>{signingOut ? "Signing out…" : "Sign out"}</span>
                             <span aria-hidden>→</span>
                           </button>
                         </div>
@@ -318,9 +336,11 @@ export default function GlobalNav() {
                       <button
                         type="button"
                         onClick={handleLogout}
-                        className="min-h-11 px-2 text-left text-ivory/75 transition-colors hover:text-ivory"
+                        disabled={signingOut}
+                        aria-busy={signingOut}
+                        className="min-h-11 px-2 text-left text-ivory/75 transition-colors hover:text-ivory disabled:cursor-wait disabled:opacity-60"
                       >
-                        Sign out
+                        {signingOut ? "Signing out…" : "Sign out"}
                       </button>
                     </div>
                   </>

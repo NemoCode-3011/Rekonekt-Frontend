@@ -6,6 +6,8 @@ import ComingSoon from './ComingSoon'
 import HiddenWonders from './HiddenWonders'
 import DiscoverDifferently from './DiscoverDifferently'
 import CinematicInterlude from './CinematicInterlude'
+import DidYouKnow from './DidYouKnow'
+import AccountCTA from './AccountCTA'
 
 const Home = () => {
   return (
@@ -17,6 +19,8 @@ const Home = () => {
    <HiddenWonders/>
    <DiscoverDifferently/>
    <CinematicInterlude/>
+   <DidYouKnow/>
+   <AccountCTA/>
    </>
   )
 }

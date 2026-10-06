@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
-import { resendOtp, verifyOtp } from "../../services/api/auth";
+import { resendOtp, verifyOtp } from "../../features/auth/api";
 import type { ApiError } from "../../services/api/client";
 
 export default function Verify() {
