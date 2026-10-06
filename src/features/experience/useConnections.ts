@@ -1,4 +1,7 @@
 import {
+  getArtifactMedia,
+  getArtifactSources,
+  getEventSources,
   getPersonMedia,
   getPersonSources,
   getPlaceMedia,
@@ -22,8 +25,11 @@ const sectionPlacesCache = new Map<number, ExperiencePlace[]>();
 const sectionSourcesCache = new Map<number, ExperienceSource[]>();
 const personSourcesCache = new Map<number, ExperienceSource[]>();
 const placeSourcesCache = new Map<number, ExperienceSource[]>();
+const eventSourcesCache = new Map<number, ExperienceSource[]>();
+const artifactSourcesCache = new Map<number, ExperienceSource[]>();
 const personMediaCache = new Map<number, ExperienceMedia[]>();
 const placeMediaCache = new Map<number, ExperienceMedia[]>();
+const artifactMediaCache = new Map<number, ExperienceMedia[]>();
 
 // For a chapter
 export const useSectionPeople = (sectionId: number) =>
@@ -42,8 +48,17 @@ export const usePersonSources = (personId: number) =>
 export const usePlaceSources = (placeId: number) =>
   useCachedList(placeId, getPlaceSources, placeSourcesCache);
 
+export const useEventSources = (eventId: number) =>
+  useCachedList(eventId, getEventSources, eventSourcesCache);
+
+export const useArtifactSources = (artifactId: number) =>
+  useCachedList(artifactId, getArtifactSources, artifactSourcesCache);
+
 export const usePersonMedia = (personId: number) =>
   useCachedList(personId, getPersonMedia, personMediaCache);
 
 export const usePlaceMedia = (placeId: number) =>
   useCachedList(placeId, getPlaceMedia, placeMediaCache);
+
+export const useArtifactMedia = (artifactId: number) =>
+  useCachedList(artifactId, getArtifactMedia, artifactMediaCache);

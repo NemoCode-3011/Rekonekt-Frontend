@@ -1,5 +1,5 @@
 import { toParagraphs } from "../../../lib/text";
-import { useDiscovery } from "../discovery/DiscoveryContext";
+import { useDiscovery } from "../discovery/discovery-context";
 import { useSectionPeople, useSectionPlaces } from "../useConnections";
 
 interface ConnectionRowProps {

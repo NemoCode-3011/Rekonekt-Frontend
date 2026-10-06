@@ -14,6 +14,7 @@ export default function SignIn() {
     email?: string;
     verified?: boolean;
     reset?: boolean;
+    from?: string;
   } | null;
 
   // A returning user is someone who signed in on this device before
@@ -46,7 +47,7 @@ export default function SignIn() {
       setUser(user);
       saveLastUser({ name: user.name, email: user.email });
       showToast("You're signed in.");
-      navigate("/");
+      navigate(state?.from ?? "/");
     } catch (err) {
       const { status, message } = err as ApiError;
 

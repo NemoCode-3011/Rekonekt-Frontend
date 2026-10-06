@@ -110,8 +110,3 @@ export interface ExperienceSource {
   perspective_note: string | null;
   relationship: string | null;
 }
-
-// What the side drawer can show.
-export type DiscoverySubject =
-  | { kind: "person"; person: ExperiencePerson }
-  | { kind: "place"; place: ExperiencePlace };

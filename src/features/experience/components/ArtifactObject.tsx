@@ -1,4 +1,5 @@
 import { toParagraphs } from "../../../lib/text";
+import SaveButton from "../../bookmarks/components/SaveButton";
 import type { ArtifactWithMedia } from "../types";
 import ArtifactMedia from "./ArtifactMedia";
 
@@ -65,6 +66,10 @@ function ArtifactObject({ artifact, mirrored }: ArtifactObjectProps) {
             ))}
           </div>
         )}
+
+        <div className="mt-8">
+          <SaveButton artifactId={artifact.id} tone="dark" />
+        </div>
       </div>
     </article>
   );

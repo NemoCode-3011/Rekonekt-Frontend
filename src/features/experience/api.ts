@@ -114,3 +114,15 @@ export function getPersonSources(personId: number) {
 export function getPlaceSources(placeId: number) {
   return get<ExperienceSource[]>(`/source-links/content/place/${placeId}`);
 }
+
+export async function getArtifactMedia(artifactId: number) {
+  return findMedia("artifact", artifactId, await getMediaLibrary());
+}
+
+export function getEventSources(eventId: number) {
+  return get<ExperienceSource[]>(`/source-links/content/event/${eventId}`);
+}
+
+export function getArtifactSources(artifactId: number) {
+  return get<ExperienceSource[]>(`/source-links/content/artifact/${artifactId}`);
+}

@@ -7,9 +7,9 @@ import CinematicImage from "../../features/experience/components/CinematicImage"
 import ChapterContent from "../../features/experience/components/ChapterContent";
 import ChapterFooter from "../../features/experience/components/ChapterFooter";
 import ExperienceEnding from "../../features/experience/components/ExperienceEnding";
-import { DiscoveryProvider } from "../../features/experience/discovery/DiscoveryContext";
 import { getExperienceBySlug } from "../../features/experience/api";
 import type { Experience } from "../../features/experience/types";
+import { useProgressSaver } from "../../features/progress/useProgressSaver";
 
 import aburi from "../../assets/images/hero/aburi.jpg";
 import aburi2 from "../../assets/images/hero/aburi2.jpg";
@@ -66,6 +66,24 @@ function ExperienceDetail() {
     loadExperience();
   }, [slug]);
 
+  // The current chapter lives in the URL (?chapter=<section slug>) so a
+  // chapter can be linked to and survives a refresh. Unknown or missing
+  // values open the first chapter.
+  const sections = experience?.sections ?? [];
+  const chapterSlug = searchParams.get("chapter");
+  const chapterIndex = Math.max(
+    0,
+    sections.findIndex((item) => item.slug === chapterSlug),
+  );
+
+  // Remember where a signed-in visitor is. This does nothing for visitors
+  // who aren't signed in, and while the experience is still loading.
+  useProgressSaver(
+    experience?.id,
+    sections[chapterIndex]?.id,
+    sections.length > 0 && chapterIndex === sections.length - 1,
+  );
+
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-ink text-white">
@@ -84,8 +102,6 @@ function ExperienceDetail() {
     );
   }
 
-  const { sections } = experience;
-
   if (sections.length === 0) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-ink px-5 text-white">
@@ -95,15 +111,6 @@ function ExperienceDetail() {
       </main>
     );
   }
-
-  // The current chapter lives in the URL (?chapter=<section slug>) so a
-  // chapter can be linked to and survives a refresh. Unknown or missing
-  // values open the first chapter.
-  const chapterSlug = searchParams.get("chapter");
-  const chapterIndex = Math.max(
-    0,
-    sections.findIndex((item) => item.slug === chapterSlug),
-  );
 
   const section = sections[chapterIndex];
   const nextSection = sections[chapterIndex + 1]; // undefined on the last chapter
@@ -115,99 +122,93 @@ function ExperienceDetail() {
   };
 
   return (
-    <DiscoveryProvider>
-      <main className="bg-ink text-white">
-        <ExperienceNav title={experience.title} />
+    <main className="bg-ink text-white">
+      <ExperienceNav title={experience.title} />
 
-        {/* When one chapter has faded out, jump to the top for the next one */}
-        <AnimatePresence
-          mode="wait"
-          onExitComplete={() =>
-            window.scrollTo({ top: 0, behavior: "instant" })
-          }
+      {/* When one chapter has faded out, jump to the top for the next one */}
+      <AnimatePresence
+        mode="wait"
+        onExitComplete={() => window.scrollTo({ top: 0, behavior: "instant" })}
+      >
+        <motion.div
+          key={section.id}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.7, ease: "easeInOut" }}
         >
-          <motion.div
-            key={section.id}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.7, ease: "easeInOut" }}
-          >
-            <section className="relative flex min-h-screen items-end overflow-hidden">
-              <CinematicImage
-                src={image}
-                alt={`${experience.title} — ${section.title}`}
-                focus="50% 30%"
-              />
+          <section className="relative flex min-h-screen items-end overflow-hidden">
+            <CinematicImage
+              src={image}
+              alt={`${experience.title} — ${section.title}`}
+              focus="50% 30%"
+            />
 
-              <div className="relative z-10 w-full px-5 pb-20 pt-32 md:px-10 md:pb-24">
-                <motion.div
-                  initial={{ opacity: 0, y: 35 }}
+            <div className="relative z-10 w-full px-5 pb-20 pt-32 md:px-10 md:pb-24">
+              <motion.div
+                initial={{ opacity: 0, y: 35 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.8,
+                  delay: 0.15,
+                  ease: "easeOut",
+                }}
+                className="max-w-7xl"
+              >
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.8,
-                    delay: 0.15,
-                    ease: "easeOut",
-                  }}
-                  className="max-w-7xl"
+                  transition={{ duration: 0.8 }}
+                  className="font-display text-[clamp(5rem,min(15vw,24svh),13rem)] leading-[0.85] tracking-[-0.05em] text-ivory/90"
                 >
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
-                    className="font-display text-[clamp(5rem,min(15vw,24svh),13rem)] leading-[0.85] tracking-[-0.05em] text-ivory/90"
-                  >
-                    {date}
-                  </motion.p>
+                  {date}
+                </motion.p>
 
-                  <p className="mt-5 font-sans text-label uppercase tracking-[0.18em] text-ivory/75">
-                    Chapter {String(chapterIndex + 1).padStart(2, "0")}
-                  </p>
+                <p className="mt-5 font-sans text-label uppercase tracking-[0.18em] text-ivory/75">
+                  Chapter {String(chapterIndex + 1).padStart(2, "0")}
+                </p>
 
-                  <h1 className="mt-3 max-w-4xl font-display text-[clamp(2.25rem,5vw,4.5rem)] leading-[0.95] tracking-[-0.03em] text-ivory">
-                    {section.title}
-                  </h1>
+                <h1 className="mt-3 max-w-4xl font-display text-[clamp(2.25rem,5vw,4.5rem)] leading-[0.95] tracking-[-0.03em] text-ivory">
+                  {section.title}
+                </h1>
 
-                  <div className="mt-12 flex items-center gap-3">
-                    {sections.map((chapter, index) => (
-                      <button
-                        key={chapter.id}
-                        type="button"
-                        aria-label={`Go to ${chapter.title}`}
-                        aria-current={
-                          index === chapterIndex ? "step" : undefined
-                        }
-                        onClick={() => goToChapter(index)}
-                        className={`h-1.5 rounded-full transition-all duration-300 ${
-                          index === chapterIndex
-                            ? "w-12 bg-white"
-                            : "w-5 bg-white/30 hover:bg-white/60"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </motion.div>
-              </div>
-            </section>
+                <div className="mt-12 flex items-center gap-3">
+                  {sections.map((chapter, index) => (
+                    <button
+                      key={chapter.id}
+                      type="button"
+                      aria-label={`Go to ${chapter.title}`}
+                      aria-current={index === chapterIndex ? "step" : undefined}
+                      onClick={() => goToChapter(index)}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${
+                        index === chapterIndex
+                          ? "w-12 bg-white"
+                          : "w-5 bg-white/30 hover:bg-white/60"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+          </section>
 
-            <ChapterContent section={section} date={date} />
+          <ChapterContent section={section} date={date} />
 
-            {nextSection ? (
-              <ChapterFooter
-                chapterNumber={chapterIndex + 1}
-                nextTitle={nextSection.title}
-                onNext={() => goToChapter(chapterIndex + 1)}
-              />
-            ) : (
-              <ExperienceEnding
-                experienceTitle={experience.title}
-                onRestart={() => goToChapter(0)}
-              />
-            )}
-          </motion.div>
-        </AnimatePresence>
-      </main>
-    </DiscoveryProvider>
+          {nextSection ? (
+            <ChapterFooter
+              chapterNumber={chapterIndex + 1}
+              nextTitle={nextSection.title}
+              onNext={() => goToChapter(chapterIndex + 1)}
+            />
+          ) : (
+            <ExperienceEnding
+              experienceTitle={experience.title}
+              onRestart={() => goToChapter(0)}
+            />
+          )}
+        </motion.div>
+      </AnimatePresence>
+    </main>
   );
 }
 

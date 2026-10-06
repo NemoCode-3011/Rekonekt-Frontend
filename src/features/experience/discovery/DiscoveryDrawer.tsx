@@ -1,27 +1,40 @@
 import { motion, useReducedMotion } from "framer-motion";
-import type { DiscoverySubject } from "../types";
 import { useModalDialog } from "../useModalDialog";
-import SubjectDetails from "../discovery/SubjectDetails";
+import SubjectDetails from "./SubjectDetails";
+import type { DiscoverySubject } from "./types";
 
 interface DiscoveryDrawerProps {
   subject: DiscoverySubject;
   onClose: () => void;
 }
 
-// A panel that slides in from the right with a person's or place's details.
+function titleOf(subject: DiscoverySubject) {
+  switch (subject.kind) {
+    case "person":
+      return subject.person.name;
+    case "place":
+      return subject.place.name;
+    case "event":
+      return subject.event.title;
+    case "artifact":
+      return subject.artifact.title;
+    case "story":
+      return subject.story.title;
+  }
+}
+
+// A panel that slides in from the right with the details of whatever the
+// visitor selected.
 function DiscoveryDrawer({ subject, onClose }: DiscoveryDrawerProps) {
   const { dialogRef, close, closeOnBackdropClick } = useModalDialog();
   const reduce = useReducedMotion();
-
-  const label =
-    subject.kind === "person" ? subject.person.name : subject.place.name;
 
   return (
     <dialog
       ref={dialogRef}
       onClose={onClose}
       onClick={closeOnBackdropClick}
-      aria-label={label}
+      aria-label={titleOf(subject)}
       className="fixed inset-y-0 left-auto right-0 m-0 h-dvh max-h-none w-full max-w-xl bg-transparent p-0 backdrop:bg-ink/60"
     >
       <motion.div
