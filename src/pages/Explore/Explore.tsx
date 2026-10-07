@@ -2,8 +2,8 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 
-import exhibitionsImage from "../../assets/images/hero/aburi.jpg";
-import peopleImage from "../../assets/images/hero/fela2.jpg";
+import exhibitionsImage from "../../assets/images/hero/benin2.jpg";
+import peopleImage from "../../assets/images/hero/zik.jpg";
 import eventsImage from "../../assets/images/hero/lagos3.jpg";
 import placesImage from "../../assets/images/hero/Awhuhm.png";
 import artifactsImage from "../../assets/images/hero/benin1.jpg";

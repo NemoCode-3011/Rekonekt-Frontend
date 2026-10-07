@@ -1,6 +1,13 @@
 import { http } from "../../services/api/client";
 import type { User } from "./types";
 
+export interface CulturalGroup {
+  id: number;
+  name: string;
+  language: string | null;
+  region: string | null;
+}
+
 const cleanEmail = (email: string) => email.trim().toLowerCase();
 
 export function signUp(input: {
@@ -49,4 +56,29 @@ export async function getCurrentUser() {
 
 export function logout() {
   return http.post("/auth/logout");
+}
+
+// ---------- Settings ----------
+
+export async function updateProfile(input: {
+  name: string;
+  preferredLanguage: string;
+  culturalGroupId: number | null;
+}) {
+  const res = await http.patch<{ message: string; data: User }>(
+    "/auth/me",
+    input,
+  );
+  return res.data.data;
+}
+
+export function changePassword(currentPassword: string, newPassword: string) {
+  return http.post("/auth/change-password", { currentPassword, newPassword });
+}
+
+export async function getCulturalGroups() {
+  const res = await http.get<{ message: string; data: CulturalGroup[] }>(
+    "/cultural-groups",
+  );
+  return res.data.data;
 }

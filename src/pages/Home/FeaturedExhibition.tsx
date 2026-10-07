@@ -1,22 +1,33 @@
 import { useEffect, useState } from "react";
 import ArrowLink from "../../components/ui/ArrowLink";
 import { getExhibitions } from "../../features/exhibitions/api/exhibitions";
-import aburiImage from "../../assets/images/hero/aburi.jpg";
+import type { Exhibition } from "../../features/exhibitions/types/exhibitions";
+import fallbackImage from "../../assets/images/hero/benin1.jpg";
+
+// The exhibition shown on the homepage
+const FEATURED_SLUG = "the-benin-empire";
 
 export default function FeaturedExhibition() {
-  const [slug, setSlug] = useState<string | null>(null);
+  const [exhibition, setExhibition] = useState<Exhibition | null>(null);
 
-  // The backend has no "featured" flag, so find the Aburi exhibition by title
   useEffect(() => {
     getExhibitions()
       .then((list) => {
-        const aburi = list.find((e) => e.title.toLowerCase().includes("aburi"));
-        setSlug(aburi?.slug ?? null);
+        setExhibition(
+          list.find((item) => item.slug === FEATURED_SLUG) ?? list[0] ?? null,
+        );
       })
-      .catch(() => setSlug(null));
+      .catch(() => setExhibition(null));
   }, []);
 
-  const href = slug ? `/exhibitions/${slug}` : "/explore/exhibitions";
+  const title = exhibition?.title ?? "Our exhibitions";
+  const teaser =
+    exhibition?.subtitle ??
+    "Stories that unfold across time, place and perspective.";
+  const image = exhibition?.cover_image_url || fallbackImage;
+  const href = exhibition
+    ? `/exhibitions/${exhibition.slug}`
+    : "/explore/exhibitions";
 
   return (
     <section className="bg-sand/25 pb-24 lg:pb-40">
@@ -28,33 +39,31 @@ export default function FeaturedExhibition() {
         </p>
 
         <div className="relative mt-8 lg:mt-12">
-          <div className="aspect-4/3 w-full overflow-hidden bg-sand lg:aspect-16/10 lg:w-2/3">
+          <div className="relative aspect-4/3 w-full overflow-hidden bg-[#090b09] lg:aspect-16/10 lg:w-2/3">
             <img
-              src={aburiImage}
-              alt="Yakubu Gowon shaking hands with Odumegwu Ojukwu, surrounded by delegates and officers, at the Aburi talks in Ghana, January 1967"
-              className="h-full w-full object-cover object-[50%_30%]"
+              src={image}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 h-full w-full scale-110 object-cover opacity-25 blur-2xl"
+            />
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(232,199,143,0.32)_0%,rgba(15,19,15,0.12)_42%,rgba(0,0,0,0.78)_100%)]"
+            />
+            <img
+              src={image}
+              alt={title}
+              className="relative z-10 h-full w-full object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.55)]"
             />
           </div>
 
-          <p className="mt-3 text-meta text-muted lg:absolute lg:left-0 lg:top-full lg:w-1/2">
-            Yakubu Gowon (left) shaking hands with Odumegwu Ojukwu (right),
-            surrounded by delegates and officers. Aburi, Ghana, January 1967.
-            Source: thehistoryville.com.
-          </p>
-
-          <h2 className="mt-8 font-display text-display-l leading-[0.95] tracking-normal text-ink lg:absolute lg:bottom-0 lg:left-[56%] lg:mt-0 lg:text-ivory lg:mix-blend-difference">
-            <span className="block">
-              THE<span className="lg:block"> ABURI</span>
-            </span>
-            <span className="block">ACCORD</span>
+          <h2 className="mt-8 font-display text-display-l uppercase leading-[0.95] tracking-normal text-ink lg:absolute lg:bottom-0 lg:left-[56%] lg:mt-0 lg:text-ivory lg:mix-blend-difference">
+            {title}
           </h2>
         </div>
 
         <div className="mt-8 lg:ml-[56%] lg:mt-10 lg:max-w-md">
-          <p className="text-body-l text-muted">
-            A meeting that promised a different path for Nigeria — and became a
-            turning point in the country's history.
-          </p>
+          <p className="text-body-l text-muted">{teaser}</p>
 
           <ArrowLink to={href} className="mt-8">
             Enter exhibition

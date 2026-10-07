@@ -3,28 +3,18 @@ import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 
 import ExperienceNav from "../../features/experience/components/ExperienceNav";
+import ExperienceGuide from "../../features/experience/components/ExperienceGuide";
 import CinematicImage from "../../features/experience/components/CinematicImage";
 import ChapterContent from "../../features/experience/components/ChapterContent";
 import ChapterFooter from "../../features/experience/components/ChapterFooter";
 import ExperienceEnding from "../../features/experience/components/ExperienceEnding";
 import { getExperienceBySlug } from "../../features/experience/api";
 import type { Experience } from "../../features/experience/types";
+import { useChapterDate } from "../../features/experience/useChapterDate";
 import { useProgressSaver } from "../../features/progress/useProgressSaver";
 
-import aburi from "../../assets/images/hero/aburi.jpg";
-import aburi2 from "../../assets/images/hero/aburi2.jpg";
-
-const chapterImages = [aburi, aburi2, aburi, aburi2, aburi, aburi2, aburi];
-
-const chapterDates = [
-  "1967",
-  "1966",
-  "JANUARY 1967",
-  "JANUARY 4–5, 1967",
-  "1967",
-  "MAY 1967",
-  "1967 →",
-];
+// Only used when a chapter and its exhibition both have no image set.
+import fallbackImage from "../../assets/hero.png";
 
 function ExperienceDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -84,6 +74,9 @@ function ExperienceDetail() {
     sections.length > 0 && chapterIndex === sections.length - 1,
   );
 
+  // The big date comes from this chapter's own events.
+  const date = useChapterDate(sections[chapterIndex]?.id);
+
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-ink text-white">
@@ -114,8 +107,10 @@ function ExperienceDetail() {
 
   const section = sections[chapterIndex];
   const nextSection = sections[chapterIndex + 1]; // undefined on the last chapter
-  const image = chapterImages[chapterIndex] ?? aburi;
-  const date = chapterDates[chapterIndex] ?? "1967";
+
+  // The chapter's own image, then the exhibition's cover, then a plain default.
+  const image =
+    section.hero_image_url || experience.cover_image_url || fallbackImage;
 
   const goToChapter = (index: number) => {
     setSearchParams({ chapter: sections[index].slug }, { replace: true });
@@ -124,6 +119,7 @@ function ExperienceDetail() {
   return (
     <main className="bg-ink text-white">
       <ExperienceNav title={experience.title} />
+      <ExperienceGuide />
 
       {/* When one chapter has faded out, jump to the top for the next one */}
       <AnimatePresence
@@ -155,14 +151,16 @@ function ExperienceDetail() {
                 }}
                 className="max-w-7xl"
               >
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8 }}
-                  className="font-display text-[clamp(5rem,min(15vw,24svh),13rem)] leading-[0.85] tracking-[-0.05em] text-ivory/90"
-                >
-                  {date}
-                </motion.p>
+                {date && (
+                  <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
+                    className="font-display text-[clamp(5rem,min(15vw,24svh),13rem)] leading-[0.85] tracking-[-0.05em] text-ivory/90"
+                  >
+                    {date}
+                  </motion.p>
+                )}
 
                 <p className="mt-5 font-sans text-label uppercase tracking-[0.18em] text-ivory/75">
                   Chapter {String(chapterIndex + 1).padStart(2, "0")}
@@ -192,7 +190,7 @@ function ExperienceDetail() {
             </div>
           </section>
 
-          <ChapterContent section={section} date={date} />
+          <ChapterContent section={section} date={date ?? ""} />
 
           {nextSection ? (
             <ChapterFooter

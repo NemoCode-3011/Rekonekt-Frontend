@@ -7,6 +7,7 @@ import {
   PeopleStage,
   PlacesStage,
 } from "./DiscoverStages";
+import { useDiscoverSamples } from "../../features/home/useDiscoverSamples";
 
 const ease = [0.76, 0, 0.24, 1] as const;
 
@@ -52,7 +53,7 @@ const routes = [
 export default function DiscoverDifferently() {
   const reduce = useReducedMotion();
   const dur = reduce ? 0 : 0.9;
-
+  const samples = useDiscoverSamples();
   const [active, setActive] = useState(0);
   const [prev, setPrev] = useState<number | null>(null);
 
@@ -120,7 +121,7 @@ export default function DiscoverDifferently() {
                 style={{ zIndex: i === active ? 2 : i === prev ? 1 : 0 }}
                 className={`absolute inset-0 ${route.env}`}
               >
-                <route.Stage />
+                <route.Stage sample={samples[route.key] ?? null} />
               </motion.div>
             ))}
           </div>
@@ -184,7 +185,7 @@ export default function DiscoverDifferently() {
                     aria-hidden
                     className={`mt-5 h-[420px] overflow-hidden border border-line ${route.env}`}
                   >
-                    <route.Stage />
+                    <route.Stage sample={samples[route.key] ?? null} />
                   </div>
                   <ArrowLink to={route.to} className="mt-6">
                     {route.link}

@@ -5,6 +5,8 @@ const tabs = [
   { to: "/account/profile", label: "Profile" },
   { to: "/account/progress", label: "Your progress" },
   { to: "/account/bookmarks", label: "Bookmarks" },
+  { to: "/account/notes", label: "Notes" },
+  { to: "/account/settings", label: "Settings" },
 ];
 
 // The frame around every Account page: a heading and the page tabs.
@@ -19,7 +21,7 @@ export default function AccountLayout() {
 
         <nav
           aria-label="Account"
-          className="mt-10 flex gap-8 border-b border-line"
+          className="mt-10 flex gap-8 overflow-x-auto whitespace-nowrap border-b border-line"
         >
           {tabs.map((tab) => (
             <NavLink

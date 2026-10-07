@@ -1,16 +1,27 @@
-import {
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getCurrentUser, logout as logoutRequest } from "./api";
 import type { User } from "./types";
 import { AuthContext, type Toast } from "./auth-context";
+import { setSessionExpiredHandler } from "../../services/api/client";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<Toast | null>(null);
+
+  // The session-expired handler runs outside React's rendering, so it reads
+  // the latest user and page from refs.
+  const userRef = useRef<User | null>(null);
+  const pathRef = useRef("/");
+
+  useEffect(() => {
+    userRef.current = user;
+    pathRef.current = location.pathname + location.search;
+  });
 
   useEffect(() => {
     if (!toast) return;
@@ -26,6 +37,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
   }, []);
+
+  // If a signed-in visitor's session ends, send them to sign in again.
+  useEffect(() => {
+    setSessionExpiredHandler(() => {
+      if (!userRef.current) return; // guests have no session to lose
+
+      userRef.current = null; // several requests can fail at once: react once
+      setUser(null);
+
+      const path = pathRef.current;
+
+      if (path.startsWith("/admin")) {
+        navigate("/admin/login", { replace: true, state: { expired: true } });
+      } else {
+        navigate("/auth/login", {
+          replace: true,
+          state: { expired: true, from: path },
+        });
+      }
+    });
+
+    return () => setSessionExpiredHandler(null);
+  }, [navigate]);
 
   async function logout() {
     await logoutRequest();

@@ -7,4 +7,5 @@ export interface User {
   role: Role;
   preferred_language: string;
   is_verified: boolean;
+  cultural_group_id?: number | null;
 }

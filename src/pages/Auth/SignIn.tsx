@@ -1,35 +1,65 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  ArrowRight,
+  CheckCircle2,
+  CircleAlert,
+  Clock3,
+  LoaderCircle,
+  LockKeyhole,
+  Mail,
+  ShieldCheck,
+} from "lucide-react";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
-import { clearLastUser, getLastUser, saveLastUser } from "../../features/auth/lastUser";
+import {
+  clearLastUser,
+  getLastUser,
+  saveLastUser,
+} from "../../features/auth/lastUser";
 import { signIn } from "../../features/auth/api";
 import type { ApiError } from "../../services/api/client";
 import { useAuth } from "../../features/auth/auth-context";
 
-export default function SignIn() {
+type SignInMode = "visitor" | "admin";
+
+interface SignInProps {
+  mode?: SignInMode;
+}
+
+export default function SignIn({ mode = "visitor" }: SignInProps) {
   const navigate = useNavigate();
-  const { setUser, showToast } = useAuth();
+  const { setUser, logout, showToast } = useAuth();
+
   const state = useLocation().state as {
     email?: string;
     verified?: boolean;
     reset?: boolean;
     from?: string;
+    expired?: boolean;
   } | null;
 
-  // A returning user is someone who signed in on this device before
+  const isAdminLogin = mode === "admin";
+
   const [returning, setReturning] = useState(() =>
-    state?.email ? null : getLastUser()
+    state?.email || isAdminLogin ? null : getLastUser(),
   );
 
-  const [form, setForm] = useState({ email: state?.email ?? "", password: "" });
+  const [form, setForm] = useState({
+    email: state?.email ?? "",
+    password: "",
+  });
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const email = returning?.email ?? form.email;
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
   }
 
   function handleNotYou() {
@@ -39,21 +69,42 @@ export default function SignIn() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+
     setError("");
     setLoading(true);
 
     try {
       const user = await signIn(email, form.password);
+
+      const isAdmin = user.role === "admin" || user.role === "super admin";
+
+      if (isAdminLogin && !isAdmin) {
+        await logout();
+        setError("This account does not have admin access.");
+        return;
+      }
+
       setUser(user);
-      saveLastUser({ name: user.name, email: user.email });
+
+      saveLastUser({
+        name: user.name,
+        email: user.email,
+      });
+
       showToast("You're signed in.");
-      navigate(state?.from ?? "/");
+
+      if (isAdmin) {
+        navigate("/admin/dashboard", { replace: true });
+      } else {
+        navigate(state?.from ?? "/", { replace: true });
+      }
     } catch (err) {
       const { status, message } = err as ApiError;
 
       if (status === 403) {
-        // Correct password, email not verified yet
-        navigate("/auth/verify", { state: { email } });
+        navigate("/auth/verify", {
+          state: { email },
+        });
       } else {
         setError(message);
       }
@@ -65,12 +116,14 @@ export default function SignIn() {
   return (
     <>
       <h1 className="font-display text-heading-l leading-tight">
-        {returning
-          ? `Welcome back, ${returning.name.split(" ")[0]}.`
-          : "Pick up where you left off."}
+        {isAdminLogin
+          ? "Sign in to REKÒ Admin."
+          : returning
+            ? `Welcome back, ${returning.name.split(" ")[0]}.`
+            : "Pick up where you left off."}
       </h1>
 
-      {returning && (
+      {returning && !isAdminLogin && (
         <p className="mt-4 text-body-m text-muted">
           Signing in as {returning.email}.{" "}
           <button
@@ -83,12 +136,31 @@ export default function SignIn() {
         </p>
       )}
 
-      {state?.verified && (
-        <p className="mt-4 text-body-m text-success">Email verified. Sign in to continue.</p>
+      {isAdminLogin && (
+        <p className="mt-4 flex items-center gap-2 text-body-m text-muted">
+          <ShieldCheck aria-hidden="true" className="size-4 shrink-0 text-heritage-green" />
+          <span>Admin and super admin accounts only.</span>
+        </p>
       )}
+
+      {state?.verified && (
+        <p role="status" className="mt-4 flex items-start gap-2 text-body-m text-success">
+          <CheckCircle2 aria-hidden="true" className="mt-1 size-4 shrink-0" />
+          <span>Email verified. Sign in to continue.</span>
+        </p>
+      )}
+
       {state?.reset && (
-        <p className="mt-4 text-body-m text-success">
-          Password updated. Sign in with your new password.
+        <p role="status" className="mt-4 flex items-start gap-2 text-body-m text-success">
+          <CheckCircle2 aria-hidden="true" className="mt-1 size-4 shrink-0" />
+          <span>Password updated. Sign in with your new password.</span>
+        </p>
+      )}
+
+      {state?.expired && (
+        <p role="status" className="mt-4 flex items-start gap-2 text-body-m text-muted">
+          <Clock3 aria-hidden="true" className="mt-1 size-4 shrink-0" />
+          <span>Your session expired. Enter your password to continue.</span>
         </p>
       )}
 
@@ -103,6 +175,7 @@ export default function SignIn() {
             name="email"
             type="email"
             autoComplete="email"
+            icon={Mail}
             required
             value={form.email}
             onChange={handleChange}
@@ -114,6 +187,7 @@ export default function SignIn() {
           name="password"
           type="password"
           autoComplete="current-password"
+          icon={LockKeyhole}
           required
           value={form.password}
           onChange={handleChange}
@@ -130,8 +204,9 @@ export default function SignIn() {
         </div>
 
         {error && (
-          <p role="alert" className="text-body-s text-error">
-            {error}
+          <p role="alert" className="flex items-start gap-2 text-body-s text-error">
+            <CircleAlert aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+            <span>{error}</span>
           </p>
         )}
 
@@ -141,16 +216,31 @@ export default function SignIn() {
           aria-busy={loading}
           className="w-full"
         >
-          {loading ? "Signing in…" : "Sign in"}
+          {loading ? (
+            <>
+              <LoaderCircle aria-hidden="true" className="mr-2 inline size-4 animate-spin" />
+              Signing in…
+            </>
+          ) : (
+            <>
+              Sign in
+              <ArrowRight aria-hidden="true" className="ml-2 inline size-4" />
+            </>
+          )}
         </Button>
       </form>
 
-      <p className="mt-8 text-body-s text-muted">
-        New to REKÒ?{" "}
-        <Link to="/auth/signup" className="font-medium text-ink underline underline-offset-4">
-          Create an account
-        </Link>
-      </p>
+      {!isAdminLogin && (
+        <p className="mt-8 text-body-s text-muted">
+          New to REKÒ?{" "}
+          <Link
+            to="/auth/signup"
+            className="font-medium text-ink underline underline-offset-4"
+          >
+            Create an account
+          </Link>
+        </p>
+      )}
     </>
   );
 }

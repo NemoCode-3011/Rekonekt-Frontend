@@ -5,7 +5,10 @@ export default function AuthLayout() {
   const { user, loading } = useAuth();
 
   if (loading) return null;
-  if (user) return <Navigate to="/" replace />;
+  if (user) {
+    const isAdmin = user.role === "admin" || user.role === "super admin";
+    return <Navigate to={isAdmin ? "/admin/dashboard" : "/"} replace />;
+  }
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-2">
       {/* Image panel: desktop only. Replace this whole stack with the real photo later. */}
