@@ -34,8 +34,12 @@ import { DiscoveryProvider } from "./features/experience/discovery/DiscoveryProv
 import CollectionPage from "./pages/Explore/CollectionPage";
 import About from "./pages/About/About";
 import NotFound from "./pages/NotFound";
-import Notes from "./pages/Account/Notes";
 import Settings from "./pages/Account/Settings";
+import AdminExhibitions from "./pages/Admin/Exhibitions";
+import ExhibitionWorkspace from "./pages/Admin/ExhibitionsWorkspace";
+import Team from "./pages/Admin/Team";
+import AdminSettings from "./pages/Admin/AdminSettings";
+import RequireSuperAdmin from "./features/admin/components/RequireSuperAdmin";
 function App() {
   return (
     <DiscoveryProvider>
@@ -46,10 +50,22 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/explore/exhibitions" element={<Exhibitions />} />
-            <Route path="/explore/people" element={<CollectionPage kind="people" />} />
-            <Route path="/explore/events" element={<CollectionPage kind="events" />} />
-            <Route path="/explore/places" element={<CollectionPage kind="places" />} />
-            <Route path="/explore/artifacts" element={<CollectionPage kind="artifacts" />} />
+            <Route
+              path="/explore/people"
+              element={<CollectionPage kind="people" />}
+            />
+            <Route
+              path="/explore/events"
+              element={<CollectionPage kind="events" />}
+            />
+            <Route
+              path="/explore/places"
+              element={<CollectionPage kind="places" />}
+            />
+            <Route
+              path="/explore/artifacts"
+              element={<CollectionPage kind="artifacts" />}
+            />
             <Route path="/exhibitions/:slug" element={<ExhibitionDetail />} />
             <Route path="/search" element={<Search />} />
             <Route path="/about" element={<About />} />
@@ -62,7 +78,6 @@ function App() {
                 <Route path="profile" element={<Profile />} />
                 <Route path="progress" element={<Progress />} />
                 <Route path="bookmarks" element={<Bookmarks />} />
-                <Route path="notes" element={<Notes />} />
                 <Route path="settings" element={<Settings />} />
               </Route>
             </Route>
@@ -77,6 +92,12 @@ function App() {
             <Route element={<AdminLayout />}>
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<Dashboard />} />
+              <Route path="exhibitions" element={<AdminExhibitions />} />
+              <Route path="exhibitions/:id" element={<ExhibitionWorkspace />} />
+              <Route path="settings" element={<AdminSettings />} />
+              <Route element={<RequireSuperAdmin />}>
+                <Route path="team" element={<Team />} />
+              </Route>
             </Route>
           </Route>
 

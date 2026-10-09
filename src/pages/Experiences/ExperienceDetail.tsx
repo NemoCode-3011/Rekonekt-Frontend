@@ -12,6 +12,7 @@ import { getExperienceBySlug } from "../../features/experience/api";
 import type { Experience } from "../../features/experience/types";
 import { useChapterDate } from "../../features/experience/useChapterDate";
 import { useProgressSaver } from "../../features/progress/useProgressSaver";
+import NotesWidget from "../../features/notes/noteWidget";
 
 // Only used when a chapter and its exhibition both have no image set.
 import fallbackImage from "../../assets/hero.png";
@@ -120,6 +121,7 @@ function ExperienceDetail() {
     <main className="bg-ink text-white">
       <ExperienceNav title={experience.title} />
       <ExperienceGuide />
+      <NotesWidget />
 
       {/* When one chapter has faded out, jump to the top for the next one */}
       <AnimatePresence

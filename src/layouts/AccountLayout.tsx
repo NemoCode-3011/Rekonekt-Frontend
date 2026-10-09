@@ -5,7 +5,6 @@ const tabs = [
   { to: "/account/profile", label: "Profile" },
   { to: "/account/progress", label: "Your progress" },
   { to: "/account/bookmarks", label: "Bookmarks" },
-  { to: "/account/notes", label: "Notes" },
   { to: "/account/settings", label: "Settings" },
 ];
 

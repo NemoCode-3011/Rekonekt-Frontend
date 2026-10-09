@@ -1,6 +1,6 @@
 import { useRef } from "react";
 
-import benin from "../../assets/images/hero/benin1.jpg";
+import war from "../../assets/images/hero/civilwar.jpeg";
 import fela from "../../assets/images/hero/fela3.jpg";
 import lagos from "../../assets/images/hero/lagos3.jpg";
 
@@ -11,8 +11,8 @@ type Upcoming = {
 
 const upcoming: Upcoming[] = [
   {
-    title: "The Benin Kingdom",
-    image: benin,
+    title: "The Nigerian Civil War",
+    image: war,
   },
   {
     title: "Fela & the Politics of Music",
