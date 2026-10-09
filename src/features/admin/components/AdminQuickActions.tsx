@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { useAuth } from "../../auth/auth-context";
 import Button from "../../../components/ui/Button";
 import type {
@@ -15,6 +15,7 @@ import {
   createPlace,
   createStory,
 } from "../api/dashboard";
+import { uploadAdminImage, type UploadedMedia } from "../api/media";
 
 interface AdminQuickActionsProps {
   exhibitions: DashboardExhibition[] | null;
@@ -176,6 +177,55 @@ function Field({
   );
 }
 
+function ImagePicker({
+  preview,
+  onChange,
+  onError,
+}: {
+  preview: string;
+  onChange: (file: File | null, preview: string) => void;
+  onError: (message: string | null) => void;
+}) {
+  return (
+    <div>
+      <input
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        aria-label="Choose image"
+        className="block w-full border border-line bg-transparent px-3 py-2 font-sans text-body-s file:mr-4 file:border-0 file:bg-heritage-green file:px-3 file:py-2 file:font-sans file:text-body-s file:text-ivory"
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+          if (!file) return;
+          if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+            onChange(null, "");
+            onError("Choose a JPEG, PNG, or WebP image.");
+            event.target.value = "";
+            return;
+          }
+          if (file.size > 10 * 1024 * 1024) {
+            onChange(null, "");
+            onError("Images must be 10 MB or smaller.");
+            event.target.value = "";
+            return;
+          }
+          onError(null);
+          onChange(file, URL.createObjectURL(file));
+        }}
+      />
+      {preview && (
+        <img
+          src={preview}
+          alt="Selected image preview"
+          className="mt-3 max-h-48 w-auto max-w-full object-contain"
+        />
+      )}
+      <p className="mt-1.5 font-sans text-meta text-muted">
+        JPEG, PNG, or WebP. Maximum 10 MB.
+      </p>
+    </div>
+  );
+}
+
 function TextAreaField({
   label,
   name,
@@ -233,6 +283,19 @@ export default function AdminQuickActions({
   const [values, setValues] = useState(emptyForm);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [uploadedImage, setUploadedImage] = useState<UploadedMedia | null>(
+    null,
+  );
+  const [imagePreview, setImagePreview] = useState("");
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+
+  useEffect(
+    () => () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+    },
+    [imagePreview],
+  );
 
   const selectedSections =
     sections?.filter(
@@ -249,6 +312,10 @@ export default function AdminQuickActions({
   }
 
   function openForm(kind: CreateContentKind) {
+    setImageFile(null);
+    setUploadedImage(null);
+    setImagePreview("");
+    setUploadProgress(null);
     setValues(emptyForm);
     setError(null);
     setActiveKind(kind);
@@ -257,6 +324,10 @@ export default function AdminQuickActions({
   function closeForm() {
     if (submitting) return;
     setActiveKind(null);
+    setImageFile(null);
+    setUploadedImage(null);
+    setImagePreview("");
+    setUploadProgress(null);
     setValues(emptyForm);
     setError(null);
   }
@@ -281,6 +352,27 @@ export default function AdminQuickActions({
     setError(null);
 
     try {
+      let uploadedImageUrl = "";
+      if (uploadedImage) {
+        uploadedImageUrl = uploadedImage.file_url;
+      } else if (imageFile) {
+        const title =
+          activeKind === "person" || activeKind === "place"
+            ? values.name.trim()
+            : values.title.trim();
+        const media = await uploadAdminImage(
+          imageFile,
+          {
+            title: `${title} image`,
+            mediaType: "image",
+            description: values.description,
+          },
+          setUploadProgress,
+        );
+        setUploadedImage(media);
+        uploadedImageUrl = media.file_url;
+      }
+
       switch (activeKind) {
         case "exhibition":
           await createExhibition({
@@ -291,7 +383,7 @@ export default function AdminQuickActions({
               subtitle: values.subtitle,
               description: values.description,
               endDate: values.endDate,
-              coverImageUrl: values.coverImageUrl,
+              coverImageUrl: uploadedImageUrl || values.coverImageUrl,
             }),
           });
           break;
@@ -304,7 +396,7 @@ export default function AdminQuickActions({
               description: values.description,
               eventDate: values.eventDate,
               dateDisplay: values.dateDisplay,
-              imageUrl: values.imageUrl,
+              imageUrl: uploadedImageUrl || values.imageUrl,
             }),
           });
           break;
@@ -349,7 +441,7 @@ export default function AdminQuickActions({
             content: values.content.trim(),
             ...optionalValues({
               excerpt: values.excerpt,
-              coverImageUrl: values.coverImageUrl,
+              coverImageUrl: uploadedImageUrl || values.coverImageUrl,
             }),
           });
           break;
@@ -366,6 +458,10 @@ export default function AdminQuickActions({
       showToast(label);
       setActiveKind(null);
       setValues(emptyForm);
+      setImageFile(null);
+      setUploadedImage(null);
+      setImagePreview("");
+      setUploadProgress(null);
       await onCreated();
     } catch (submissionError) {
       setError(getErrorMessage(submissionError));
@@ -559,12 +655,19 @@ export default function AdminQuickActions({
                   onChange={(value) => updateValue("subtitle", value)}
                 />
                 <Field
-                  label="Cover image URL"
+                  label="Cover image"
                   name="coverImageUrl"
-                  type="url"
-                  value={values.coverImageUrl}
-                  onChange={(value) => updateValue("coverImageUrl", value)}
-                />
+                >
+                  <ImagePicker
+                    preview={imagePreview || values.coverImageUrl}
+                    onChange={(file, preview) => {
+                      setImageFile(file);
+                      setUploadedImage(null);
+                      setImagePreview(preview);
+                    }}
+                    onError={setError}
+                  />
+                </Field>
               </>
             )}
 
@@ -584,12 +687,19 @@ export default function AdminQuickActions({
                   onChange={(value) => updateValue("dateDisplay", value)}
                 />
                 <Field
-                  label="Image URL"
+                  label="Image"
                   name="imageUrl"
-                  type="url"
-                  value={values.imageUrl}
-                  onChange={(value) => updateValue("imageUrl", value)}
-                />
+                >
+                  <ImagePicker
+                    preview={imagePreview || values.imageUrl}
+                    onChange={(file, preview) => {
+                      setImageFile(file);
+                      setUploadedImage(null);
+                      setImagePreview(preview);
+                    }}
+                    onError={setError}
+                  />
+                </Field>
               </>
             )}
 
@@ -684,12 +794,19 @@ export default function AdminQuickActions({
             {activeKind === "story" && (
               <>
                 <Field
-                  label="Cover image URL"
+                  label="Cover image"
                   name="coverImageUrl"
-                  type="url"
-                  value={values.coverImageUrl}
-                  onChange={(value) => updateValue("coverImageUrl", value)}
-                />
+                >
+                  <ImagePicker
+                    preview={imagePreview || values.coverImageUrl}
+                    onChange={(file, preview) => {
+                      setImageFile(file);
+                      setUploadedImage(null);
+                      setImagePreview(preview);
+                    }}
+                    onError={setError}
+                  />
+                </Field>
                 <Field
                   label="Excerpt"
                   name="excerpt"
@@ -744,6 +861,12 @@ export default function AdminQuickActions({
               </div>
             )}
           </div>
+
+          {uploadProgress !== null && submitting && (
+            <p role="status" className="mt-4 font-sans text-meta text-muted">
+              Uploading image… {uploadProgress}%
+            </p>
+          )}
 
           {error && (
             <p role="alert" className="mt-5 font-sans text-body-s text-error">

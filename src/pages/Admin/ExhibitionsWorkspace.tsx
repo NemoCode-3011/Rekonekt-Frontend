@@ -38,8 +38,8 @@ import { useAuth } from "../../features/auth/auth-context";
 const imageFields: FormField[] = [
   {
     name: "imageUrl",
-    label: "Image URL",
-    hint: "Right-click the picture and choose Copy image address.",
+    label: "Image",
+    kind: "image",
   },
   { name: "imageCredit", label: "Image credit", placeholder: "Photographer or institution" },
   { name: "imageLicense", label: "Image license", placeholder: "For example CC BY-SA 4.0" },
@@ -55,7 +55,7 @@ const eventFields: FormField[] = [
     hint: "Used for ordering and for the big year at the top of the chapter.",
   },
   { name: "description", label: "Description", kind: "textarea" },
-  { name: "imageUrl", label: "Image URL", hint: "Right-click the picture and choose Copy image address." },
+  { name: "imageUrl", label: "Image", kind: "image" },
 ];
 
 const personFields: FormField[] = [
@@ -282,7 +282,8 @@ function ChapterPanel({
               { name: "introduction", label: "Introduction", kind: "textarea", initial: section.introduction ?? "" },
               {
                 name: "heroImageUrl",
-                label: "Hero image URL",
+                label: "Hero image",
+                kind: "image",
                 initial: section.hero_image_url ?? "",
                 hint: "The big picture at the top of this chapter in the experience.",
               },
@@ -543,7 +544,7 @@ export default function ExhibitionWorkspace() {
                 { name: "title", label: "Title", required: true, initial: exhibition.title },
                 { name: "subtitle", label: "Subtitle", initial: exhibition.subtitle ?? "" },
                 { name: "description", label: "Description", kind: "textarea", initial: exhibition.description ?? "" },
-                { name: "coverImageUrl", label: "Cover image URL", initial: exhibition.cover_image_url ?? "" },
+                { name: "coverImageUrl", label: "Cover image", kind: "image", initial: exhibition.cover_image_url ?? "" },
               ]}
               onSubmit={async (values) => {
                 await updateExhibition(exhibition.id, values);
@@ -608,7 +609,7 @@ export default function ExhibitionWorkspace() {
             fields={[
               { name: "title", label: "Title", required: true },
               { name: "introduction", label: "Introduction", kind: "textarea" },
-              { name: "heroImageUrl", label: "Hero image URL", hint: "Optional. You can add it later." },
+              { name: "heroImageUrl", label: "Hero image", kind: "image", hint: "Optional. You can add it later." },
             ]}
             onSubmit={async (values) => {
               await addChapter(exhibition.id, sections.length + 1, values);

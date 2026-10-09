@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
 
 import ExperienceNav from "../../features/experience/components/ExperienceNav";
 import ExperienceGuide from "../../features/experience/components/ExperienceGuide";
@@ -13,12 +13,17 @@ import type { Experience } from "../../features/experience/types";
 import { useChapterDate } from "../../features/experience/useChapterDate";
 import { useProgressSaver } from "../../features/progress/useProgressSaver";
 import NotesWidget from "../../features/notes/noteWidget";
+import SignupGate from "../../features/exhibitions/components/SignupGate";
+import { useAuth } from "../../features/auth/auth-context";
+import { ApiError } from "../../services/api/client";
 
 // Only used when a chapter and its exhibition both have no image set.
 import fallbackImage from "../../assets/hero.png";
 
 function ExperienceDetail() {
   const { slug } = useParams<{ slug: string }>();
+  const { user, loading: authLoading } = useAuth();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [experience, setExperience] = useState<Experience | null>(null);
@@ -26,11 +31,7 @@ function ExperienceDetail() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!slug) {
-      setError("Experience not found.");
-      setLoading(false);
-      return;
-    }
+    if (authLoading || !user || !slug) return;
 
     const experienceSlug = slug;
 
@@ -47,15 +48,19 @@ function ExperienceDetail() {
             (a, b) => a.section_order - b.section_order,
           ),
         });
-      } catch {
-        setError("Unable to load this experience.");
+      } catch (caught) {
+        if (caught instanceof ApiError && caught.status === 401) {
+          setError(caught.code === "SIGNUP_REQUIRED" ? "SIGNUP_REQUIRED" : "SIGNIN_REQUIRED");
+        } else {
+          setError("Unable to load this experience.");
+        }
       } finally {
         setLoading(false);
       }
     }
 
     loadExperience();
-  }, [slug]);
+  }, [slug, user, authLoading]);
 
   // The current chapter lives in the URL (?chapter=<section slug>) so a
   // chapter can be linked to and survives a refresh. Unknown or missing
@@ -79,10 +84,36 @@ function ExperienceDetail() {
   const date = useChapterDate(sections[chapterIndex]?.id);
 
   if (loading) {
+    if (!authLoading && !user) {
+      return (
+        <SignupGate
+          returnTo={location.pathname + location.search}
+          mode="signup"
+        />
+      );
+    }
     return (
       <main className="flex min-h-screen items-center justify-center bg-ink text-white">
         <p className="font-sans text-sm text-white/60">Loading experience...</p>
       </main>
+    );
+  }
+
+  if (!user) {
+    return (
+      <SignupGate
+        returnTo={location.pathname + location.search}
+        mode="signup"
+      />
+    );
+  }
+
+  if (error === "SIGNUP_REQUIRED" || error === "SIGNIN_REQUIRED") {
+    return (
+      <SignupGate
+        returnTo={location.pathname + location.search}
+        mode={error === "SIGNUP_REQUIRED" ? "signup" : "signin"}
+      />
     );
   }
 

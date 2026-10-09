@@ -118,30 +118,34 @@ export default function Team() {
           <h2 className="mb-4 font-display text-heading-s">Add an admin</h2>
 
           <InlineForm
-            submitLabel="Create admin"
+            submitLabel="Send invitation"
             fields={[
               { name: "name", label: "Name", required: true },
               { name: "email", label: "Email", kind: "email", required: true },
               {
-                name: "password",
-                label: "Temporary password",
-                kind: "password",
-                required: true,
-                hint: "At least 8 characters. Share it privately. They can change it in Settings.",
+                name: "preferredLanguage",
+                label: "Preferred language (optional)",
+                kind: "select",
+                options: [
+                  { value: "", label: "Choose later" },
+                  { value: "en", label: "English" },
+                  { value: "yo", label: "Yoruba" },
+                  { value: "ig", label: "Igbo" },
+                  { value: "ha", label: "Hausa" },
+                ],
               },
             ]}
             onSubmit={async (values) => {
-              if (values.password.length < 8) {
-                throw new Error("The password needs at least 8 characters.");
-              }
-
+              const preferredLanguage = (
+                ["en", "yo", "ig", "ha"] as const
+              ).find((language) => language === values.preferredLanguage);
               await createAdmin({
                 name: values.name.trim(),
                 email: values.email.trim().toLowerCase(),
-                password: values.password,
+                ...(preferredLanguage ? { preferredLanguage } : {}),
               });
 
-              showToast("Admin created.");
+              showToast("Invitation sent. The admin can set their password from the email.");
               await load();
             }}
           />

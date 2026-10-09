@@ -18,9 +18,13 @@ export async function getTeam() {
 export function createAdmin(input: {
   name: string;
   email: string;
-  password: string;
+  preferredLanguage?: "en" | "yo" | "ig" | "ha";
 }) {
   return http.post("/admin/admins", input);
+}
+
+export function setupAdminPassword(token: string, password: string) {
+  return http.post("/auth/admin/setup-password", { token, password });
 }
 
 export function revokeAdmin(id: number) {

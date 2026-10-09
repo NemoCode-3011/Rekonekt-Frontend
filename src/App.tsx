@@ -40,6 +40,7 @@ import ExhibitionWorkspace from "./pages/Admin/ExhibitionsWorkspace";
 import Team from "./pages/Admin/Team";
 import AdminSettings from "./pages/Admin/AdminSettings";
 import RequireSuperAdmin from "./features/admin/components/RequireSuperAdmin";
+import AdminSetupPassword from "./pages/Admin/AdminSetupPassword";
 function App() {
   return (
     <DiscoveryProvider>
@@ -86,6 +87,7 @@ function App() {
 
           {/* Admin authentication */}
           <Route path="/admin/login" element={<AdminSignIn />} />
+          <Route path="/admin/setup-password" element={<AdminSetupPassword />} />
 
           {/* Admin */}
           <Route path="/admin" element={<RequireAdmin />}>

@@ -67,7 +67,8 @@ export default function Exhibitions() {
               { name: "description", label: "Description", kind: "textarea" },
               {
                 name: "coverImageUrl",
-                label: "Cover image URL",
+                label: "Cover image",
+                kind: "image",
                 hint: "Optional. You can add it later.",
               },
             ]}

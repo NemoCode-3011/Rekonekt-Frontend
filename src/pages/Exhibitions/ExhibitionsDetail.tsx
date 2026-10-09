@@ -2,7 +2,9 @@ import { useParams } from "react-router-dom";
 import ArrowLink from "../../components/ui/ArrowLink";
 import ChapterList from "../../features/exhibitions/components/ChapterList";
 import ExhibitionHero from "../../features/exhibitions/components/ExhibitionHero";
+import SignupGate from "../../features/exhibitions/components/SignupGate";
 import { useExhibitionDetail } from "../../features/exhibitions/hooks/useExhibitionDetail";
+import { useAuth } from "../../features/auth/auth-context";
 
 function LoadingState() {
   return (
@@ -33,7 +35,8 @@ function MessageState({ title, body }: { title: string; body: string }) {
 
 function ExhibitionDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const state = useExhibitionDetail(slug);
+  const { user, loading } = useAuth();
+  const state = useExhibitionDetail(slug, user, loading);
 
   if (state.status === "loading") return <LoadingState />;
 
@@ -56,11 +59,16 @@ function ExhibitionDetail() {
   }
 
   const { exhibition, sections } = state;
+  const returnTo = `/exhibitions/${exhibition.slug}`;
 
   return (
     <main>
       <ExhibitionHero exhibition={exhibition} chapterCount={sections.length} />
-      <ChapterList experienceSlug={exhibition.slug} sections={sections} />
+      {state.accessRequired ? (
+        <SignupGate returnTo={returnTo} mode={state.accessRequired} />
+      ) : (
+        <ChapterList experienceSlug={exhibition.slug} sections={sections} />
+      )}
     </main>
   );
 }

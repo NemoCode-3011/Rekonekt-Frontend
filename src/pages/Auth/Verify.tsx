@@ -7,7 +7,10 @@ import type { ApiError } from "../../services/api/client";
 
 export default function Verify() {
   const navigate = useNavigate();
-  const stateEmail: string | undefined = useLocation().state?.email;
+  const locationState = useLocation().state as
+    | { email?: string; from?: string }
+    | null;
+  const stateEmail = locationState?.email;
 
   const [email, setEmail] = useState(stateEmail ?? "");
   const [otp, setOtp] = useState("");
@@ -23,7 +26,9 @@ export default function Verify() {
 
     try {
       await verifyOtp(email, otp);
-      navigate("/auth/login", { state: { email, verified: true } });
+      navigate("/auth/login", {
+        state: { email, verified: true, from: locationState?.from },
+      });
     } catch (err) {
       setError((err as ApiError).message);
     } finally {

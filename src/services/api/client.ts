@@ -2,10 +2,12 @@ import axios from "axios";
 
 export class ApiError extends Error {
   status: number;
+  code?: string;
 
-  constructor(status: number, message: string) {
+  constructor(status: number, message: string, code?: string) {
     super(message);
     this.status = status;
+    this.code = code;
   }
 }
 
@@ -41,6 +43,7 @@ http.interceptors.response.use(
     if (axios.isAxiosError(error) && error.response) {
       if (
         error.response.status === 401 &&
+        error.response.data?.code !== "SIGNUP_REQUIRED" &&
         !EXPECTED_401.includes(error.config?.url ?? "")
       ) {
         onSessionExpired?.();
@@ -51,6 +54,7 @@ http.interceptors.response.use(
           error.response.status,
           error.response.data?.message ??
             "Something went wrong. Please try again.",
+          error.response.data?.code,
         ),
       );
     }

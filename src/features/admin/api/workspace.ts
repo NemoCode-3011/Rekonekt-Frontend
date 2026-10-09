@@ -63,18 +63,22 @@ async function attachImage(
 ) {
   if (!values.imageUrl) return;
 
-  const media = await post<{ id: number }>(
-    "/media",
-    clean({
-      title: `${title} image`,
-      mediaType: "image",
-      fileUrl: values.imageUrl,
-      sourceCredit: values.imageCredit,
-      license: values.imageLicense,
-    }),
-  );
+  const mediaId = values.imageMediaId
+    ? Number(values.imageMediaId)
+    : (
+        await post<{ id: number }>(
+          "/media",
+          clean({
+            title: `${title} image`,
+            mediaType: "image",
+            fileUrl: values.imageUrl,
+            sourceCredit: values.imageCredit,
+            license: values.imageLicense,
+          }),
+        )
+      ).id;
 
-  await post("/media-attachment", { mediaId: media.id, ...target, displayOrder: 0 });
+  await post("/media-attachment", { mediaId, ...target, displayOrder: 0 });
 }
 
 // ---------- Reading ----------

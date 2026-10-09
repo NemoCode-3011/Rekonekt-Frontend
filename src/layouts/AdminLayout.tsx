@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
-import AdminSidebar, { useAdminLinks } from "../features/admin/components/AdminSidebar";
+import AdminSidebar from "../features/admin/components/AdminSidebar";
+import { useAdminLinks } from "../features/admin/hooks/useAdminLinks";
 import { useAuth } from "../features/auth/auth-context";
 
 // On small screens the sidebar is replaced by a slim bar with the same links.
@@ -8,13 +9,13 @@ function MobileBar() {
   const { logout } = useAuth();
 
   return (
-    <header className="border-b border-line bg-ivory px-5 py-4 lg:hidden">
+    <header className="border-b border-deep-forest/30 bg-deep-forest px-5 py-4 text-ivory lg:hidden">
       <div className="flex items-center justify-between">
-        <span className="font-display text-2xl tracking-[-0.04em]">REKÒ</span>
+        <span className="font-display text-2xl tracking-[-0.04em] text-ivory">REKÒ</span>
         <button
           type="button"
           onClick={logout}
-          className="font-sans text-meta text-muted underline underline-offset-4"
+          className="font-sans text-meta text-ivory/70 underline underline-offset-4 hover:text-ivory"
         >
           Sign out
         </button>
@@ -27,7 +28,9 @@ function MobileBar() {
             to={link.to}
             className={({ isActive }) =>
               `border-b-2 pb-1 font-sans text-body-s ${
-                isActive ? "border-ochre text-ink" : "border-transparent text-muted"
+                isActive
+                  ? "border-sand text-ivory"
+                  : "border-transparent text-ivory/70 hover:text-ivory"
               }`
             }
           >
