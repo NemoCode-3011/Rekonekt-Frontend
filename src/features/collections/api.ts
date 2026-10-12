@@ -12,20 +12,20 @@ import type {
   ExperiencePerson,
   ExperiencePlace,
 } from "../experience/types";
+import type { DiscoveryRef } from "../experience/discovery/types";
 
 export type CollectionKind = "people" | "events" | "places" | "artifacts";
 
-// One card on a list page. Every kind (person, event, place, artifact) is
-// turned into this same shape, so one page can show all of them.
 export interface CollectionItem {
   id: number;
   title: string;
-  meta: string | null; // the line above the title: years, date, type...
+  ref: DiscoveryRef;
+  meta: string | null;
   description: string | null;
   image: string | null;
-  credit: string | null; // who to thank for the image
+  credit: string | null; 
 
-  // Extra details, used by the "Discover differently" panels on the homepage.
+  // Extra details omo to dey comment get as e be
   year: string | null;
   coordinates: { latitude: string; longitude: string } | null;
   type: string | null;
@@ -34,7 +34,7 @@ export interface CollectionItem {
 }
 
 function makeItem(
-  partial: Pick<CollectionItem, "id" | "title"> & Partial<CollectionItem>,
+  partial: Pick<CollectionItem, "id" | "ref" |"title"> & Partial<CollectionItem>,
 ): CollectionItem {
   return {
     meta: null,
@@ -102,6 +102,7 @@ const loaders: Record<CollectionKind, () => Promise<CollectionItem[]>> = {
         return makeItem({
           id: person.id,
           title: person.name,
+          ref: { kind: "person", slug: person.slug },
           meta: lifeSpan(person.birth_date, person.death_date),
           description: person.description,
           image: image?.file_url ?? null,
@@ -119,6 +120,7 @@ const loaders: Record<CollectionKind, () => Promise<CollectionItem[]>> = {
       makeItem({
         id: event.id,
         title: event.title,
+        ref: { kind: "event", id: event.id },
         meta: event.date_display ?? yearOf(event.event_date),
         description: event.description,
         image: event.image_url,
@@ -139,6 +141,7 @@ const loaders: Record<CollectionKind, () => Promise<CollectionItem[]>> = {
         return makeItem({
           id: place.id,
           title: place.name,
+          ref: { kind: "place", id: place.id },
           meta: coordinates
             ? `${coordinates.latitude}, ${coordinates.longitude}`
             : null,
@@ -163,6 +166,7 @@ const loaders: Record<CollectionKind, () => Promise<CollectionItem[]>> = {
         return makeItem({
           id: artifact.id,
           title: artifact.title,
+          ref: { kind: "artifact", slug: artifact.slug },
           meta:
             [artifact.artifact_type, artifact.date_display]
               .filter(Boolean)

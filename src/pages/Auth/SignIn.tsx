@@ -20,6 +20,7 @@ import {
 import { signIn } from "../../features/auth/api";
 import type { ApiError } from "../../services/api/client";
 import { useAuth } from "../../features/auth/auth-context";
+import GoogleAuthButton from "../../features/auth/components/GoogleAuthButton";
 
 type SignInMode = "visitor" | "admin";
 
@@ -138,27 +139,39 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
 
       {isAdminLogin && (
         <p className="mt-4 flex items-center gap-2 text-body-m text-muted">
-          <ShieldCheck aria-hidden="true" className="size-4 shrink-0 text-heritage-green" />
+          <ShieldCheck
+            aria-hidden="true"
+            className="size-4 shrink-0 text-heritage-green"
+          />
           <span>Admin and super admin accounts only.</span>
         </p>
       )}
 
       {state?.verified && (
-        <p role="status" className="mt-4 flex items-start gap-2 text-body-m text-success">
+        <p
+          role="status"
+          className="mt-4 flex items-start gap-2 text-body-m text-success"
+        >
           <CheckCircle2 aria-hidden="true" className="mt-1 size-4 shrink-0" />
           <span>Email verified. Sign in to continue.</span>
         </p>
       )}
 
       {state?.reset && (
-        <p role="status" className="mt-4 flex items-start gap-2 text-body-m text-success">
+        <p
+          role="status"
+          className="mt-4 flex items-start gap-2 text-body-m text-success"
+        >
           <CheckCircle2 aria-hidden="true" className="mt-1 size-4 shrink-0" />
           <span>Password updated. Sign in with your new password.</span>
         </p>
       )}
 
       {state?.expired && (
-        <p role="status" className="mt-4 flex items-start gap-2 text-body-m text-muted">
+        <p
+          role="status"
+          className="mt-4 flex items-start gap-2 text-body-m text-muted"
+        >
           <Clock3 aria-hidden="true" className="mt-1 size-4 shrink-0" />
           <span>Your session expired. Enter your password to continue.</span>
         </p>
@@ -204,8 +217,14 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
         </div>
 
         {error && (
-          <p role="alert" className="flex items-start gap-2 text-body-s text-error">
-            <CircleAlert aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+          <p
+            role="alert"
+            className="flex items-start gap-2 text-body-s text-error"
+          >
+            <CircleAlert
+              aria-hidden="true"
+              className="mt-0.5 size-4 shrink-0"
+            />
             <span>{error}</span>
           </p>
         )}
@@ -218,7 +237,10 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
         >
           {loading ? (
             <>
-              <LoaderCircle aria-hidden="true" className="mr-2 inline size-4 animate-spin" />
+              <LoaderCircle
+                aria-hidden="true"
+                className="mr-2 inline size-4 animate-spin"
+              />
               Signing in…
             </>
           ) : (
@@ -229,6 +251,15 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
           )}
         </Button>
       </form>
+
+      {!isAdminLogin && (
+        <div className="mt-8">
+          <p className="mb-4 text-center text-body-s text-muted">or</p>
+          <div className="flex justify-center">
+            <GoogleAuthButton />
+          </div>
+        </div>
+      )}
 
       {!isAdminLogin && (
         <p className="mt-8 text-body-s text-muted">

@@ -27,6 +27,7 @@ const EXPECTED_401 = [
   "/auth/forgot-password",
   "/auth/reset-password",
   "/auth/logout",
+  "/auth/google"
 ];
 
 // The app registers what should happen when a session expires.
@@ -41,9 +42,13 @@ http.interceptors.response.use(
   (res) => res,
   (error) => {
     if (axios.isAxiosError(error) && error.response) {
+      const { status, data } = error.response;
+
+      const code: string | undefined = data?.data?.code;
+
       if (
-        error.response.status === 401 &&
-        error.response.data?.code !== "SIGNUP_REQUIRED" &&
+        status === 401 &&
+        code !== "SIGNUP_REQUIRED" &&
         !EXPECTED_401.includes(error.config?.url ?? "")
       ) {
         onSessionExpired?.();
@@ -51,10 +56,9 @@ http.interceptors.response.use(
 
       return Promise.reject(
         new ApiError(
-          error.response.status,
-          error.response.data?.message ??
-            "Something went wrong. Please try again.",
-          error.response.data?.code,
+          status,
+          data?.message ?? "Something went wrong. Please try again.",
+          code,
         ),
       );
     }

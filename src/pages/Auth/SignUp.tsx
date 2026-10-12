@@ -4,6 +4,7 @@ import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import { signUp } from "../../features/auth/api";
 import type { ApiError } from "../../services/api/client";
+import GoogleAuthButton from "../../features/auth/components/GoogleAuthButton";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -26,7 +27,9 @@ export default function SignUp() {
       navigate("/auth/verify", { state: { email: form.email, from } });
     } catch (err) {
       const { status, message } = err as ApiError;
-      setError(status === 409 ? "An account with this email already exists." : message);
+      setError(
+        status === 409 ? "An account with this email already exists." : message,
+      );
     } finally {
       setLoading(false);
     }
@@ -81,9 +84,28 @@ export default function SignUp() {
         </Button>
       </form>
 
+      <div className="mt-8">
+        <div className="relative flex items-center gap-4">
+          <div className="h-px flex-1 bg-border" />
+
+          <span className="text-xs font-medium uppercase tracking-[0.18em] text-muted">
+            Or continue with
+          </span>
+
+          <div className="h-px flex-1 bg-border" />
+        </div>
+
+        <div className="mt-5">
+          <GoogleAuthButton />
+        </div>
+      </div>
+
       <p className="mt-8 text-body-s text-muted">
         Already have an account?{" "}
-        <Link to="/auth/login" className="font-medium text-ink underline underline-offset-4">
+        <Link
+          to="/auth/login"
+          className="font-medium text-ink underline underline-offset-4"
+        >
           Sign in
         </Link>
       </p>

@@ -99,18 +99,24 @@ export interface ChapterContent {
 }
 
 // Everything that belongs to one chapter, drafts included.
-export async function getChapterContent(sectionId: number): Promise<ChapterContent> {
-  const [events, artifacts, people, places, links, sources] = await Promise.all([
-    get<DashboardEvent[]>(`/events/admin?sectionId=${sectionId}`),
-    get<DashboardArtifact[]>(`/artifacts/admin?sectionId=${sectionId}`),
-    get<DashboardPerson[]>(`/admin/sections/${sectionId}/people`),
-    get<DashboardPlace[]>(`/admin/sections/${sectionId}/places`),
-    get<{ source_id: number; section_id: number | null }[]>("/source-links"),
-    get<LinkedSource[]>("/sources"),
-  ]);
+export async function getChapterContent(
+  sectionId: number,
+): Promise<ChapterContent> {
+  const [events, artifacts, people, places, links, sources] = await Promise.all(
+    [
+      get<DashboardEvent[]>(`/events/admin?sectionId=${sectionId}`),
+      get<DashboardArtifact[]>(`/artifacts/admin?sectionId=${sectionId}`),
+      get<DashboardPerson[]>(`/admin/sections/${sectionId}/people`),
+      get<DashboardPlace[]>(`/admin/sections/${sectionId}/places`),
+      get<{ source_id: number; section_id: number | null }[]>("/source-links"),
+      get<LinkedSource[]>("/sources"),
+    ],
+  );
 
   const linked = new Set(
-    links.filter((link) => link.section_id === sectionId).map((link) => link.source_id),
+    links
+      .filter((link) => link.section_id === sectionId)
+      .map((link) => link.source_id),
   );
 
   return {
@@ -156,7 +162,15 @@ export function publishExhibition(id: number) {
   return http.patch(`/exhibitions/${id}/publish`);
 }
 
-export function addChapter(exhibitionId: number, order: number, values: Values) {
+export function unpublishExhibition(id: number) {
+  return http.patch(`/exhibitions/${id}/unpublish`);
+}
+
+export function addChapter(
+  exhibitionId: number,
+  order: number,
+  values: Values,
+) {
   return withSlug(values.title, (slug) =>
     post("/sections", {
       exhibitionId,
@@ -232,7 +246,10 @@ export function addPerson(sectionId: number, values: Values) {
       }),
     );
 
-    await post(`/sections/${sectionId}/people`, { personId: person.id, displayOrder: 0 });
+    await post(`/sections/${sectionId}/people`, {
+      personId: person.id,
+      displayOrder: 0,
+    });
     await attachImage(values, values.name, { personId: person.id });
     return person;
   });
@@ -245,7 +262,9 @@ export async function addPlace(sectionId: number, values: Values) {
   );
 
   if (!match) {
-    throw new Error("Enter coordinates like 6.3350, 5.6037 (copy them from Google Maps).");
+    throw new Error(
+      "Enter coordinates like 6.3350, 5.6037 (copy them from Google Maps).",
+    );
   }
 
   const place = await post<{ id: number }>("/places", {
@@ -254,13 +273,20 @@ export async function addPlace(sectionId: number, values: Values) {
     ...clean({ name: values.name.trim(), description: values.description }),
   });
 
-  await post(`/sections/${sectionId}/places`, { placeId: place.id, displayOrder: 0 });
+  await post(`/sections/${sectionId}/places`, {
+    placeId: place.id,
+    displayOrder: 0,
+  });
   await attachImage(values, values.name, { placeId: place.id });
   return place;
 }
 
 // Attach a person or place that already exists.
-export function linkExisting(kind: "people" | "places", sectionId: number, id: number) {
+export function linkExisting(
+  kind: "people" | "places",
+  sectionId: number,
+  id: number,
+) {
   return post(`/sections/${sectionId}/${kind}`, {
     [kind === "people" ? "personId" : "placeId"]: id,
     displayOrder: 0,

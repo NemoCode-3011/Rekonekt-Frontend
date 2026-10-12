@@ -2,7 +2,9 @@ import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import AdminPageHeader from "../../features/admin/components/AdminPageHeader";
-import InlineForm, { type FormField } from "../../features/admin/components/InlineForm";
+import InlineForm, {
+  type FormField,
+} from "../../features/admin/components/InlineForm";
 import {
   getAdminExhibitions,
   getAdminPeople,
@@ -22,6 +24,7 @@ import {
   setPublished,
   updateChapter,
   updateExhibition,
+  unpublishExhibition,
   type ChapterContent,
   type PublishKind,
 } from "../../features/admin/api/workspace";
@@ -41,13 +44,25 @@ const imageFields: FormField[] = [
     label: "Image",
     kind: "image",
   },
-  { name: "imageCredit", label: "Image credit", placeholder: "Photographer or institution" },
-  { name: "imageLicense", label: "Image license", placeholder: "For example CC BY-SA 4.0" },
+  {
+    name: "imageCredit",
+    label: "Image credit",
+    placeholder: "Photographer or institution",
+  },
+  {
+    name: "imageLicense",
+    label: "Image license",
+    placeholder: "For example CC BY-SA 4.0",
+  },
 ];
 
 const eventFields: FormField[] = [
   { name: "title", label: "Title", required: true },
-  { name: "dateDisplay", label: "Date as readers see it", placeholder: "4 January 1897" },
+  {
+    name: "dateDisplay",
+    label: "Date as readers see it",
+    placeholder: "4 January 1897",
+  },
   {
     name: "eventDate",
     label: "Exact date",
@@ -86,9 +101,14 @@ const sourceFields: FormField[] = [
     label: "Type",
     kind: "select",
     initial: "Website",
-    options: ["Book", "Article", "Website", "Archive document", "Museum page", "Other"].map(
-      (value) => ({ value, label: value }),
-    ),
+    options: [
+      "Book",
+      "Article",
+      "Website",
+      "Archive document",
+      "Museum page",
+      "Other",
+    ].map((value) => ({ value, label: value })),
   },
   { name: "publication", label: "Publication or publisher" },
   { name: "url", label: "Link" },
@@ -147,13 +167,19 @@ function Row({
     <li className="flex items-center justify-between gap-4 py-3">
       <div className="min-w-0">
         <p className="truncate font-sans text-body-s text-ink">{title}</p>
-        {meta && <p className="truncate font-sans text-meta text-muted">{meta}</p>}
+        {meta && (
+          <p className="truncate font-sans text-meta text-muted">{meta}</p>
+        )}
       </div>
 
       <div className="flex shrink-0 items-center gap-3">
         {status && <StatusChip status={status} />}
         {onToggle && (
-          <button type="button" onClick={onToggle} className={`${textButton} text-meta`}>
+          <button
+            type="button"
+            onClick={onToggle}
+            className={`${textButton} text-meta`}
+          >
             {status === "published" ? "Unpublish" : "Publish"}
           </button>
         )}
@@ -217,7 +243,10 @@ function ChapterPanel({
       await setPublished(kind, id, status !== "published");
       await load();
     } catch (error) {
-      showToast(error instanceof Error ? error.message : "Couldn't change that.", "error");
+      showToast(
+        error instanceof Error ? error.message : "Couldn't change that.",
+        "error",
+      );
     }
   }
 
@@ -226,22 +255,36 @@ function ChapterPanel({
 
     const drafts = [
       ...content.events.map((item) => ({ ...item, kind: "events" as const })),
-      ...content.artifacts.map((item) => ({ ...item, kind: "artifacts" as const })),
+      ...content.artifacts.map((item) => ({
+        ...item,
+        kind: "artifacts" as const,
+      })),
       ...content.people.map((item) => ({ ...item, kind: "people" as const })),
       ...content.places.map((item) => ({ ...item, kind: "places" as const })),
     ].filter((item) => item.status !== "published");
 
     try {
-      await Promise.all(drafts.map((item) => setPublished(item.kind, item.id, true)));
+      await Promise.all(
+        drafts.map((item) => setPublished(item.kind, item.id, true)),
+      );
       await load();
-      showToast(`Published ${drafts.length} item${drafts.length === 1 ? "" : "s"}.`);
+      showToast(
+        `Published ${drafts.length} item${drafts.length === 1 ? "" : "s"}.`,
+      );
     } catch (error) {
-      showToast(error instanceof Error ? error.message : "Couldn't publish.", "error");
+      showToast(
+        error instanceof Error ? error.message : "Couldn't publish.",
+        "error",
+      );
     }
   }
 
   if (!content) {
-    return <p className="px-1 py-6 font-sans text-body-s text-muted">Loading chapter…</p>;
+    return (
+      <p className="px-1 py-6 font-sans text-body-s text-muted">
+        Loading chapter…
+      </p>
+    );
   }
 
   const draftCount = [
@@ -251,8 +294,12 @@ function ChapterPanel({
     ...content.places,
   ].filter((item) => item.status !== "published").length;
 
-  const freePeople = people.filter((p) => !content.people.some((c) => c.id === p.id));
-  const freePlaces = places.filter((p) => !content.places.some((c) => c.id === p.id));
+  const freePeople = people.filter(
+    (p) => !content.people.some((c) => c.id === p.id),
+  );
+  const freePlaces = places.filter(
+    (p) => !content.places.some((c) => c.id === p.id),
+  );
 
   const cancel = () => setMode(null);
 
@@ -260,13 +307,18 @@ function ChapterPanel({
     <div className="divide-y divide-line">
       {/* Chapter details */}
       <div className="flex flex-wrap items-center justify-between gap-4 py-5">
-        <button type="button" onClick={() => setMode(mode === "edit" ? null : "edit")} className={textButton}>
+        <button
+          type="button"
+          onClick={() => setMode(mode === "edit" ? null : "edit")}
+          className={textButton}
+        >
           {mode === "edit" ? "Close" : "Edit chapter details"}
         </button>
 
         {draftCount > 0 && (
           <button type="button" onClick={publishDrafts} className={textButton}>
-            Publish {draftCount} draft{draftCount === 1 ? "" : "s"} in this chapter
+            Publish {draftCount} draft{draftCount === 1 ? "" : "s"} in this
+            chapter
           </button>
         )}
       </div>
@@ -278,8 +330,18 @@ function ChapterPanel({
             submitLabel="Save chapter"
             onCancel={cancel}
             fields={[
-              { name: "title", label: "Title", required: true, initial: section.title },
-              { name: "introduction", label: "Introduction", kind: "textarea", initial: section.introduction ?? "" },
+              {
+                name: "title",
+                label: "Title",
+                required: true,
+                initial: section.title,
+              },
+              {
+                name: "introduction",
+                label: "Introduction",
+                kind: "textarea",
+                initial: section.introduction ?? "",
+              },
               {
                 name: "heroImageUrl",
                 label: "Hero image",
@@ -302,15 +364,34 @@ function ChapterPanel({
       <Group title="Events" count={content.events.length}>
         <ul className="divide-y divide-line">
           {content.events.map((item) => (
-            <Row key={item.id} title={item.title} meta={item.date_display} status={item.status} onToggle={() => toggle("events", item.id, item.status)} />
+            <Row
+              key={item.id}
+              title={item.title}
+              meta={item.date_display}
+              status={item.status}
+              onToggle={() => toggle("events", item.id, item.status)}
+            />
           ))}
         </ul>
         {mode === "event" ? (
           <div className="mt-3">
-            <InlineForm fields={eventFields} submitLabel="Add event" onCancel={cancel} onSubmit={(v) => run(() => addEvent(section.id, v), "Event added.")} />
+            <InlineForm
+              fields={eventFields}
+              submitLabel="Add event"
+              onCancel={cancel}
+              onSubmit={(v) =>
+                run(() => addEvent(section.id, v), "Event added.")
+              }
+            />
           </div>
         ) : (
-          <button type="button" onClick={() => setMode("event")} className={`${textButton} mt-3`}>+ Add event</button>
+          <button
+            type="button"
+            onClick={() => setMode("event")}
+            className={`${textButton} mt-3`}
+          >
+            + Add event
+          </button>
         )}
       </Group>
 
@@ -318,7 +399,13 @@ function ChapterPanel({
       <Group title="Artifacts" count={content.artifacts.length}>
         <ul className="divide-y divide-line">
           {content.artifacts.map((item) => (
-            <Row key={item.id} title={item.title} meta={item.artifact_type} status={item.status} onToggle={() => toggle("artifacts", item.id, item.status)} />
+            <Row
+              key={item.id}
+              title={item.title}
+              meta={item.artifact_type}
+              status={item.status}
+              onToggle={() => toggle("artifacts", item.id, item.status)}
+            />
           ))}
         </ul>
         {mode === "artifact" ? (
@@ -328,22 +415,41 @@ function ChapterPanel({
               onCancel={cancel}
               fields={[
                 { name: "title", label: "Title", required: true },
-                { name: "artifactType", label: "Type", required: true, placeholder: "Photograph, document, brass plaque" },
+                {
+                  name: "artifactType",
+                  label: "Type",
+                  required: true,
+                  placeholder: "Photograph, document, brass plaque",
+                },
                 { name: "dateDisplay", label: "Date as readers see it" },
                 {
                   name: "placeId",
                   label: "Place",
                   kind: "select",
-                  options: [{ value: "", label: "No place" }, ...places.map((p) => ({ value: String(p.id), label: p.name }))],
+                  options: [
+                    { value: "", label: "No place" },
+                    ...places.map((p) => ({
+                      value: String(p.id),
+                      label: p.name,
+                    })),
+                  ],
                 },
                 { name: "description", label: "Description", kind: "textarea" },
                 ...imageFields,
               ]}
-              onSubmit={(v) => run(() => addArtifact(section.id, v), "Artifact added.")}
+              onSubmit={(v) =>
+                run(() => addArtifact(section.id, v), "Artifact added.")
+              }
             />
           </div>
         ) : (
-          <button type="button" onClick={() => setMode("artifact")} className={`${textButton} mt-3`}>+ Add artifact</button>
+          <button
+            type="button"
+            onClick={() => setMode("artifact")}
+            className={`${textButton} mt-3`}
+          >
+            + Add artifact
+          </button>
         )}
       </Group>
 
@@ -351,12 +457,27 @@ function ChapterPanel({
       <Group title="People" count={content.people.length}>
         <ul className="divide-y divide-line">
           {content.people.map((item) => (
-            <Row key={item.id} title={item.name} status={item.status} onToggle={() => toggle("people", item.id, item.status)} />
+            <Row
+              key={item.id}
+              title={item.name}
+              status={item.status}
+              onToggle={() => toggle("people", item.id, item.status)}
+            />
           ))}
         </ul>
         {mode === "person-new" && (
           <div className="mt-3">
-            <InlineForm fields={personFields} submitLabel="Add person" onCancel={cancel} onSubmit={(v) => run(async () => { await addPerson(section.id, v); onLibraryChanged(); }, "Person added.")} />
+            <InlineForm
+              fields={personFields}
+              submitLabel="Add person"
+              onCancel={cancel}
+              onSubmit={(v) =>
+                run(async () => {
+                  await addPerson(section.id, v);
+                  onLibraryChanged();
+                }, "Person added.")
+              }
+            />
           </div>
         )}
         {mode === "person-existing" && (
@@ -364,16 +485,47 @@ function ChapterPanel({
             <InlineForm
               submitLabel="Add to chapter"
               onCancel={cancel}
-              fields={[{ name: "id", label: "Person", kind: "select", required: true, options: [{ value: "", label: "Choose…" }, ...freePeople.map((p) => ({ value: String(p.id), label: p.name }))] }]}
-              onSubmit={(v) => run(() => linkExisting("people", section.id, Number(v.id)), "Person added.")}
+              fields={[
+                {
+                  name: "id",
+                  label: "Person",
+                  kind: "select",
+                  required: true,
+                  options: [
+                    { value: "", label: "Choose…" },
+                    ...freePeople.map((p) => ({
+                      value: String(p.id),
+                      label: p.name,
+                    })),
+                  ],
+                },
+              ]}
+              onSubmit={(v) =>
+                run(
+                  () => linkExisting("people", section.id, Number(v.id)),
+                  "Person added.",
+                )
+              }
             />
           </div>
         )}
         {mode !== "person-new" && mode !== "person-existing" && (
           <div className="mt-3 flex gap-6">
-            <button type="button" onClick={() => setMode("person-new")} className={textButton}>+ New person</button>
+            <button
+              type="button"
+              onClick={() => setMode("person-new")}
+              className={textButton}
+            >
+              + New person
+            </button>
             {freePeople.length > 0 && (
-              <button type="button" onClick={() => setMode("person-existing")} className={textButton}>+ Existing person</button>
+              <button
+                type="button"
+                onClick={() => setMode("person-existing")}
+                className={textButton}
+              >
+                + Existing person
+              </button>
             )}
           </div>
         )}
@@ -383,12 +535,27 @@ function ChapterPanel({
       <Group title="Places" count={content.places.length}>
         <ul className="divide-y divide-line">
           {content.places.map((item) => (
-            <Row key={item.id} title={item.name} status={item.status} onToggle={() => toggle("places", item.id, item.status)} />
+            <Row
+              key={item.id}
+              title={item.name}
+              status={item.status}
+              onToggle={() => toggle("places", item.id, item.status)}
+            />
           ))}
         </ul>
         {mode === "place-new" && (
           <div className="mt-3">
-            <InlineForm fields={placeFields} submitLabel="Add place" onCancel={cancel} onSubmit={(v) => run(async () => { await addPlace(section.id, v); onLibraryChanged(); }, "Place added.")} />
+            <InlineForm
+              fields={placeFields}
+              submitLabel="Add place"
+              onCancel={cancel}
+              onSubmit={(v) =>
+                run(async () => {
+                  await addPlace(section.id, v);
+                  onLibraryChanged();
+                }, "Place added.")
+              }
+            />
           </div>
         )}
         {mode === "place-existing" && (
@@ -396,16 +563,47 @@ function ChapterPanel({
             <InlineForm
               submitLabel="Add to chapter"
               onCancel={cancel}
-              fields={[{ name: "id", label: "Place", kind: "select", required: true, options: [{ value: "", label: "Choose…" }, ...freePlaces.map((p) => ({ value: String(p.id), label: p.name }))] }]}
-              onSubmit={(v) => run(() => linkExisting("places", section.id, Number(v.id)), "Place added.")}
+              fields={[
+                {
+                  name: "id",
+                  label: "Place",
+                  kind: "select",
+                  required: true,
+                  options: [
+                    { value: "", label: "Choose…" },
+                    ...freePlaces.map((p) => ({
+                      value: String(p.id),
+                      label: p.name,
+                    })),
+                  ],
+                },
+              ]}
+              onSubmit={(v) =>
+                run(
+                  () => linkExisting("places", section.id, Number(v.id)),
+                  "Place added.",
+                )
+              }
             />
           </div>
         )}
         {mode !== "place-new" && mode !== "place-existing" && (
           <div className="mt-3 flex gap-6">
-            <button type="button" onClick={() => setMode("place-new")} className={textButton}>+ New place</button>
+            <button
+              type="button"
+              onClick={() => setMode("place-new")}
+              className={textButton}
+            >
+              + New place
+            </button>
             {freePlaces.length > 0 && (
-              <button type="button" onClick={() => setMode("place-existing")} className={textButton}>+ Existing place</button>
+              <button
+                type="button"
+                onClick={() => setMode("place-existing")}
+                className={textButton}
+              >
+                + Existing place
+              </button>
             )}
           </div>
         )}
@@ -420,10 +618,23 @@ function ChapterPanel({
         </ul>
         {mode === "source" ? (
           <div className="mt-3">
-            <InlineForm fields={sourceFields} submitLabel="Add source" onCancel={cancel} onSubmit={(v) => run(() => addSource(section.id, v), "Source added.")} />
+            <InlineForm
+              fields={sourceFields}
+              submitLabel="Add source"
+              onCancel={cancel}
+              onSubmit={(v) =>
+                run(() => addSource(section.id, v), "Source added.")
+              }
+            />
           </div>
         ) : (
-          <button type="button" onClick={() => setMode("source")} className={`${textButton} mt-3`}>+ Add source</button>
+          <button
+            type="button"
+            onClick={() => setMode("source")}
+            className={`${textButton} mt-3`}
+          >
+            + Add source
+          </button>
         )}
       </Group>
     </div>
@@ -437,18 +648,23 @@ export default function ExhibitionWorkspace() {
   const exhibitionId = Number(id);
   const { showToast } = useAuth();
 
-  const [exhibition, setExhibition] = useState<DashboardExhibitionResponseItem | null>(null);
+  const [exhibition, setExhibition] =
+    useState<DashboardExhibitionResponseItem | null>(null);
   const [sections, setSections] = useState<DashboardSection[]>([]);
   const [people, setPeople] = useState<DashboardPerson[]>([]);
   const [places, setPlaces] = useState<DashboardPlace[]>([]);
-  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [status, setStatus] = useState<"loading" | "ready" | "error">(
+    "loading",
+  );
   const [openId, setOpenId] = useState<number | null>(null);
   const [editing, setEditing] = useState(false);
   const [addingChapter, setAddingChapter] = useState(false);
 
   const loadExhibition = useCallback(async () => {
     const all = await getAdminExhibitions();
-    setExhibition(all.exhibitions.find((item) => item.id === exhibitionId) ?? null);
+    setExhibition(
+      all.exhibitions.find((item) => item.id === exhibitionId) ?? null,
+    );
   }, [exhibitionId]);
 
   const loadSections = useCallback(async () => {
@@ -469,14 +685,21 @@ export default function ExhibitionWorkspace() {
   }, [loadExhibition, loadSections, loadLibrary]);
 
   if (status === "loading") {
-    return <p className="px-8 py-12 font-sans text-body-s text-muted">Loading…</p>;
+    return (
+      <p className="px-8 py-12 font-sans text-body-s text-muted">Loading…</p>
+    );
   }
 
   if (status === "error" || !exhibition) {
     return (
       <div className="mx-auto max-w-5xl px-5 py-12 md:px-8">
-        <p className="font-sans text-body-m text-muted">We couldn't find this exhibition.</p>
-        <Link to="/admin/exhibitions" className={`${textButton} mt-4 inline-block`}>
+        <p className="font-sans text-body-m text-muted">
+          We couldn't find this exhibition.
+        </p>
+        <Link
+          to="/admin/exhibitions"
+          className={`${textButton} mt-4 inline-block`}
+        >
           Back to exhibitions
         </Link>
       </div>
@@ -487,7 +710,10 @@ export default function ExhibitionWorkspace() {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-5 py-8 md:px-8 md:py-12">
-      <Link to="/admin/exhibitions" className="font-sans text-body-s text-muted hover:text-ink">
+      <Link
+        to="/admin/exhibitions"
+        className="font-sans text-body-s text-muted hover:text-ink"
+      >
         ← Exhibitions
       </Link>
 
@@ -499,9 +725,40 @@ export default function ExhibitionWorkspace() {
             published ? (
               <div className="flex items-center gap-5">
                 <StatusChip status="published" />
-                <Link to={`/experiences/${exhibition.slug}`} className={textButton}>
+                <Link
+                  to={`/experiences/${exhibition.slug}`}
+                  className={textButton}
+                >
                   Open experience
                 </Link>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (
+                      !window.confirm(
+                        "Unpublish this exhibition? Visitors will no longer see it or anything inside it.",
+                      )
+                    ) {
+                      return;
+                    }
+
+                    try {
+                      await unpublishExhibition(exhibition.id);
+                      await loadExhibition();
+                      showToast("Exhibition unpublished.");
+                    } catch (error) {
+                      showToast(
+                        error instanceof Error
+                          ? error.message
+                          : "Couldn't unpublish.",
+                        "error",
+                      );
+                    }
+                  }}
+                  className={textButton}
+                >
+                  Unpublish
+                </button>
               </div>
             ) : (
               <button
@@ -512,7 +769,12 @@ export default function ExhibitionWorkspace() {
                     await loadExhibition();
                     showToast("Exhibition published.");
                   } catch (error) {
-                    showToast(error instanceof Error ? error.message : "Couldn't publish.", "error");
+                    showToast(
+                      error instanceof Error
+                        ? error.message
+                        : "Couldn't publish.",
+                      "error",
+                    );
                   }
                 }}
                 className="h-11 bg-heritage-green px-6 font-sans text-body-s font-medium text-ivory transition-colors hover:bg-deep-forest"
@@ -525,12 +787,17 @@ export default function ExhibitionWorkspace() {
       </div>
 
       <p className="mt-4 max-w-2xl font-sans text-body-s text-muted">
-        Visitors only see items that are published, inside a published exhibition.
+        Visitors only see items that are published, inside a published
+        exhibition.
       </p>
 
       {/* Exhibition details */}
       <div className="mt-6">
-        <button type="button" onClick={() => setEditing(!editing)} className={textButton}>
+        <button
+          type="button"
+          onClick={() => setEditing(!editing)}
+          className={textButton}
+        >
           {editing ? "Close" : "Edit exhibition details"}
         </button>
 
@@ -541,10 +808,29 @@ export default function ExhibitionWorkspace() {
               submitLabel="Save details"
               onCancel={() => setEditing(false)}
               fields={[
-                { name: "title", label: "Title", required: true, initial: exhibition.title },
-                { name: "subtitle", label: "Subtitle", initial: exhibition.subtitle ?? "" },
-                { name: "description", label: "Description", kind: "textarea", initial: exhibition.description ?? "" },
-                { name: "coverImageUrl", label: "Cover image", kind: "image", initial: exhibition.cover_image_url ?? "" },
+                {
+                  name: "title",
+                  label: "Title",
+                  required: true,
+                  initial: exhibition.title,
+                },
+                {
+                  name: "subtitle",
+                  label: "Subtitle",
+                  initial: exhibition.subtitle ?? "",
+                },
+                {
+                  name: "description",
+                  label: "Description",
+                  kind: "textarea",
+                  initial: exhibition.description ?? "",
+                },
+                {
+                  name: "coverImageUrl",
+                  label: "Cover image",
+                  kind: "image",
+                  initial: exhibition.cover_image_url ?? "",
+                },
               ]}
               onSubmit={async (values) => {
                 await updateExhibition(exhibition.id, values);
@@ -571,7 +857,9 @@ export default function ExhibitionWorkspace() {
           <li key={section.id}>
             <button
               type="button"
-              onClick={() => setOpenId(openId === section.id ? null : section.id)}
+              onClick={() =>
+                setOpenId(openId === section.id ? null : section.id)
+              }
               aria-expanded={openId === section.id}
               className="flex w-full items-center justify-between gap-4 py-5 text-left transition-colors hover:bg-heritage-green/5"
             >
@@ -579,7 +867,9 @@ export default function ExhibitionWorkspace() {
                 <span className="font-display text-heading-s text-ochre">
                   {String(index + 1).padStart(2, "0")}
                 </span>
-                <span className="font-display text-heading-s">{section.title}</span>
+                <span className="font-display text-heading-s">
+                  {section.title}
+                </span>
               </span>
               <span aria-hidden className="text-muted">
                 {openId === section.id ? "−" : "+"}
@@ -609,7 +899,12 @@ export default function ExhibitionWorkspace() {
             fields={[
               { name: "title", label: "Title", required: true },
               { name: "introduction", label: "Introduction", kind: "textarea" },
-              { name: "heroImageUrl", label: "Hero image", kind: "image", hint: "Optional. You can add it later." },
+              {
+                name: "heroImageUrl",
+                label: "Hero image",
+                kind: "image",
+                hint: "Optional. You can add it later.",
+              },
             ]}
             onSubmit={async (values) => {
               await addChapter(exhibition.id, sections.length + 1, values);
@@ -619,7 +914,11 @@ export default function ExhibitionWorkspace() {
             }}
           />
         ) : (
-          <button type="button" onClick={() => setAddingChapter(true)} className={textButton}>
+          <button
+            type="button"
+            onClick={() => setAddingChapter(true)}
+            className={textButton}
+          >
             + Add chapter
           </button>
         )}
