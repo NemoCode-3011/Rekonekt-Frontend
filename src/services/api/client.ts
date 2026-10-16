@@ -27,7 +27,7 @@ const EXPECTED_401 = [
   "/auth/forgot-password",
   "/auth/reset-password",
   "/auth/logout",
-  "/auth/google"
+  "/auth/google",
 ];
 
 // The app registers what should happen when a session expires.
@@ -46,11 +46,7 @@ http.interceptors.response.use(
 
       const code: string | undefined = data?.data?.code;
 
-      if (
-        status === 401 &&
-        code !== "SIGNUP_REQUIRED" &&
-        !EXPECTED_401.includes(error.config?.url ?? "")
-      ) {
+      if (status === 401 && !EXPECTED_401.includes(error.config?.url ?? "")) {
         onSessionExpired?.();
       }
 

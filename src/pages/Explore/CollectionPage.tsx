@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { useLocation } from "react-router-dom";
 
 import {
   getCollection,
   type CollectionItem,
   type CollectionKind,
 } from "../../features/collections/api";
-import SignupGate from "../../features/exhibitions/components/SignupGate";
 import { useDiscovery } from "../../features/experience/discovery/discovery-context";
-import { ApiError } from "../../services/api/client";
 
 // The words that change between the four pages.
 const copy: Record<
@@ -128,13 +125,11 @@ export default function CollectionPage({ kind }: { kind: CollectionKind }) {
   const words = copy[kind];
 
   const { openRef } = useDiscovery();
-  const location = useLocation();
 
   const [items, setItems] = useState<CollectionItem[]>([]);
-  const [status, setStatus] = useState<"loading" | "ready" | "error" | "login">(
+  const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading",
   );
-  const [loginMode, setLoginMode] = useState<"signup" | "signin">("signup");
   const [query, setQuery] = useState("");
 
   // Runs again when the visitor moves between People, Events, Places and
@@ -152,17 +147,8 @@ export default function CollectionPage({ kind }: { kind: CollectionKind }) {
         setItems(data);
         setStatus("ready");
       })
-      .catch((error) => {
-        if (cancelled) return;
-
-        // 401 means the login wall
-        if (error instanceof ApiError && error.status === 401) {
-          setLoginMode(error.code === "SIGNUP_REQUIRED" ? "signup" : "signin");
-          setStatus("login");
-          return;
-        }
-
-        setStatus("error");
+      .catch(() => {
+        if (!cancelled) setStatus("error");
       });
 
     return () => {
@@ -210,10 +196,6 @@ export default function CollectionPage({ kind }: { kind: CollectionKind }) {
         <div className="container">
           {status === "loading" && (
             <p className="text-body-m text-muted">Loading…</p>
-          )}
-
-          {status === "login" && (
-            <SignupGate returnTo={location.pathname} mode={loginMode} />
           )}
 
           {status === "error" && (

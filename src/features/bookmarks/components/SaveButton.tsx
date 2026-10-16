@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth/auth-context";
+import SignInPrompt from "../../auth/components/Signinprompt";
 import { useBookmarks } from "../bookmarks-context";
 
 interface SaveButtonProps {
@@ -27,12 +27,13 @@ function BookmarkIcon({ saved }: { saved: boolean }) {
   );
 }
 
-// Visitors who aren't signed in are invited to sign in and return to this page.
+// Visitors who aren't signed in get a small prompt to create an account or
+// sign in, and come back to this same page afterwards.
 function SaveButton({ artifactId, tone }: SaveButtonProps) {
   const { user } = useAuth();
   const { isSaved, toggle, status } = useBookmarks();
-  const location = useLocation();
   const [busy, setBusy] = useState(false);
+  const [promptOpen, setPromptOpen] = useState(false);
 
   const colors =
     tone === "dark"
@@ -42,15 +43,26 @@ function SaveButton({ artifactId, tone }: SaveButtonProps) {
 
   if (!user) {
     return (
-      <Link
-        to="/auth/login"
-        state={{ from: location.pathname + location.search }}
-        className={style}
-        aria-label="Sign in to bookmark this object"
-        title="Sign in to bookmark"
-      >
-        <BookmarkIcon saved={false} />
-      </Link>
+      <>
+        <button
+          type="button"
+          onClick={() => setPromptOpen(true)}
+          aria-haspopup="dialog"
+          className={style}
+          aria-label="Bookmark this object"
+          title="Bookmark this object"
+        >
+          <BookmarkIcon saved={false} />
+        </button>
+
+        {promptOpen && (
+          <SignInPrompt
+            title="Sign in to save this."
+            body="Create a free account to bookmark stories and objects and find them later."
+            onClose={() => setPromptOpen(false)}
+          />
+        )}
+      </>
     );
   }
 

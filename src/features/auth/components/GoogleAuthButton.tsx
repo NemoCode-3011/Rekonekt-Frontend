@@ -2,11 +2,11 @@ import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import { useLocation, useNavigate } from "react-router-dom";
 import { googleSignIn } from "../api";
 import { useAuth } from "../auth-context";
-import { saveLastUser } from "../lastUser";
+import { ApiError } from "../../../services/api/client";
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
 
-export default function GoogleAuthButton() {
+export default function GoogleAuthButton({ mode }: { mode: "signin" | "signup" }) {
   const navigate = useNavigate();
   const { setUser, showToast } = useAuth();
   const from = (useLocation().state as { from?: string } | null)?.from;
@@ -14,22 +14,21 @@ export default function GoogleAuthButton() {
   // No client ID set up yet: show nothing instead of a broken button.
   if (!clientId) return null;
 
-  function failed() {
-    showToast("Google sign-in failed. Please try again.", "error");
+  function failed(message = "Google sign-in failed. Please try again.") {
+    showToast(message, "error");
   }
 
   async function handleSuccess(credential?: string) {
     if (!credential) return failed();
 
     try {
-      const user = await googleSignIn(credential);
+      const user = await googleSignIn(credential, mode);
 
       setUser(user);
-      saveLastUser({ name: user.name, email: user.email });
       showToast("You're signed in.");
       navigate(from ?? "/", { replace: true });
-    } catch {
-      failed();
+    } catch (err) {
+      failed(err instanceof ApiError ? err.message : undefined);
     }
   }
 

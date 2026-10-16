@@ -96,7 +96,7 @@ export default function SignUp() {
         </div>
 
         <div className="mt-5">
-          <GoogleAuthButton />
+          <GoogleAuthButton mode="signup"/>
         </div>
       </div>
 

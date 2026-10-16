@@ -1,28 +1,38 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 import heroImage from "../../assets/images/hero/lekki-bridge.jpg";
+import { useSplash } from "../../components/splash/splash-context";
 
 const FOCUS = "object-[58%_60%]";
 
 const ease = [0.76, 0, 0.24, 1] as const;
+const CLOSED = "inset(18% 22% 18% 22%)";
+const OPEN = "inset(0% 0% 0% 0%)";
 
 export default function Hero() {
   const reduce = useReducedMotion();
+  const { introDone, markHomeReady } = useSplash();
+  const open = reduce || introDone;
 
   return (
     <section className="relative h-dvh min-h-[600px] overflow-hidden bg-ink">
       <motion.div
         className="absolute inset-0"
-        initial={reduce ? false : { clipPath: "inset(18% 22% 18% 22%)" }}
-        animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
+        initial={reduce ? false : { clipPath: CLOSED }}
+        animate={{ clipPath: open ? OPEN : CLOSED }}
         transition={{ duration: 1.6, ease }}
       >
         <motion.img
           src={heroImage}
           alt=""
           className={`h-full w-full object-cover ${FOCUS}`}
+          ref={(el) => {
+            if (el?.complete) markHomeReady();
+          }}
+          onLoad={markHomeReady}
+          onError={markHomeReady}
           initial={reduce ? false : { scale: 1.1 }}
-          animate={{ scale: 1 }}
+          animate={{ scale: open ? 1 : 1.1 }}
           transition={{ duration: 2.4, ease }}
         />
 
@@ -52,7 +62,7 @@ export default function Hero() {
           <motion.h1
             className="font-display text-display-xl leading-[0.95] text-ivory"
             initial={reduce ? false : { y: "105%" }}
-            animate={{ y: 0 }}
+            animate={{ y: open ? 0 : "105%" }}
             transition={{ duration: 1, ease, delay: 0.9 }}
           >
             <span className="block">Know Your Roots.</span>
@@ -62,7 +72,7 @@ export default function Hero() {
 
         <motion.div
           initial={reduce ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
+          animate={{ opacity: open ? 1 : 0 }}
           transition={{ duration: 0.8, delay: 1.7 }}
         >
           <p className="mt-6 max-w-xl text-body-l text-ivory/85">

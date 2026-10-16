@@ -4,7 +4,6 @@ import { getExhibitionBySlug } from "../api/exhibitions";
 import { getSectionsByExhibition } from "../api/sections";
 import type { Exhibition } from "../types/exhibitions";
 import type { Section } from "../types/sections";
-import type { User } from "../../auth/types";
 
 type Settled =
   | { status: "not-found" }
@@ -13,12 +12,11 @@ type Settled =
       status: "ready";
       exhibition: Exhibition;
       sections: Section[];
-      accessRequired?: "signup" | "signin";
     };
 
 export type ExhibitionDetailState = { status: "loading" } | Settled;
 
-async function load(slug: string, canReadContent: boolean): Promise<Settled> {
+async function load(slug: string): Promise<Settled> {
   let exhibition: Exhibition;
   try {
     exhibition = await getExhibitionBySlug(slug);
@@ -28,15 +26,6 @@ async function load(slug: string, canReadContent: boolean): Promise<Settled> {
       : { status: "error" };
   }
 
-  if (!canReadContent) {
-    return {
-      status: "ready",
-      exhibition,
-      sections: [],
-      accessRequired: "signup",
-    };
-  }
-
   try {
     const sections = await getSectionsByExhibition(exhibition.id);
     return {
@@ -44,24 +33,12 @@ async function load(slug: string, canReadContent: boolean): Promise<Settled> {
       exhibition,
       sections: [...sections].sort((a, b) => a.section_order - b.section_order),
     };
-  } catch (error) {
-    if (error instanceof ApiError && error.status === 401) {
-      return {
-        status: "ready",
-        exhibition,
-        sections: [],
-        accessRequired: error.code === "SIGNUP_REQUIRED" ? "signup" : "signin",
-      };
-    }
+  } catch {
     return { status: "error" };
   }
 }
 
-export function useExhibitionDetail(
-  slug: string | undefined,
-  user: User | null,
-  authLoading: boolean,
-): ExhibitionDetailState {
+export function useExhibitionDetail(slug: string | undefined): ExhibitionDetailState {
   const [result, setResult] = useState<{ slug: string; state: Settled } | null>(
     null,
   );
@@ -71,14 +48,14 @@ export function useExhibitionDetail(
 
     let cancelled = false;
 
-    load(slug, !authLoading && user !== null).then((state) => {
+    load(slug).then((state) => {
       if (!cancelled) setResult({ slug, state });
     });
 
     return () => {
       cancelled = true;
     };
-  }, [slug, user, authLoading]);
+  }, [slug]);
 
   if (!slug) return { status: "not-found" };
   // Ignore a result that belongs to a previous slug.

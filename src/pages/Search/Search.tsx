@@ -4,12 +4,12 @@ import SearchResults from "../../features/search/components/SearchResults";
 import { useSearch } from "../../features/search/hooks/useSearch";
 
 function Search() {
-  // The search text lives in the address bar (?q=...), so a search can be
+  // The search text lives in the address bar, so a search can be
   // shared, and the back button behaves as expected.
   const [params, setParams] = useSearchParams();
   const query = params.get("q") ?? "";
 
-  const { status, loginMode, results, searching } = useSearch(query);
+  const { status, results, searching } = useSearch(query);
 
   return (
     <div className="bg-ivory text-ink">
@@ -27,7 +27,6 @@ function Search() {
           <SearchResults
             query={query}
             status={status}
-            loginMode={loginMode}
             searching={searching}
             results={results}
           />

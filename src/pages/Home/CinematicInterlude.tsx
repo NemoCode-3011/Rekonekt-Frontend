@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from "framer-motion";
-import interlude from "../../assets/images/hero/Riyoum4.jpg";
+import interlude from "../../assets/images/hero/obudu2.jpg";
 
 const ease = [0.76, 0, 0.24, 1] as const;
 
@@ -10,7 +10,7 @@ export default function CinematicInterlude() {
     <section className="relative h-[90svh] min-h-[600px] overflow-hidden bg-ink text-ivory">
       <motion.img
         src={interlude}
-        alt="Rock formations across the Jos Plateau in Nigeria"
+        alt="Obudu Cattle Ranch in Cross River State"
         loading="lazy"
         className="absolute inset-0 h-full w-full object-cover object-[50%_45%]"
         initial={reduce ? false : { scale: 1.06 }}
@@ -25,7 +25,7 @@ export default function CinematicInterlude() {
       <div className="container relative z-10 flex h-full flex-col justify-between py-8 sm:py-10 lg:py-14">
         <p className="flex items-center gap-3 text-label font-medium tracking-[0.2em] text-ink">
           <span aria-hidden className="h-px w-8 bg-heritage-green" />
-          JOS PLATEAU · NIGERIA
+          CROSS RIVER · NIGERIA
         </p>
 
         <motion.div

@@ -57,7 +57,7 @@ export default function FeaturedExhibition() {
             />
           </div>
 
-          <h2 className="mt-8 font-display text-display-l uppercase leading-[0.95] tracking-normal text-ink lg:absolute lg:bottom-0 lg:left-[56%] lg:mt-0 lg:text-ivory lg:mix-blend-difference">
+          <h2 className="mt-8 font-display text-display-l lg:text-[clamp(3rem,5vw,5.5rem)] uppercase leading-[0.95] tracking-normal text-ink lg:absolute lg:bottom-0 lg:left-[56%] lg:mt-0 lg:text-ivory lg:mix-blend-difference">
             {title}
           </h2>
         </div>

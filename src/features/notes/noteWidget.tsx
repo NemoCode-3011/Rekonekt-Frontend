@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/auth-context";
+import SignInPrompt from "../auth/components/Signinprompt";
 import { formatLongDate } from "../../lib/dates";
 import { createNote, deleteNote, getNotes, updateNote, type Note } from "./api";
 
@@ -21,10 +21,10 @@ function errorMessage(error: unknown) {
 // A floating button that opens a panel for quick personal notes.
 export default function NotesWidget() {
   const { user, showToast } = useAuth();
-  const location = useLocation();
   const userId = user?.id;
 
   const [open, setOpen] = useState(false);
+  const [promptOpen, setPromptOpen] = useState(false);
   const [notes, setNotes] = useState<Note[]>([]);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">(
     "idle",
@@ -129,9 +129,11 @@ export default function NotesWidget() {
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        // Anonymous visitors get a small sign-in prompt instead of the panel.
+        onClick={() => (user ? setOpen(true) : setPromptOpen(true))}
         aria-label="Open notes"
         aria-expanded={open}
+        aria-haspopup="dialog"
         className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-heritage-green text-ivory shadow-lg ring-1 ring-ivory/30 transition-colors hover:bg-deep-forest"
       >
         <svg
@@ -156,13 +158,13 @@ export default function NotesWidget() {
             type="button"
             aria-label="Close notes"
             onClick={() => setOpen(false)}
-            className="fixed inset-0 z-[60] cursor-default bg-ink/40"
+            className="fixed inset-0 z-60 cursor-default bg-ink/40"
           />
 
           <aside
             role="dialog"
             aria-label="Notes"
-            className="fixed inset-y-0 right-0 z-[70] flex w-full max-w-md flex-col bg-ivory text-ink shadow-2xl"
+            className="fixed inset-y-0 right-0 z-70 flex w-full max-w-md flex-col bg-ivory text-ink shadow-2xl"
           >
             <div className="flex items-center justify-between border-b border-line px-6 py-5">
               <h2 className="font-display text-heading-s">Your notes</h2>
@@ -176,24 +178,7 @@ export default function NotesWidget() {
               </button>
             </div>
 
-            {!user ? (
-              <div className="px-6 py-8">
-                <p className="font-display text-heading-s leading-tight">
-                  Keep your thoughts as you explore.
-                </p>
-                <p className="mt-3 font-sans text-body-m text-muted">
-                  Sign in to write notes and find them again on your next visit.
-                </p>
-                <Link
-                  to="/auth/login"
-                  state={{ from: location.pathname + location.search }}
-                  onClick={() => setOpen(false)}
-                  className="mt-6 inline-flex h-12 items-center bg-heritage-green px-6 font-sans text-body-s font-medium text-ivory transition-colors hover:bg-deep-forest"
-                >
-                  Sign in
-                </Link>
-              </div>
-            ) : (
+            {user && (
               <>
                 <div className="border-b border-line px-6 py-5">
                   <textarea
@@ -298,6 +283,14 @@ export default function NotesWidget() {
             )}
           </aside>
         </>
+      )}
+
+      {promptOpen && (
+        <SignInPrompt
+          title="Sign in to keep notes."
+          body="Your notes are private and saved to your account."
+          onClose={() => setPromptOpen(false)}
+        />
       )}
     </>
   );

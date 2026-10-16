@@ -2,9 +2,7 @@ import { useParams } from "react-router-dom";
 import ArrowLink from "../../components/ui/ArrowLink";
 import ChapterList from "../../features/exhibitions/components/ChapterList";
 import ExhibitionHero from "../../features/exhibitions/components/ExhibitionHero";
-import SignupGate from "../../features/exhibitions/components/SignupGate";
 import { useExhibitionDetail } from "../../features/exhibitions/hooks/useExhibitionDetail";
-import { useAuth } from "../../features/auth/auth-context";
 
 function LoadingState() {
   return (
@@ -13,7 +11,7 @@ function LoadingState() {
       aria-label="Loading exhibition"
       className="container grid gap-10 py-10 md:grid-cols-12 md:gap-12 md:py-16"
     >
-      <div className="order-first aspect-[4/3] animate-pulse bg-sand/50 motion-reduce:animate-none md:order-last md:col-span-7 md:aspect-auto md:min-h-[34rem]" />
+      <div className="order-first aspect-4/3 animate-pulse bg-sand/50 motion-reduce:animate-none md:order-last md:col-span-7 md:aspect-auto md:min-h-136" />
       <div className="flex flex-col justify-end gap-5 md:col-span-5">
         <div className="h-8 w-32 animate-pulse bg-sand/50 motion-reduce:animate-none" />
         <div className="h-24 w-full animate-pulse bg-sand/50 motion-reduce:animate-none" />
@@ -35,8 +33,7 @@ function MessageState({ title, body }: { title: string; body: string }) {
 
 function ExhibitionDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const { user, loading } = useAuth();
-  const state = useExhibitionDetail(slug, user, loading);
+  const state = useExhibitionDetail(slug);
 
   if (state.status === "loading") return <LoadingState />;
 
@@ -59,16 +56,11 @@ function ExhibitionDetail() {
   }
 
   const { exhibition, sections } = state;
-  const returnTo = `/exhibitions/${exhibition.slug}`;
 
   return (
     <main>
       <ExhibitionHero exhibition={exhibition} chapterCount={sections.length} />
-      {state.accessRequired ? (
-        <SignupGate returnTo={returnTo} mode={state.accessRequired} />
-      ) : (
-        <ChapterList experienceSlug={exhibition.slug} sections={sections} />
-      )}
+      <ChapterList experienceSlug={exhibition.slug} sections={sections} />
     </main>
   );
 }

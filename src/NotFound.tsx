@@ -1,4 +1,4 @@
-import ArrowLink from "../components/ui/ArrowLink";
+import ArrowLink from "./components/ui/ArrowLink";
 
 export default function NotFound() {
   return (

@@ -256,7 +256,7 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
         <div className="mt-8">
           <p className="mb-4 text-center text-body-s text-muted">or</p>
           <div className="flex justify-center">
-            <GoogleAuthButton />
+            <GoogleAuthButton mode="signin"/>
           </div>
         </div>
       )}

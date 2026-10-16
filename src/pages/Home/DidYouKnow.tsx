@@ -1,23 +1,24 @@
 import { motion, useReducedMotion } from "framer-motion";
 import ArrowLink from "../../components/ui/ArrowLink";
 
-import discoveryImage from "../../assets/images/hero/fela3.jpg";
+import discoveryImage from "../../assets/images/hero/fumilayo2.jpg";
 
 type DiscoveryStory = {
   title: string;
   excerpt: string;
   image: string;
   href: string;
+  credit: string;
 };
 
 const discoveryStory: DiscoveryStory = {
-  // Temporary content.
-  // Replace with GET /stories/discovery when the backend is ready.
+  // Temporary content fr the storirs endpoint
   title: "Nigeria's history is full of stories worth finding.",
   excerpt:
     "The past becomes more interesting when you look beyond the familiar names and events and start following the connections between them.",
   image: discoveryImage,
   href: "/stories",
+  credit: "Picture of Funmilayo Ransome-Kuti And The Women’s Union of Abeokuta Comic strip Illustrations: Alaba Onajin Script and text: Obioma Ofoego - Published by UNESCO with share alike license"
 };
 
 export default function DidYouKnow() {
@@ -55,6 +56,9 @@ export default function DidYouKnow() {
                 loading="lazy"
                 className="h-full w-full object-cover"
               />
+            </div>
+            <div>
+            <p className="text-label">{discoveryStory.credit}</p>
             </div>
           </motion.div>
 

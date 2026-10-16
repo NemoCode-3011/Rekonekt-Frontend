@@ -1,7 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { useLocation, useParams, useSearchParams } from "react-router-dom";
-
+import { useParams, useSearchParams } from "react-router-dom";
 import ExperienceNav from "../../features/experience/components/ExperienceNav";
 import ExperienceGuide from "../../features/experience/components/ExperienceGuide";
 import CinematicImage from "../../features/experience/components/CinematicImage";
@@ -13,17 +12,13 @@ import type { Experience } from "../../features/experience/types";
 import { useChapterDate } from "../../features/experience/useChapterDate";
 import { useProgressSaver } from "../../features/progress/useProgressSaver";
 import NotesWidget from "../../features/notes/noteWidget";
-import SignupGate from "../../features/exhibitions/components/SignupGate";
-import { useAuth } from "../../features/auth/auth-context";
-import { ApiError } from "../../services/api/client";
-
-// Only used when a chapter and its exhibition both have no image set.
+// Only used when a chapter and its exhibition bith have no image.
 import fallbackImage from "../../assets/hero.png";
+import ExamineObjectCard from "../../features/experience/components/ExamineObjectCard";
+import { getObjectsFor } from "../../features/object-viewer/objects";
 
 function ExperienceDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const { user, loading: authLoading } = useAuth();
-  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [experience, setExperience] = useState<Experience | null>(null);
@@ -31,7 +26,7 @@ function ExperienceDetail() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (authLoading || !user || !slug) return;
+    if (!slug) return;
 
     const experienceSlug = slug;
 
@@ -48,21 +43,17 @@ function ExperienceDetail() {
             (a, b) => a.section_order - b.section_order,
           ),
         });
-      } catch (caught) {
-        if (caught instanceof ApiError && caught.status === 401) {
-          setError(caught.code === "SIGNUP_REQUIRED" ? "SIGNUP_REQUIRED" : "SIGNIN_REQUIRED");
-        } else {
-          setError("Unable to load this experience.");
-        }
+      } catch {
+        setError("Unable to load this experience.");
       } finally {
         setLoading(false);
       }
     }
 
     loadExperience();
-  }, [slug, user, authLoading]);
+  }, [slug]);
 
-  // The current chapter lives in the URL (?chapter=<section slug>) so a
+  // The current chapter lives in the URL,  so a
   // chapter can be linked to and survives a refresh. Unknown or missing
   // values open the first chapter.
   const sections = experience?.sections ?? [];
@@ -72,8 +63,8 @@ function ExperienceDetail() {
     sections.findIndex((item) => item.slug === chapterSlug),
   );
 
-  // Remember where a signed-in visitor is. This does nothing for visitors
-  // who aren't signed in, and while the experience is still loading.
+  // Remember where a signed-in visitor is. This does nothing for anonymous
+  // visitors, who can read everything but have nowhere to save progress.
   useProgressSaver(
     experience?.id,
     sections[chapterIndex]?.id,
@@ -84,36 +75,10 @@ function ExperienceDetail() {
   const date = useChapterDate(sections[chapterIndex]?.id);
 
   if (loading) {
-    if (!authLoading && !user) {
-      return (
-        <SignupGate
-          returnTo={location.pathname + location.search}
-          mode="signup"
-        />
-      );
-    }
     return (
       <main className="flex min-h-screen items-center justify-center bg-ink text-white">
         <p className="font-sans text-sm text-white/60">Loading experience...</p>
       </main>
-    );
-  }
-
-  if (!user) {
-    return (
-      <SignupGate
-        returnTo={location.pathname + location.search}
-        mode="signup"
-      />
-    );
-  }
-
-  if (error === "SIGNUP_REQUIRED" || error === "SIGNIN_REQUIRED") {
-    return (
-      <SignupGate
-        returnTo={location.pathname + location.search}
-        mode={error === "SIGNUP_REQUIRED" ? "signup" : "signin"}
-      />
     );
   }
 
@@ -189,7 +154,7 @@ function ExperienceDetail() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8 }}
-                    className="font-display text-[clamp(5rem,min(15vw,24svh),13rem)] leading-[0.85] tracking-[-0.05em] text-ivory/90"
+                    className="font-display text-[clamp(5rem,min(15vw,24svh),13rem)] leading-[0.85] tracking-tighter text-ivory/90"
                   >
                     {date}
                   </motion.p>
@@ -224,6 +189,14 @@ function ExperienceDetail() {
           </section>
 
           <ChapterContent section={section} date={date ?? ""} />
+          {slug &&
+            getObjectsFor(slug, section.slug).map((object) => (
+              <ExamineObjectCard
+                key={object.key}
+                object={object}
+                exhibitionSlug={slug}
+              />
+            ))}
 
           {nextSection ? (
             <ChapterFooter

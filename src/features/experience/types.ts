@@ -108,5 +108,6 @@ export interface ExperienceSource {
   citation: string | null;
   rights_statement: string | null;
   perspective_note: string | null;
+  cover_image_url: string | null; 
   relationship: string | null;
 }

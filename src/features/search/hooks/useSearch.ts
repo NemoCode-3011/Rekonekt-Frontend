@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { ApiError } from "../../../services/api/client";
 import { searchContent } from "../api";
 import type { SearchResult } from "../types";
 
@@ -9,13 +8,11 @@ export const MIN_QUERY_LENGTH = 2;
 // How long to wait after the last keystroke before asking the backend.
 const TYPING_PAUSE_MS = 300;
 
-export type SearchStatus = "idle" | "ready" | "error" | "login";
-export type LoginMode = "signup" | "signin";
+export type SearchStatus = "idle" | "ready" | "error";
 
 interface Answer {
   query: string;
   failed: boolean;
-  loginMode: LoginMode | null; // set when the backend asked for a login
   results: SearchResult[];
 }
 
@@ -36,21 +33,13 @@ export function useSearch(rawQuery: string) {
       searchContent(query)
         .then((results) => {
           if (!cancelled) {
-            setAnswer({ query, failed: false, loginMode: null, results });
+            setAnswer({ query, failed: false, results });
           }
         })
-        .catch((error) => {
-          if (cancelled) return;
-
-          // 401 means the login wall, not a broken search.
-          const loginMode: LoginMode | null =
-            error instanceof ApiError && error.status === 401
-              ? error.code === "SIGNUP_REQUIRED"
-                ? "signup"
-                : "signin"
-              : null;
-
-          setAnswer({ query, failed: true, loginMode, results: [] });
+        .catch(() => {
+          if (!cancelled) {
+            setAnswer({ query, failed: true, results: [] });
+          }
         });
     }, TYPING_PAUSE_MS);
 
@@ -63,21 +52,15 @@ export function useSearch(rawQuery: string) {
   if (tooShort) {
     return {
       status: "idle" as SearchStatus,
-      loginMode: null,
       results: [],
       searching: false,
     };
   }
 
-  const status: SearchStatus = answer?.loginMode
-    ? "login"
-    : answer?.failed
-      ? "error"
-      : "ready";
+  const status: SearchStatus = answer?.failed ? "error" : "ready";
 
   return {
     status,
-    loginMode: answer?.loginMode ?? null,
     // While a new search is on its way, the previous results stay visible.
     results: answer?.results ?? [],
     searching: answer?.query !== query,

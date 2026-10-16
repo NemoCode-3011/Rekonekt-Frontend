@@ -38,7 +38,7 @@ export default function Team() {
   async function remove(member: TeamMember) {
     if (
       !window.confirm(
-        `Remove admin access for ${member.name}? They keep their account as a visitor.`,
+        `Remove ${member.name} as an admin? Their account will be deleted and they won't be able to sign in unless you add them again.`
       )
     ) {
       return;

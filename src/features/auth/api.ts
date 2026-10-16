@@ -83,9 +83,10 @@ export async function getCulturalGroups() {
   return res.data.data;
 }
 
-export async function googleSignIn(credential: string) {
+export async function googleSignIn( credential: string, mode: "signin" | "signup",) {
   const res = await http.post<{ message: string; data: User }>("/auth/google", {
     credential,
+    mode,
   });
   return res.data.data;
 }

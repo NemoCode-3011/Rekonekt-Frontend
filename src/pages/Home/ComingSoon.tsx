@@ -73,23 +73,14 @@ export default function ComingSoon() {
       <ul
         ref={railRef}
         className="
-          mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto
-          pb-2 motion-safe:scroll-smooth
-          pl-[var(--gutter-mobile)]
-          pr-[var(--gutter-mobile)]
-          scroll-pl-[var(--gutter-mobile)]
-          [scrollbar-width:none]
-          [&::-webkit-scrollbar]:hidden
-
-          md:pl-[var(--gutter-tablet)]
-          md:pr-[var(--gutter-tablet)]
-          md:scroll-pl-[var(--gutter-tablet)]
-
-          lg:mt-14 lg:gap-6
-          lg:pl-[max(var(--gutter-desktop),calc((100vw-1440px)/2))]
-          lg:pr-[max(var(--gutter-desktop),calc((100vw-1440px)/2))]
-          lg:scroll-pl-[max(var(--gutter-desktop),calc((100vw-1440px)/2))]
-        "
+        mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto
+        pb-2 motion-safe:scroll-smooth
+        pl-[max(var(--gutter),calc((100vw_-_1440px)/2))]
+        pr-[max(var(--gutter),calc((100vw_-_1440px)/2))]
+        scroll-pl-[max(var(--gutter),calc((100vw_-_1440px)/2))]
+        [scrollbar-width:none]
+        [&::-webkit-scrollbar]:hidden
+        lg:mt-14 lg:gap-6"
       >
         {upcoming.map((item) => (
           <li
