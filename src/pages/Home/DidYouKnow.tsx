@@ -1,28 +1,41 @@
+import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import ArrowLink from "../../components/ui/ArrowLink";
+import { getDidYouKnowStory, storyPath } from "../../features/stories/api";
+import { categoryLabel } from "../../features/stories/Category";
+import type { DidYouKnowStory } from "../../features/stories/types";
 
-import discoveryImage from "../../assets/images/hero/fumilayo2.jpg";
-
-type DiscoveryStory = {
-  title: string;
-  excerpt: string;
-  image: string;
-  href: string;
-  credit: string;
-};
-
-const discoveryStory: DiscoveryStory = {
-  // Temporary content fr the storirs endpoint
-  title: "Nigeria's history is full of stories worth finding.",
-  excerpt:
-    "The past becomes more interesting when you look beyond the familiar names and events and start following the connections between them.",
-  image: discoveryImage,
-  href: "/stories",
-  credit: "Picture of Funmilayo Ransome-Kuti And The Women’s Union of Abeokuta Comic strip Illustrations: Alaba Onajin Script and text: Obioma Ofoego - Published by UNESCO with share alike license"
-};
-
+// The story of the day, taken from the stories on the Stories page. Its snippet
+// ("did you know") is the headline, its picture is the image, and the link opens
+// that exact story. If there is no story ready, this section does not appear.
 export default function DidYouKnow() {
   const reduce = useReducedMotion();
+  const [story, setStory] = useState<DidYouKnowStory | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    getDidYouKnowStory()
+      .then((result) => {
+        if (!cancelled) setStory(result);
+      })
+      .catch(() => {
+        // The home page works without this section, so a failure is not shown.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (!story) return null;
+
+  const label = categoryLabel(story.category);
+  // A long snippet gets a smaller headline so it doesn't fill the whole screen.
+  const headingSize =
+    story.did_you_know.length > 110
+      ? "text-heading-m lg:text-heading-l"
+      : "text-heading-l lg:text-display-m";
 
   return (
     <section className="bg-ivory py-20 text-ink md:py-28 lg:py-40">
@@ -43,23 +56,21 @@ export default function DidYouKnow() {
             initial={reduce ? false : { x: -30, opacity: 0 }}
             whileInView={{ x: 0, opacity: 1 }}
             viewport={{ once: true, amount: 0.25 }}
-            transition={{
-              duration: 0.9,
-              ease: [0.22, 1, 0.36, 1],
-            }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
             className="md:col-span-5"
           >
-            <div className="aspect-[4/5] overflow-hidden">
+            <div className="aspect-[4/5] overflow-hidden bg-sand/40">
               <img
-                src={discoveryStory.image}
-                alt=""
+                src={story.cover_image_url}
+                alt={story.cover_image_alt ?? ""}
                 loading="lazy"
+                decoding="async"
                 className="h-full w-full object-cover"
               />
             </div>
-            <div>
-            <p className="text-label">{discoveryStory.credit}</p>
-            </div>
+            {story.cover_image_credit && (
+              <p className="mt-3 text-label text-muted">{story.cover_image_credit}</p>
+            )}
           </motion.div>
 
           {/* Content */}
@@ -68,13 +79,10 @@ export default function DidYouKnow() {
               initial={reduce ? false : { opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
-              transition={{
-                duration: 0.8,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              className="max-w-3xl font-display text-display-m leading-[0.95] lg:text-display-l"
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              className={`max-w-3xl font-display leading-[1.05] ${headingSize}`}
             >
-              {discoveryStory.title}
+              {story.did_you_know}
             </motion.h2>
 
             {/* Underline */}
@@ -83,45 +91,33 @@ export default function DidYouKnow() {
                 initial={reduce ? false : { scaleX: 0 }}
                 whileInView={{ scaleX: 1 }}
                 viewport={{ once: true, amount: 0.5 }}
-                transition={{
-                  duration: 0.8,
-                  delay: 0.25,
-                  ease: [0.76, 0, 0.24, 1],
-                }}
+                transition={{ duration: 0.8, delay: 0.25, ease: [0.76, 0, 0.24, 1] }}
                 style={{ transformOrigin: "left" }}
                 className="h-px w-24 bg-ochre"
               />
             </div>
 
-            {/* Context */}
+            {/* Which story this comes from */}
             <motion.p
               initial={reduce ? false : { opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.4 }}
-              transition={{
-                duration: 0.7,
-                delay: 0.15,
-              }}
+              transition={{ duration: 0.7, delay: 0.15 }}
               className="mt-8 max-w-2xl text-body-l text-muted"
             >
-              {discoveryStory.excerpt}
+              {label ? `${label} · ` : ""}
+              {story.title}
             </motion.p>
 
-            {/* Link */}
+            {/* Link: opens this exact story */}
             <motion.div
               initial={reduce ? false : { opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.4 }}
-              transition={{
-                duration: 0.7,
-                delay: 0.3,
-              }}
+              transition={{ duration: 0.7, delay: 0.3 }}
               className="mt-10"
             >
-              <ArrowLink
-                to={discoveryStory.href}
-                className="text-ink"
-              >
+              <ArrowLink to={storyPath(story.slug)} className="text-ink">
                 Explore the story
               </ArrowLink>
             </motion.div>

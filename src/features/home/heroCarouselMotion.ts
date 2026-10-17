@@ -2,7 +2,7 @@
 // Change a number, save, and the carousel updates.
 
 /** How fast the strip drifts by itself, in slides per second. 0 = still. */
-export const DRIFT_SLIDES_PER_SECOND =0.8;
+export const DRIFT_SLIDES_PER_SECOND = 0.1;
 
 /** Space between slides, as a multiple of one slide's width. */
 export const STEP_RATIO = 1.08;
@@ -12,15 +12,15 @@ export const STEP_RATIO = 1.08;
  * Positive curves the strip towards you, like a wall around the viewer.
  * Negative curves it away from you, like a classic cover-flow.
  */
-export const TILT_PER_STEP = 12;
+export const TILT_PER_STEP = 16;
 
 /**
- * Size of the middle slide, and how much it grows per step away from the
- * middle. For the reference look, keep these as they are.
- * To make the middle slide the biggest, use 1.08 and -0.06.
+ * Size of the middle slide, and how much it changes per step away from the
+ * middle. A negative number shrinks the slides on the sides, so the middle
+ * one towers over them. Slides are lined up along their bottom edge.
  */
-export const CENTER_SCALE = 0.92;
-export const SCALE_PER_STEP = 0.05;
+export const CENTER_SCALE = 1;
+export const SCALE_PER_STEP = -0.1;
 
 /** Tilt and size stop changing after this many steps from the middle. */
 export const MAX_STEPS = 3;
@@ -30,7 +30,14 @@ export const FADE_START = 2.6;
 export const FADE_END = 3.6;
 
 /** How dark the slides furthest from the middle become (0 to 1). */
-export const EDGE_SHADE = 0.45;
+export const EDGE_SHADE = 0.55;
+
+/**
+ * How the blurred picture behind the hero looks. The sepia gives grey archive
+ * photographs a warm glow instead of a dead grey. Make the blur smaller for a
+ * sharper glow, or brightness bigger for a brighter room.
+ */
+export const BACKDROP_FILTER = "blur(70px) sepia(0.3) saturate(1.5) brightness(0.6)";
 
 /**
  * A light, film-like warmth applied to every photo, so pictures from

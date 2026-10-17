@@ -25,6 +25,8 @@ import { BookmarksProvider } from "./features/bookmarks/BookmarksProvider";
 import { DiscoveryProvider } from "./features/experience/discovery/DiscoveryProvider";
 import CollectionPage from "./pages/Explore/CollectionPage";
 import About from "./pages/About/About";
+import Stories from "./pages/Stories/Stories";
+import StoryDetail from "./pages/Stories/StoryDetail";
 import NotFound from "./NotFound";
 import Settings from "./pages/Account/Settings";
 import AdminExhibitions from "./pages/Admin/Exhibitions";
@@ -72,6 +74,8 @@ function App() {
               <Route path="/exhibitions/:slug" element={<ExhibitionDetail />} />
               <Route path="/search" element={<Search />} />
               <Route path="/about" element={<About />} />
+              <Route path="/stories" element={<Stories />} />
+              <Route path="/stories/:slug" element={<StoryDetail />} />
 
               {/* Visitor account */}
               <Route path="/account" element={<RequireAuth />}>
@@ -111,7 +115,7 @@ function App() {
               </Route>
             </Route>
 
-            {/* Immersive experience */}
+            {/* the experience */}
             <Route path="/experiences/:slug" element={<ExperienceDetail />} />
             <Route
               path="/experiences/:slug/object/:key"

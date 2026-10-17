@@ -14,14 +14,14 @@ interface HeroSlideItemProps {
   isDuplicate: boolean;
   /** Where the carousel currently is, in slides. Shared by every slide. */
   offset: MotionValue<number>;
-  /** Called once the very first picture has loaded (or failed to). */
+  /** Called once the very first picture (or video frame) has loaded, or failed to. */
   onFirstImageReady?: () => void;
   reduceMotion: boolean;
 }
 
-// One picture in the strip. It reads its distance from the middle and turns
-// that into position, tilt, size and fade. Nothing here re-renders while the
-// strip moves, so the animation stays smooth.
+// One picture or video in the strip. It reads its distance from the middle and
+// turns that into position, tilt, size and fade. Nothing here re-renders while
+// the strip moves, so the animation stays smooth.
 function HeroSlideItem({
   slide,
   slot,
@@ -47,7 +47,7 @@ function HeroSlideItem({
   // A video only plays while its slide is near the middle.
   useMotionValueEvent(d, "change", (value) => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || reduceMotion) return;
 
     const nearMiddle = Math.abs(value) < 1.6;
     if (nearMiddle && video.paused) video.play().catch(() => {});
@@ -55,23 +55,34 @@ function HeroSlideItem({
   });
 
   const isFirst = slot === 0;
-  const showVideo = Boolean(slide.video) && !reduceMotion && !failed;
+  // A video slide shows its video. With "reduce motion" it shows its still
+  // picture instead, if it has one.
+  const showVideo = Boolean(slide.video) && (!reduceMotion || !slide.image);
+  const nothingToShow = !slide.image && !slide.video;
 
   const face = (
     <div className="relative h-full w-full overflow-hidden rounded-xl bg-heritage-green/40 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.65)] ring-1 ring-ivory/15">
-      {failed ? (
-        // If a picture is missing, show a quiet green tile instead of a broken icon.
-        <div className="h-full w-full bg-linear-to-br from-heritage-green/60 to-deep-forest" />
+      {failed || nothingToShow ? (
+        // If a picture is missing, show a quiet tile instead of a broken icon.
+        <div className="h-full w-full bg-linear-to-br from-ivory/10 to-ink" />
       ) : showVideo ? (
         <video
           ref={videoRef}
-          src={slide.video}
-          poster={slide.image}
+          // "#t=0.1" makes the browser show the first frame before it plays,
+          // so the slide is never an empty box.
+          src={`${slide.video}#t=0.1`}
+          poster={slide.image || undefined}
           muted
           loop
           playsInline
-          preload="none"
-          aria-hidden="true"
+          preload="metadata"
+          role={isDuplicate ? undefined : "img"}
+          aria-label={isDuplicate ? undefined : slide.alt}
+          onLoadedData={isFirst ? onFirstImageReady : undefined}
+          onError={() => {
+            setFailed(true);
+            if (isFirst) onFirstImageReady?.();
+          }}
           className="h-full w-full object-cover"
           style={{ filter: PHOTO_TREATMENT }}
         />
@@ -99,12 +110,12 @@ function HeroSlideItem({
       )}
 
       {/* Grounds the picture in the palette, bottom to top */}
-      <div className="absolute inset-0 bg-linear-to-t from-deep-forest/55 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-t from-ink/55 via-transparent to-transparent" />
 
       {/* Slides further from the middle sink into the background */}
       <motion.div
         aria-hidden="true"
-        className="absolute inset-0 bg-deep-forest"
+        className="absolute inset-0 bg-ink"
         style={{ opacity: shade }}
       />
     </div>
@@ -115,7 +126,8 @@ function HeroSlideItem({
       data-hero-slide
       aria-hidden={isDuplicate || undefined}
       className="absolute inset-0 m-auto h-[calc(var(--item-w)*1.333)] w-(--item-w)"
-      style={{ x, rotateY, scale, opacity, zIndex }}
+      // Slides shrink towards their bottom edge, so the middle one stands tallest.
+      style={{ x, rotateY, scale, opacity, zIndex, transformOrigin: "50% 100%" }}
     >
       {slide.href ? (
         <Link

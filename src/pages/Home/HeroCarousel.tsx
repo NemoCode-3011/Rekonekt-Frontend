@@ -9,7 +9,7 @@ import {
   useReducedMotion,
 } from "framer-motion";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
-import { useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import type { HeroSlide } from "../../features/home/heroSlides";
 import { DRIFT_SLIDES_PER_SECOND, STEP_RATIO } from "../../features/home/heroCarouselMotion";
 import HeroSlideItem from "./HeroSlideItem";
@@ -18,11 +18,12 @@ interface HeroCarouselProps {
   slides: HeroSlide[];
   /** Called once the first picture has loaded, so the splash screen can leave. */
   onFirstImageReady?: () => void;
+  /** Called with the index of the slide in the middle, whenever it changes. */
+  onActiveChange?: (index: number) => void;
 }
 
 // Fades the two ends of the strip into the background.
-const EDGE_FADE =
-  "linear-gradient(to right, transparent, black 14%, black 86%, transparent)";
+const EDGE_FADE = "linear-gradient(to right, transparent, black 14%, black 86%, transparent)";
 
 const arrowStyle =
   "absolute top-1/2 z-10 hidden size-12 -translate-y-1/2 place-items-center rounded-full border border-ivory/30 text-ivory transition-colors hover:bg-ivory/10 sm:grid";
@@ -31,7 +32,7 @@ const arrowStyle =
 //   - It drifts on its own, and stops when you hover, focus, drag or press pause.
 //   - Drag or swipe it, or use the arrows or the left and right arrow keys.
 //   - With "reduce motion" switched on, it never moves by itself.
-function HeroCarousel({ slides, onFirstImageReady }: HeroCarouselProps) {
+function HeroCarousel({ slides, onFirstImageReady, onActiveChange }: HeroCarouselProps) {
   const reduceMotion = useReducedMotion() ?? false;
 
   const count = slides.length;
@@ -60,15 +61,15 @@ function HeroCarousel({ slides, onFirstImageReady }: HeroCarouselProps) {
     setActive((previous) => (previous === index ? previous : index));
   });
 
+  // Tell the page which slide is in the middle (it tints the background to match).
+  useEffect(() => {
+    onActiveChange?.(active);
+  }, [active, onActiveChange]);
+
   // The slow drift. It does nothing while the strip is off screen.
   useAnimationFrame((_, delta) => {
     const stopped =
-      reduceMotion ||
-      userPaused ||
-      !inView ||
-      hovering.current ||
-      drag.current ||
-      tween.current;
+      reduceMotion || userPaused || !inView || hovering.current || drag.current || tween.current;
     if (stopped) return;
 
     // Cap the step so the strip doesn't jump after the tab was in the background.
@@ -150,9 +151,9 @@ function HeroCarousel({ slides, onFirstImageReady }: HeroCarouselProps) {
       <div className="relative">
         <div
           ref={stripRef}
-          // --item-w is the width of one slide. It also limits itself by the
-          // screen's height, so the whole hero fits on a laptop.
-          className="relative h-[calc(var(--item-w)*1.5)] w-full touch-pan-y select-none [--item-w:min(56vw,36svh)] sm:[--item-w:min(28vw,32svh)] lg:[--item-w:min(17vw,380px,27svh)]"
+          // --item-w is the width of one slide. It is also limited by the
+          // screen's height, so the tall middle photo still fits on a laptop.
+          className="relative h-[calc(var(--item-w)*1.4)] w-full touch-pan-y select-none [--item-w:min(66vw,40svh)] sm:[--item-w:min(40vw,42svh)] lg:[--item-w:min(26vw,42svh)]"
           style={{
             perspective: "1100px",
             WebkitMaskImage: EDGE_FADE,

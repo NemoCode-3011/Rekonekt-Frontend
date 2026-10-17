@@ -1,10 +1,10 @@
 
-import placeholder1 from "../../assets/images/hero/fela11.jpg";
-import placeholder2 from "../../assets/images/hero/ind60.jpg";
-import placeholder3 from "../../assets/images/hero/aburi.jpg";
-import placeholder4 from "../../assets/images/hero/benin1.jpg";
-import placeholder5 from "../../assets/images/hero/Nig50.jpg";
-import placeholder6 from "../../assets/images/hero/aburi2.jpg";
+import image1 from "../../assets/images/hero/civilwar.jpeg";
+import image2 from "../../assets/images/hero/about1.jpg";
+import video1 from "../../assets/images/hero/herovideo2.mp4";
+import image3 from "../../assets/images/hero/heroimage1.jpg";
+import image4 from "../../assets/images/hero/heroimage3.jpg";
+import image5 from "../../assets/images/hero/heroimage4.jpg";
 
 export interface HeroSlide {
   id: string;
@@ -19,39 +19,39 @@ export interface HeroSlide {
 export const heroSlides: HeroSlide[] = [
   {
     id: "slide-1",
-    image: placeholder1,
-    alt: "People walking together in a street, some with their arms raised",
-    caption: "Placeholder: add a place and a year",
+    image: image1,
+    alt: "Nigerian federal troops during the Nigerian Civil War",
+    caption: "Ore, Nigeria, August 16, 1967",
   },
   {
     id: "slide-2",
-    image: placeholder2,
-    alt: "A young woman wearing a sash, surrounded by a smiling crowd",
-    caption: "Placeholder: add a place and a year",
+    image: image5,
+    alt: "Chief Obafemi Awolowo",
+    caption: "Ibadan / Lagos, Nigeria, Circa 1960s",
   },
   {
     id: "slide-3",
-    image: placeholder3,
-    alt: "Men greeting each other with a handshake",
-    caption: "Placeholder: add a place and a year",
+    image:image3,
+    alt: "Moremi Statue of Liberty",
+    caption: "Palace of the Ooni of Ife, Ile-Ife, 2016",
   },
   {
     id: "slide-4",
-    image: placeholder4,
-    alt: "A carved ivory mask from the Kingdom of Benin",
-    caption: "Placeholder: add a place and a year",
-    href: "/exhibitions/the-benin-empire",
+    image: "",
+    video: video1,
+    alt: "Vibrant traditional drumming performance at a cultural outdoor venue.",
+    caption: "By Alexander Oshiame, 2026",
   },
   {
     id: "slide-5",
-    image: placeholder5,
-    alt: "A crowded road with cars and people on foot",
-    caption: "Placeholder: add a place and a year",
+    image: image4,
+    alt: "Bronze Head of Queen Idia (Iyoba)",
+    caption: "Ancient Kingdom of Benin, Early 16th Century",
   },
   {
     id: "slide-6",
-    image: placeholder6,
-    alt: "Three men talking and eating together",
-    caption: "Placeholder: add a place and a year",
+    image: image2,
+    alt: "Nigerian football supporters",
+    caption: "Nigeria, Late 2010s / Early 2020s",
   },
 ];
