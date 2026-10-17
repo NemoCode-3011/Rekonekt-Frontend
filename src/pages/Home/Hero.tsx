@@ -1,93 +1,113 @@
 import { motion, useReducedMotion } from "framer-motion";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import heroImage from "../../assets/images/hero/lekki-bridge.jpg";
 import { useSplash } from "../../components/splash/splash-context";
-
-const FOCUS = "object-[58%_60%]";
+import { heroSlides } from "../../features/home/heroSlides";
+import HeroCarousel from "./HeroCarousel";
 
 const ease = [0.76, 0, 0.24, 1] as const;
-const CLOSED = "inset(18% 22% 18% 22%)";
-const OPEN = "inset(0% 0% 0% 0%)";
+
+// The film-like grain over the background.
+function Grain() {
+  return (
+    <svg
+      aria-hidden
+      className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.12] mix-blend-overlay"
+    >
+      <filter id="hero-grain">
+        <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch" />
+      </filter>
+      <rect width="100%" height="100%" filter="url(#hero-grain)" />
+    </svg>
+  );
+}
 
 export default function Hero() {
   const reduce = useReducedMotion();
   const { introDone, markHomeReady } = useSplash();
   const open = reduce || introDone;
 
+  // With no slides there is no picture to wait for, so don't hold the splash screen.
+  useEffect(() => {
+    if (heroSlides.length === 0) markHomeReady();
+  }, [markHomeReady]);
+
+  // Fades and lifts an element in once the intro has finished.
+  const reveal = (delay: number) => ({
+    initial: reduce ? false : { opacity: 0, y: 24 },
+    animate: { opacity: open ? 1 : 0, y: open ? 0 : 24 },
+    transition: { duration: 0.9, ease, delay },
+  });
+
   return (
-    <section className="relative h-dvh min-h-[600px] overflow-hidden bg-ink">
-      <motion.div
-        className="absolute inset-0"
-        initial={reduce ? false : { clipPath: CLOSED }}
-        animate={{ clipPath: open ? OPEN : CLOSED }}
-        transition={{ duration: 1.6, ease }}
-      >
-        <motion.img
-          src={heroImage}
-          alt=""
-          className={`h-full w-full object-cover ${FOCUS}`}
-          ref={(el) => {
-            if (el?.complete) markHomeReady();
+    <section className="relative isolate flex min-h-dvh flex-col justify-center gap-8 overflow-hidden bg-deep-forest pb-8 pt-24 text-ivory md:pt-28 lg:gap-10">
+      {/* Background: Deep Forest, with a warm light behind the strip */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+        <motion.div
+          className="absolute inset-x-0 bottom-0 h-[75%]"
+          style={{
+            background:
+              "radial-gradient(60% 55% at 50% 72%, rgba(166, 106, 63, 0.32), rgba(166, 106, 63, 0) 70%)",
           }}
-          onLoad={markHomeReady}
-          onError={markHomeReady}
-          initial={reduce ? false : { scale: 1.1 }}
-          animate={{ scale: open ? 1 : 1.1 }}
-          transition={{ duration: 2.4, ease }}
+          animate={reduce ? undefined : { opacity: [0.7, 1, 0.7] }}
+          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
         />
+        {/* Darkens the corners, so the eye stays in the middle */}
+        <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_45%,transparent_55%,rgba(23,25,20,0.55)_100%)]" />
+        <Grain />
+      </div>
 
-        {/* Deep Forest tint, so the photo belongs to the palette */}
-        <div className="absolute inset-0 bg-deep-forest/70 mix-blend-multiply" />
-
-        {/* Darkness for type: bottom for the copy, top for the nav */}
-        <div className="absolute inset-0 bg-linear-to-t from-ink/85 via-ink/20 to-transparent" />
-        <div className="absolute inset-x-0 top-0 h-40 bg-linear-to-b from-ink/50 to-transparent" />
-
-        {/* Film grain */}
-        <svg
-          aria-hidden
-          className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.14] mix-blend-overlay"
+      <div className="container flex flex-col items-center text-center">
+        <motion.p
+          className="text-label font-medium uppercase tracking-[0.22em] text-sand"
+          {...reveal(0.3)}
         >
-          <filter id="hero-grain">
-            <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch" />
-          </filter>
-          <rect width="100%" height="100%" filter="url(#hero-grain)" />
-        </svg>
-      </motion.div>
+          A digital museum of Nigerian history
+        </motion.p>
 
-      {/* Type, anchored low-left in the image's negative space */}
-      <div className="container relative z-10 flex h-full flex-col justify-end pb-12 lg:pb-24">
-        {/* The headline rises out of a mask once the image has opened */}
-        <div className="overflow-hidden pb-3">
+        {/* The headline rises out of a mask once the intro has finished */}
+        <div className="mt-5 overflow-hidden pb-2">
           <motion.h1
-            className="font-display text-display-xl leading-[0.95] text-ivory"
+            className="font-display text-display-m leading-[0.98] text-ivory"
             initial={reduce ? false : { y: "105%" }}
             animate={{ y: open ? 0 : "105%" }}
-            transition={{ duration: 1, ease, delay: 0.9 }}
+            transition={{ duration: 1, ease, delay: 0.5 }}
           >
             <span className="block">Know Your Roots.</span>
             <span className="block">Own Your Future.</span>
           </motion.h1>
         </div>
 
-        <motion.div
-          initial={reduce ? false : { opacity: 0 }}
-          animate={{ opacity: open ? 1 : 0 }}
-          transition={{ duration: 0.8, delay: 1.7 }}
+        <motion.p
+          className="mt-4 max-w-2xl text-body-m text-ivory/85"
+          {...reveal(1)}
         >
-          <p className="mt-6 max-w-xl text-body-l text-ivory/85">
-            Discover the people, places, events, artifacts and stories that
-            shaped Nigeria — and the ones still shaping it today.
-          </p>
+          Nigerian history is scattered across books, archives and
+          half-remembered stories. REKÒ connects the people, places, events and
+          objects behind it — and shows you the evidence.
+        </motion.p>
 
+        <motion.div
+          className="mt-7 flex flex-col items-center gap-3 sm:flex-row"
+          {...reveal(1.15)}
+        >
           <Link
             to="/explore"
-            className="mt-8 inline-flex h-12 items-center bg-ivory px-8 text-body-s font-medium text-deep-forest transition-colors hover:bg-sand"
+            className="inline-flex h-12 items-center bg-ivory px-8 text-body-s font-medium text-deep-forest transition-colors hover:bg-sand"
           >
             Explore REKÒ
           </Link>
         </motion.div>
       </div>
+
+      {/* The strip rises in last, after the words */}
+      <motion.div
+        initial={reduce ? false : { opacity: 0, y: 40 }}
+        animate={{ opacity: open ? 1 : 0, y: open ? 0 : 40 }}
+        transition={{ duration: 1.4, ease, delay: 1.3 }}
+      >
+        <HeroCarousel slides={heroSlides} onFirstImageReady={markHomeReady} />
+      </motion.div>
     </section>
   );
 }

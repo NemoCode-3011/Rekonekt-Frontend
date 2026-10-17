@@ -78,7 +78,8 @@ function MenuIcon({ open }: { open: boolean }) {
 export default function GlobalNav() {
   const { user, loading, logout, showToast } = useAuth();
   const location = useLocation();
-  const isHome = location.pathname === "/";
+  // These pages open with a full-screen picture, so the nav floats over it.
+  const isHome = location.pathname === "/" || location.pathname === "/about";
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
