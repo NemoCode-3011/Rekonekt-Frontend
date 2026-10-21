@@ -105,7 +105,7 @@ export default function Exhibitions() {
                       aria-label={`View exhibition: ${exhibition.title}`}
                       className="group block"
                     >
-                      <div className="aspect-[3/2] overflow-hidden bg-sand">
+                      <div className="aspect-3/2verflow-hidden bg-sand">
                         {exhibition.cover_image_url ? (
                           <img
                             src={exhibition.cover_image_url}

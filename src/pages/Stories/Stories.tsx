@@ -12,9 +12,9 @@ import type { StorySummary } from "../../features/stories/types";
 // The words on this page. Change them here.
 const copy = {
   label: "STORIES",
-  heading: "The stories Nigeria tells itself.",
+  heading: "Some stories reach us through a voice.",
   intro:
-    "Myths, folktales, legends and oral histories, kept alive by the people who tell them.",
+    "Meet the heroes, spirits and everyday people of Nigeria’s storytelling traditions, where memory and imagination meet.",
   empty: "No stories have been published yet.",
   emptyFiltered: "No stories in this group yet.",
   error: "We couldn't load the stories. Please try again in a moment.",
@@ -64,7 +64,7 @@ function Featured({ story }: { story: StorySummary }) {
       to={storyPath(story.slug)}
       className="group grid items-center gap-8 md:grid-cols-12 md:gap-10 lg:gap-16"
     >
-      <Cover story={story} className="aspect-[4/3] md:col-span-7" />
+      <Cover story={story} className="aspect-4/3 md:col-span-7" />
 
       <div className="md:col-span-5">
         <Kicker story={story} />
@@ -85,7 +85,7 @@ function Featured({ story }: { story: StorySummary }) {
 function Item({ story }: { story: StorySummary }) {
   return (
     <Link to={storyPath(story.slug)} className="group block">
-      <Cover story={story} className="aspect-[4/3]" />
+      <Cover story={story} className="aspect-4/3" />
       <div className="mt-5">
         <Kicker story={story} />
         <h3 className="mt-2 font-display text-heading-s leading-tight transition-colors group-hover:text-heritage-green">

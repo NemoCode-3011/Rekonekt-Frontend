@@ -50,7 +50,7 @@ function makeItem(
   };
 }
 
-// Every backend reply looks like { message, data }.
+// Every backend reply looks like this { message, data }.
 async function get<T>(path: string) {
   const res = await http.get<{ message: string; data: T }>(path);
   return res.data.data;

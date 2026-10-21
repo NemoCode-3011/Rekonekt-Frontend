@@ -5,7 +5,7 @@ import type { ExperienceSource } from "../../features/experience/types";
 import { getStory, getStorySources } from "../../features/stories/api";
 import { categoryLabel } from "../../features/stories/Category";
 import type { Story } from "../../features/stories/types";
-import { toParagraphs } from "../../lib/text";
+import RichText from "../../components/ui/RichText";
 import { ApiError } from "../../services/api/client";
 
 type State =
@@ -96,7 +96,6 @@ export default function StoryDetail() {
 
   const { story } = state;
   const label = categoryLabel(story.category);
-  const paragraphs = toParagraphs(story.content);
 
   return (
     <article className="bg-ivory text-ink">
@@ -147,11 +146,10 @@ export default function StoryDetail() {
             </aside>
           )}
 
-          <div className="space-y-6 text-body-l leading-relaxed">
-            {paragraphs.map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
-          </div>
+          <RichText
+            html={story.content}
+            className="text-body-l leading-relaxed"
+          />
         </div>
 
         {sources.length > 0 && (

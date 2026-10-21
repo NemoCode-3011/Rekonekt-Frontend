@@ -6,7 +6,12 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useProgress } from "@react-three/drei";
 
@@ -112,8 +117,12 @@ function StoryFallback({
         <p className="mt-12 font-sans text-label uppercase tracking-[0.2em] text-ochre">
           {config.eyebrow}
         </p>
-        <h1 className="mt-4 font-display text-heading-l leading-tight">{config.title}</h1>
-        <p className="mt-2 font-sans text-body-m text-ivory/60">{config.subtitle}</p>
+        <h1 className="mt-4 font-display text-heading-l leading-tight">
+          {config.title}
+        </h1>
+        <p className="mt-2 font-sans text-body-m text-ivory/60">
+          {config.subtitle}
+        </p>
         <p className="mt-6 font-sans text-body-s text-ivory/60">{message}</p>
 
         <ol className="mt-12 space-y-12">
@@ -122,8 +131,12 @@ function StoryFallback({
               <p className="font-sans text-label uppercase tracking-[0.18em] text-ochre">
                 {pad(index + 1)} / {story.eyebrow}
               </p>
-              <h2 className="mt-2 font-display text-heading-m">{story.title}</h2>
-              <p className="mt-3 font-sans text-body-m text-ivory/75">{story.body}</p>
+              <h2 className="mt-2 font-display text-heading-m">
+                {story.title}
+              </h2>
+              <p className="mt-3 font-sans text-body-m text-ivory/75">
+                {story.body}
+              </p>
               <Sources sources={story.sources} />
             </li>
           ))}
@@ -132,8 +145,12 @@ function StoryFallback({
             <p className="font-sans text-label uppercase tracking-[0.18em] text-ochre">
               {config.finale.eyebrow}
             </p>
-            <h2 className="mt-2 font-display text-heading-m">{config.finale.title}</h2>
-            <p className="mt-3 font-sans text-body-m text-ivory/75">{config.finale.body}</p>
+            <h2 className="mt-2 font-display text-heading-m">
+              {config.finale.title}
+            </h2>
+            <p className="mt-3 font-sans text-body-m text-ivory/75">
+              {config.finale.body}
+            </p>
             <Sources sources={config.finale.sources} />
           </li>
         </ol>
@@ -169,9 +186,15 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
 
   const finaleIndex = stories.length;
   const finale = activeIndex === finaleIndex;
-  const story = activeIndex !== null && activeIndex < finaleIndex ? stories[activeIndex] : null;
+  const story =
+    activeIndex !== null && activeIndex < finaleIndex
+      ? stories[activeIndex]
+      : null;
 
-  const handleReady = useCallback(() => setPhase(reduced ? "explore" : "intro"), [reduced]);
+  const handleReady = useCallback(
+    () => setPhase(reduced ? "explore" : "intro"),
+    [reduced],
+  );
   const handleIntroDone = useCallback(() => setPhase("explore"), []);
   const handleInteract = useCallback(() => setInteracted(true), []);
 
@@ -185,7 +208,9 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
   const step = useCallback(
     (direction: number) =>
       setActiveIndex((current) =>
-        current === null ? null : (current + direction + finaleIndex + 1) % (finaleIndex + 1),
+        current === null
+          ? null
+          : (current + direction + finaleIndex + 1) % (finaleIndex + 1),
       ),
     [finaleIndex],
   );
@@ -245,7 +270,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
   return (
     <main
       aria-label={`${config.title}, interactive 3D view`}
-      className="relative h-svh min-h-[560px] w-full overflow-hidden bg-[#050806] text-ivory"
+      className="relative h-svh min-h-140 w-full overflow-hidden bg-[#050806] text-ivory"
     >
       {/* The 3D scene */}
       <div className="absolute inset-0">
@@ -289,7 +314,9 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
 
         <button
           type="button"
-          onClick={() => navigate(`/experiences/${slug}?chapter=${config.sectionSlug}`)}
+          onClick={() =>
+            navigate(`/experiences/${slug}?chapter=${config.sectionSlug}`)
+          }
           className="pointer-events-auto border border-ivory/30 bg-ink/40 px-4 py-2.5 font-sans text-[10px] uppercase tracking-[0.16em] backdrop-blur-sm transition-colors hover:border-ochre hover:bg-ochre/10"
         >
           Back to exhibition <span aria-hidden>↗</span>
@@ -347,19 +374,23 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
 
       {/* What this object is */}
       {exploring && (
-        <div className="pointer-events-none absolute left-5 top-20 z-10 md:bottom-8 md:left-10 md:top-auto">
+        <div className="pointer-events-none absolute left-5 top-20 z-10 md:bottom-8 md:left-10 md:top-auto hide-in-hall">
           <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-ochre">
             {config.eyebrow}
           </p>
           <p className="mt-1 max-w-[16rem] font-display text-[1.15rem] leading-tight md:max-w-xs md:text-[1.4rem]">
             {config.title}
           </p>
-          <p className="mt-1 font-sans text-meta text-ivory/55">{config.subtitle}</p>
+          <p className="mt-1 font-sans text-meta text-ivory/55">
+            {config.subtitle}
+          </p>
 
           {config.credit.model && (
             <p className="mt-3 hidden max-w-xs font-sans text-meta text-ivory/40 md:block">
               Digital model: {config.credit.model}
-              {config.credit.original && <> · Original: {config.credit.original}</>}
+              {config.credit.original && (
+                <> · Original: {config.credit.original}</>
+              )}
             </p>
           )}
         </div>
@@ -374,7 +405,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ delay: 0.6, duration: 0.8 }}
-            className="pointer-events-none absolute inset-x-0 bottom-24 z-10 px-6 text-center font-sans text-[10px] uppercase tracking-[0.2em] text-ivory/60 md:bottom-8"
+            className="pointer-events-none absolute inset-x-0 bottom-24 z-10 px-6 text-center font-sans text-[10px] uppercase tracking-[0.2em] text-ivory/60 md:bottom-8 hide-in-hall"
           >
             Drag to turn · Select a numbered point to look closer
           </motion.p>
@@ -385,7 +416,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
       {exploring && activeIndex === null && (
         <nav
           aria-label="Look closer"
-          className="absolute inset-x-0 bottom-6 z-20 flex justify-center px-4 md:bottom-16"
+          className="absolute inset-x-0 bottom-6 z-20 flex justify-center px-4 md:bottom-16 hide-in-hall"
         >
           <ul className="flex items-center gap-1.5 border border-ivory/15 bg-ink/70 px-2.5 py-2 backdrop-blur-md">
             {stories.map((item, index) => (
@@ -417,7 +448,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
         <button
           type="button"
           onClick={() => setResetKey((key) => key + 1)}
-          className="absolute bottom-6 right-5 z-20 hidden border border-ivory/30 bg-ink/50 px-4 py-2.5 font-sans text-[10px] uppercase tracking-[0.16em] backdrop-blur-sm transition-colors hover:border-ochre md:right-10 md:bottom-8 md:block"
+          className="absolute bottom-6 right-5 z-20 hidden border border-ivory/30 bg-ink/50 px-4 py-2.5 font-sans text-[10px] uppercase tracking-[0.16em] backdrop-blur-sm transition-colors hover:border-ochre md:right-10 md:bottom-8 md:block hide-in-hall"
         >
           Full view
         </button>
@@ -432,12 +463,12 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: reduced ? 0 : -8 }}
             transition={{ duration: reduced ? 0 : 0.35 }}
-            className="absolute inset-x-3 bottom-4 z-30 md:inset-x-auto md:bottom-auto md:right-8 md:top-1/2 md:w-[23rem] md:-translate-y-1/2"
+            className="pointer-events-none absolute inset-x-3 bottom-4 z-30 md:inset-x-auto md:bottom-24 md:right-8 md:top-24 md:flex md:w-92 md:items-center"
           >
             <aside
               role="dialog"
               aria-label={content.title}
-              className="max-h-[56svh] overflow-y-auto border border-ivory/15 border-t-2 border-t-ochre bg-[#0a110d]/90 p-6 backdrop-blur-xl md:max-h-[72svh]"
+              className="pointer-events-auto max-h-[56svh] overflow-y-auto border border-ivory/15 border-t-2 border-t-ochre bg-[#0a110d]/90 p-6 backdrop-blur-xl md:max-h-full"
             >
               <div className="flex items-center justify-between gap-4">
                 <p className="font-sans text-[10px] uppercase tracking-[0.18em] text-ivory/60">
@@ -472,7 +503,8 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
                 </button>
 
                 <span className="font-sans text-meta tabular-nums text-ochre">
-                  {Math.min((activeIndex ?? 0) + 1, finaleIndex + 1)} / {finaleIndex + 1}
+                  {Math.min((activeIndex ?? 0) + 1, finaleIndex + 1)} /{" "}
+                  {finaleIndex + 1}
                 </span>
 
                 <button
@@ -491,10 +523,12 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
       {/* Calibration helper: open this page with ?calibrate=1 */}
       {calibrate && (
         <div className="absolute bottom-24 left-5 z-40 w-72 border border-[#ff3df2]/60 bg-ink/90 p-4 font-sans text-meta md:bottom-24 md:left-10">
-          <p className="uppercase tracking-[0.16em] text-[#ff3df2]">Calibrate mode</p>
+          <p className="uppercase tracking-[0.16em] text-[#ff3df2]">
+            Calibrate mode
+          </p>
           <p className="mt-2 text-ivory/70">
-            Click the model where a marker should sit. Copy the two lines below into that
-            marker in objects.ts.
+            Click the model where a marker should sit. Copy the two lines below
+            into that marker in objects.ts.
           </p>
           <pre className="mt-3 whitespace-pre-wrap text-ivory">
             {pickedText || "Nothing picked yet."}
@@ -510,7 +544,8 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
           )}
           {!config.credit.model && (
             <p className="mt-3 text-ochre">
-              Reminder: fill in credit.model in objects.ts before showing this to anyone.
+              Reminder: fill in credit.model in objects.ts before showing this
+              to anyone.
             </p>
           )}
         </div>
@@ -534,13 +569,18 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
 // ---------- The route ----------
 
 export default function ObjectViewer() {
-  const { slug = "", key: objectKey } = useParams<{ slug: string; key: string }>();
+  const { slug = "", key: objectKey } = useParams<{
+    slug: string;
+    key: string;
+  }>();
   const config = getObject(objectKey);
 
   if (!config || config.exhibitionSlug !== slug) {
     return (
       <main className="flex min-h-svh flex-col items-center justify-center bg-ink px-5 text-center text-ivory">
-        <p className="font-display text-heading-m">This object isn't in the gallery.</p>
+        <p className="font-display text-heading-m">
+          This object isn't in the gallery.
+        </p>
         <Link
           to={slug ? `/experiences/${slug}` : "/"}
           className="mt-6 font-sans text-body-s underline underline-offset-4 hover:text-ochre"

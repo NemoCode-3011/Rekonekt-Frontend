@@ -34,8 +34,8 @@ export default function DidYouKnow() {
   // A long snippet gets a smaller headline so it doesn't fill the whole screen.
   const headingSize =
     story.did_you_know.length > 110
-      ? "text-heading-m lg:text-heading-l"
-      : "text-heading-l lg:text-display-m";
+      ? "text-heading-s lg:text-heading-m"
+      : "text-heading-m lg:text-heading-l";
 
   return (
     <section className="bg-ivory py-20 text-ink md:py-28 lg:py-40">
@@ -59,7 +59,7 @@ export default function DidYouKnow() {
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
             className="md:col-span-5"
           >
-            <div className="aspect-[4/5] overflow-hidden bg-sand/40">
+            <div className="aspect-4/5 overflow-hidden bg-sand/40">
               <img
                 src={story.cover_image_url}
                 alt={story.cover_image_alt ?? ""}
@@ -69,7 +69,9 @@ export default function DidYouKnow() {
               />
             </div>
             {story.cover_image_credit && (
-              <p className="mt-3 text-label text-muted">{story.cover_image_credit}</p>
+              <p className="mt-3 text-label text-muted">
+                {story.cover_image_credit}
+              </p>
             )}
           </motion.div>
 
@@ -91,7 +93,11 @@ export default function DidYouKnow() {
                 initial={reduce ? false : { scaleX: 0 }}
                 whileInView={{ scaleX: 1 }}
                 viewport={{ once: true, amount: 0.5 }}
-                transition={{ duration: 0.8, delay: 0.25, ease: [0.76, 0, 0.24, 1] }}
+                transition={{
+                  duration: 0.8,
+                  delay: 0.25,
+                  ease: [0.76, 0, 0.24, 1],
+                }}
                 style={{ transformOrigin: "left" }}
                 className="h-px w-24 bg-ochre"
               />

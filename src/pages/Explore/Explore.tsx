@@ -2,11 +2,11 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 
-import exhibitionsImage from "../../assets/images/hero/benin2.jpg";
-import peopleImage from "../../assets/images/hero/zik.jpg";
-import eventsImage from "../../assets/images/hero/lagos3.jpg";
+import exhibitionsImage from "../../assets/images/hero/exhibit3.jpg";
+import peopleImage from "../../assets/images/hero/people4.jpg";
+import eventsImage from "../../assets/images/hero/events1.jpg";
 import placesImage from "../../assets/images/hero/Awhuhm.png";
-import artifactsImage from "../../assets/images/hero/benin1.jpg";
+import artifactsImage from "../../assets/images/hero/artifact1.jpg";
 
 const discoveryRoutes = [
   {
@@ -67,7 +67,7 @@ export default function Explore() {
         />
 
         <div className="absolute inset-0 bg-ink/45" />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/20 to-ink/20" />
+        <div className="absolute inset-0 bg-linear-to-t from-ink/90 via-ink/20 to-ink/20" />
 
         <div className="container relative flex min-h-[75svh] flex-col justify-end py-16 lg:min-h-[85svh] lg:py-24">
           <motion.div
@@ -183,7 +183,7 @@ export default function Explore() {
 
             {/* Visual stage */}
             <div className="hidden lg:sticky lg:top-24 lg:col-span-5 lg:block lg:h-fit">
-              <div className="relative aspect-[4/5] overflow-hidden bg-deep-forest">
+              <div className="relative aspect-4/5 overflow-hidden bg-deep-forest">
                 {discoveryRoutes.map((route, index) => (
                   <motion.img
                     key={route.image}

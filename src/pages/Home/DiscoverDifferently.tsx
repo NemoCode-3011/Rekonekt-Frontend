@@ -110,7 +110,7 @@ export default function DiscoverDifferently() {
         </div>
 
         <div className="mt-10 hidden md:block lg:mx-auto lg:w-2/3">
-          <div className="relative h-[480px] overflow-hidden border border-line lg:h-[560px]">
+          <div className="relative h-120rflow-hidden border border-line lg:h-140">
             {routes.map((route, i) => (
               <motion.div
                 key={route.key}
@@ -183,7 +183,7 @@ export default function DiscoverDifferently() {
                   </p>
                   <div
                     aria-hidden
-                    className={`mt-5 h-[420px] overflow-hidden border border-line ${route.env}`}
+                    className={`mt-5 h-105 overflow-hidden border border-line ${route.env}`}
                   >
                     <route.Stage sample={samples[route.key] ?? null} />
                   </div>

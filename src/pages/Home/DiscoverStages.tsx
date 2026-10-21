@@ -68,7 +68,7 @@ export function EventsStage({ sample }: StageProps) {
             ))}
           </div>
           <div className="h-px bg-ivory/40" />
-          <span className="absolute -bottom-[5px] left-[62%] size-2.5 rounded-full bg-ivory" />
+          <span className="absolute -bottom-1.25 left-[62%] size-2.5 rounded-full bg-ivory" />
         </div>
       </div>
     </div>
@@ -117,7 +117,7 @@ export function ArtifactsStage({ sample }: StageProps) {
 
   return (
     <div className="flex h-full flex-col md:flex-row">
-      <div className="flex flex-1 items-center justify-center p-6 md:flex-[7] md:p-10">
+      <div className="flex flex-1 items-center justify-center p-6 md:flex-7 md:p-10">
         <div className="flex aspect-square h-full max-h-72 items-center justify-center overflow-hidden rounded-full bg-sand/45 md:max-h-80">
           {sample?.image && (
             <img
@@ -129,7 +129,7 @@ export function ArtifactsStage({ sample }: StageProps) {
         </div>
       </div>
 
-      <dl className="grid grid-cols-2 gap-x-4 gap-y-4 p-6 pt-0 md:flex md:flex-[5] md:flex-col md:justify-center md:gap-5 md:p-10">
+      <dl className="grid grid-cols-2 gap-x-4 gap-y-4 p-6 pt-0 md:flex md:flex-5 md:flex-col md:justify-center md:gap-5 md:p-10">
         {details.map(({ label, value }) => (
           <div key={label} className="border-t border-ink/25 pt-3">
             <dt className="text-label font-medium uppercase tracking-widest text-muted">

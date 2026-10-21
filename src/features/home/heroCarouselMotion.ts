@@ -1,49 +1,70 @@
 // Everything you might want to tune in the hero carousel lives here.
 // Change a number, save, and the carousel updates.
+//
+// The slides hang in a curve, like the reference: the middle slide is
+// smallest and flat, and the slides grow and turn inwards as they go
+// outwards. Distances are in "slide widths", so the shape stays the same on
+// every screen size.
 
-/** How fast the strip drifts by itself, in slides per second. 0 = still. */
+// ---- Movement -------------------------------------------------------------
+
+/**
+ * "glide": rest on each photo for HOLD_SECONDS, then glide to the next.
+ * "drift": move slowly and constantly, never resting.
+ */
+export const AUTOPLAY: "glide" | "drift" = "glide";
+
+/** How long each photo rests in the middle ("glide" only). */
+export const HOLD_SECONDS = 2.2;
+
+/** How long the glide to the next photo takes ("glide" only). */
+export const GLIDE_SECONDS = 1.1;
+
+/** Speed of the constant movement, in slides per second ("drift" only). */
 export const DRIFT_SLIDES_PER_SECOND = 0.1;
 
-/** Space between slides, as a multiple of one slide's width. */
-export const STEP_RATIO = 1.08;
+// ---- The curve ------------------------------------------------------------
+
+/** How far the viewer stands from the strip. Smaller = a stronger curve. */
+export const VIEWER_DISTANCE = 3.2;
+
+/** Height of a slide, as a multiple of its width. */
+export const SLIDE_HEIGHT = 1.42;
 
 /**
- * How much each slide turns, per step away from the middle, in degrees.
- * Positive curves the strip towards you, like a wall around the viewer.
- * Negative curves it away from you, like a classic cover-flow.
+ * Where a slide goes, by how many places it is from the middle (0 = the
+ * middle, 1 = next to it, and so on). A slide between two places is blended
+ * between them, which is what makes the glide smooth.
+ *   x     how far from the middle, in slide widths
+ *   turn  how far it turns to face the middle, in degrees
+ *   scale how much bigger than the middle slide
+ * These numbers were measured from the reference design.
  */
-export const TILT_PER_STEP = 16;
+const PLACES = [
+  { x: 0, turn: 0, scale: 1 },
+  { x: 1.07, turn: 23, scale: 1.06 },
+  { x: 2.28, turn: 57, scale: 1.31 },
+  { x: 3.95, turn: 70, scale: 2.01 },
+  { x: 6.5, turn: 72, scale: 2.7 }, // only a sliver at the edge of a wide screen
+];
 
-/**
- * Size of the middle slide, and how much it changes per step away from the
- * middle. A negative number shrinks the slides on the sides, so the middle
- * one towers over them. Slides are lined up along their bottom edge.
- */
-export const CENTER_SCALE = 1;
-export const SCALE_PER_STEP = -0.1;
+/** Slides fade out completely between these two places. They are off screen by then. */
+export const FADE_START = 3.9;
+export const FADE_END = 4.5;
 
-/** Tilt and size stop changing after this many steps from the middle. */
-export const MAX_STEPS = 3;
-
-/** Slides fade out completely between these two distances (in steps). */
-export const FADE_START = 2.6;
-export const FADE_END = 3.6;
-
-/** How dark the slides furthest from the middle become (0 to 1). */
-export const EDGE_SHADE = 0.55;
-
-/**
- * How the blurred picture behind the hero looks. The sepia gives grey archive
- * photographs a warm glow instead of a dead grey. Make the blur smaller for a
- * sharper glow, or brightness bigger for a brighter room.
- */
-export const BACKDROP_FILTER = "blur(70px) sepia(0.3) saturate(1.5) brightness(0.6)";
+// ---- Look -----------------------------------------------------------------
 
 /**
  * A light, film-like warmth applied to every photo, so pictures from
  * different sources feel like one family. Set to "none" to turn it off.
  */
-export const PHOTO_TREATMENT = "sepia(0.16) saturate(1.05) contrast(1.03)";
+export const PHOTO_TREATMENT = "sepia(0.12) saturate(1.05) contrast(1.03)";
+
+/** How much the photo behind the hero is softened, in pixels. 0 = sharp. */
+export const BACKDROP_BLUR_PX = 5;
+
+/** How dark the layer over the background photo is (0 = none, 1 = black). */
+export const BACKDROP_DARKNESS = 0.6;
 
 // ---------------------------------------------------------------------------
 
@@ -62,18 +83,27 @@ export function wrap(value: number, count: number) {
 }
 
 /**
- * How one slide looks, given its distance `d` from the middle
- * (measured in slides: 0 is the middle, -1 is one to the left).
+ * How one slide looks, given its distance `d` from the middle (measured in
+ * slides: 0 is the middle, -1 is one to the left) and the width of a slide in pixels.
  */
-export function slideLook(d: number) {
-  const steps = Math.min(Math.abs(d), MAX_STEPS);
+export function slideLook(d: number, itemW: number) {
+  const side = Math.sign(d);
+  const places = clamp(Math.abs(d), 0, PLACES.length - 1);
+
+  // Blend between the two places the slide is between.
+  const lower = Math.min(Math.floor(places), PLACES.length - 2);
+  const t = places - lower;
+  const a = PLACES[lower];
+  const b = PLACES[lower + 1];
+  const blend = (from: number, to: number) => from + (to - from) * t;
 
   return {
-    x: `${d * STEP_RATIO * 100}%`,
-    rotateY: -Math.sign(d) * steps * TILT_PER_STEP,
-    scale: CENTER_SCALE + steps * SCALE_PER_STEP,
+    x: side * blend(a.x, b.x) * itemW,
+    // Slides on the left turn one way, slides on the right the other.
+    rotateY: -side * blend(a.turn, b.turn),
+    scale: blend(a.scale, b.scale),
     opacity: clamp(1 - (Math.abs(d) - FADE_START) / (FADE_END - FADE_START), 0, 1),
-    zIndex: 100 - Math.round(Math.abs(d) * 10),
-    shade: (steps / MAX_STEPS) * EDGE_SHADE,
+    // Slides further out are bigger, so they sit on top.
+    zIndex: Math.round(Math.abs(d) * 10),
   };
 }

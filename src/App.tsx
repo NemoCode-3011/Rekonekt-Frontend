@@ -30,6 +30,8 @@ import StoryDetail from "./pages/Stories/StoryDetail";
 import NotFound from "./NotFound";
 import Settings from "./pages/Account/Settings";
 import AdminExhibitions from "./pages/Admin/Exhibitions";
+import AdminStories from "./pages/Admin/Stories";
+import AdminStoryEditor from "./pages/Admin/StoryEditor";
 import ExhibitionWorkspace from "./pages/Admin/ExhibitionsWorkspace";
 import Team from "./pages/Admin/Team";
 import AdminSettings from "./pages/Admin/AdminSettings";
@@ -108,6 +110,8 @@ function App() {
                   path="exhibitions/:id"
                   element={<ExhibitionWorkspace />}
                 />
+                <Route path="stories" element={<AdminStories />} />
+                <Route path="stories/:id" element={<AdminStoryEditor />} />
                 <Route path="settings" element={<AdminSettings />} />
                 <Route element={<RequireSuperAdmin />}>
                   <Route path="team" element={<Team />} />
@@ -115,7 +119,7 @@ function App() {
               </Route>
             </Route>
 
-            {/* the experience */}
+            {/* Immersive experience */}
             <Route path="/experiences/:slug" element={<ExperienceDetail />} />
             <Route
               path="/experiences/:slug/object/:key"

@@ -73,7 +73,7 @@
 @layer base {
   html {
     -webkit-font-smoothing: antialiased;
-      overflow-x: none;
+    overflow-x: none;
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -119,4 +119,89 @@
 
 .scrollbar-none::-webkit-scrollbar {
   display: none;
+}
+
+/* ---------- Rich text editor (admin) ---------- */
+.rte .ql-toolbar.ql-snow,
+.rte .ql-container.ql-snow {
+  border-color: var(--color-line);
+  font-family: var(--font-sans);
+}
+
+.rte .ql-container.ql-snow {
+  font-size: var(--text-body-s);
+}
+
+.rte .ql-editor {
+  min-height: 18rem;
+}
+
+.rte .ql-editor.ql-blank::before {
+  font-style: normal;
+  color: var(--color-muted);
+}
+
+.rte:focus-within .ql-toolbar.ql-snow,
+.rte:focus-within .ql-container.ql-snow {
+  border-color: var(--color-heritage-green);
+}
+
+.rte[data-invalid="true"] .ql-toolbar.ql-snow,
+.rte[data-invalid="true"] .ql-container.ql-snow {
+  border-color: var(--color-error);
+}
+
+/* ---------- Rich text on the public site ---------- */
+.rich-text>*+* {
+  margin-top: 1.5rem;
+}
+
+.rich-text h2 {
+  margin-top: 2.5rem;
+  font-family: var(--font-display);
+  font-size: var(--text-heading-s);
+  line-height: 1.15;
+}
+
+.rich-text h3 {
+  margin-top: 2rem;
+  font-family: var(--font-display);
+  font-size: var(--text-body-l);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.rich-text ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+}
+
+.rich-text ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+}
+
+.rich-text li+li {
+  margin-top: 0.5rem;
+}
+
+.rich-text blockquote {
+  border-left: 2px solid var(--color-ochre);
+  padding-left: 1.25rem;
+  font-family: var(--font-display);
+  font-style: italic;
+}
+
+.rich-text a {
+  color: var(--color-heritage-green);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.hide-in-hall {
+  transition: opacity 0.6s ease;
+}
+html[data-hall-focus] .hide-in-hall {
+  opacity: 0 !important;
+  pointer-events: none !important;
 }

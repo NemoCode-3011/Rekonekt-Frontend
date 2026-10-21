@@ -1,20 +1,26 @@
 import { useEffect, useState, type FormEvent } from "react";
 import Button from "../../../components/ui/Button";
 import { useAuth } from "../../auth/auth-context";
-import {
-  uploadAdminImage,
-  type UploadedMedia,
-} from "../api/media";
-
+import { uploadAdminImage, type UploadedMedia } from "../api/media";
+import RichTextEditor from "./RichTextEditor";
 export interface FormField {
   name: string;
   label: string;
-  kind?: "text" | "textarea" | "date" | "select" | "email" | "password" | "image";
+  kind?:
+    | "text"
+    | "textarea"
+    | "richtext"
+    | "date"
+    | "select"
+    | "email"
+    | "password"
+    | "image";
   required?: boolean;
   placeholder?: string;
   hint?: string;
   options?: { value: string; label: string }[];
   initial?: string;
+  rows?: number; // height of a textarea
 }
 
 interface InlineFormProps {
@@ -55,11 +61,15 @@ export default function InlineForm({
     Record<string, UploadedMedia>
   >({});
   const [previews, setPreviews] = useState<Record<string, string>>({});
-  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
+  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>(
+    {},
+  );
 
   useEffect(
     () => () => {
-      Object.values(previews).forEach((preview) => URL.revokeObjectURL(preview));
+      Object.values(previews).forEach((preview) =>
+        URL.revokeObjectURL(preview),
+      );
     },
     [previews],
   );
@@ -82,7 +92,9 @@ export default function InlineForm({
 
     try {
       const submitted = { ...values };
-      for (const field of fields.filter((candidate) => candidate.kind === "image")) {
+      for (const field of fields.filter(
+        (candidate) => candidate.kind === "image",
+      )) {
         const cachedMedia = uploadedMedia[field.name];
         if (cachedMedia) {
           submitted[field.name] = cachedMedia.file_url;
@@ -177,10 +189,19 @@ export default function InlineForm({
               {field.required && " *"}
             </label>
 
-            {field.kind === "textarea" ? (
+            {field.kind === "richtext" ? (
+              <RichTextEditor
+                id={id}
+                label={field.label}
+                value={values[field.name]}
+                placeholder={field.placeholder}
+                invalid={!!errors[field.name]}
+                onChange={change}
+              />
+            ) : field.kind === "textarea" ? (
               <textarea
                 {...common}
-                rows={3}
+                rows={field.rows ?? 3}
                 onChange={(event) => change(event.target.value)}
               />
             ) : field.kind === "select" ? (
@@ -292,7 +313,10 @@ export default function InlineForm({
                   />
                 )}
                 {uploadProgress[field.name] !== undefined && saving && (
-                  <p role="status" className="mt-2 font-sans text-meta text-muted">
+                  <p
+                    role="status"
+                    className="mt-2 font-sans text-meta text-muted"
+                  >
                     Uploading image… {uploadProgress[field.name]}%
                   </p>
                 )}

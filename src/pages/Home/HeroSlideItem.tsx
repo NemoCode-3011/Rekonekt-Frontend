@@ -2,7 +2,12 @@ import { motion, useMotionValueEvent, useTransform, type MotionValue } from "fra
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import type { HeroSlide } from "../../features/home/heroSlides";
-import { PHOTO_TREATMENT, slideLook, wrap } from "../../features/home/heroCarouselMotion";
+import {
+  PHOTO_TREATMENT,
+  SLIDE_HEIGHT,
+  slideLook,
+  wrap,
+} from "../../features/home/heroCarouselMotion";
 
 interface HeroSlideItemProps {
   slide: HeroSlide;
@@ -14,20 +19,23 @@ interface HeroSlideItemProps {
   isDuplicate: boolean;
   /** Where the carousel currently is, in slides. Shared by every slide. */
   offset: MotionValue<number>;
+  /** The width of one slide in pixels. Shared by every slide. */
+  itemWidth: MotionValue<number>;
   /** Called once the very first picture (or video frame) has loaded, or failed to. */
   onFirstImageReady?: () => void;
   reduceMotion: boolean;
 }
 
-// One picture or video in the strip. It reads its distance from the middle and
-// turns that into position, tilt, size and fade. Nothing here re-renders while
-// the strip moves, so the animation stays smooth.
+// One picture or video on the curved wall. It reads its distance from the middle
+// and turns that into position and turn. Nothing here re-renders while the
+// strip moves, so the animation stays smooth.
 function HeroSlideItem({
   slide,
   slot,
   slotCount,
   isDuplicate,
   offset,
+  itemWidth,
   onFirstImageReady,
   reduceMotion,
 }: HeroSlideItemProps) {
@@ -37,12 +45,11 @@ function HeroSlideItem({
   // Distance from the middle, in slides.
   const d = useTransform(offset, (current) => wrap(slot - current, slotCount));
 
-  const x = useTransform(d, (value) => slideLook(value).x);
-  const rotateY = useTransform(d, (value) => slideLook(value).rotateY);
-  const scale = useTransform(d, (value) => slideLook(value).scale);
-  const opacity = useTransform(d, (value) => slideLook(value).opacity);
-  const zIndex = useTransform(d, (value) => slideLook(value).zIndex);
-  const shade = useTransform(d, (value) => slideLook(value).shade);
+  const x = useTransform([d, itemWidth], ([dv, w]: number[]) => slideLook(dv, w).x);
+  const scale = useTransform([d, itemWidth], ([dv, w]: number[]) => slideLook(dv, w).scale);
+  const rotateY = useTransform([d, itemWidth], ([dv, w]: number[]) => slideLook(dv, w).rotateY);
+  const opacity = useTransform([d, itemWidth], ([dv, w]: number[]) => slideLook(dv, w).opacity);
+  const zIndex = useTransform([d, itemWidth], ([dv, w]: number[]) => slideLook(dv, w).zIndex);
 
   // A video only plays while its slide is near the middle.
   useMotionValueEvent(d, "change", (value) => {
@@ -61,7 +68,7 @@ function HeroSlideItem({
   const nothingToShow = !slide.image && !slide.video;
 
   const face = (
-    <div className="relative h-full w-full overflow-hidden rounded-xl bg-heritage-green/40 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.65)] ring-1 ring-ivory/15">
+    <div className="relative h-full w-full overflow-hidden rounded-2xl bg-ivory/10 shadow-[0_24px_50px_-20px_rgba(0,0,0,0.6)]">
       {failed || nothingToShow ? (
         // If a picture is missing, show a quiet tile instead of a broken icon.
         <div className="h-full w-full bg-linear-to-br from-ivory/10 to-ink" />
@@ -95,7 +102,7 @@ function HeroSlideItem({
           src={slide.image}
           alt={isDuplicate ? "" : slide.alt}
           width={900}
-          height={1200}
+          height={1260}
           draggable={false}
           loading={isDuplicate ? "lazy" : "eager"}
           decoding="async"
@@ -108,16 +115,6 @@ function HeroSlideItem({
           style={{ filter: PHOTO_TREATMENT }}
         />
       )}
-
-      {/* Grounds the picture in the palette, bottom to top */}
-      <div className="absolute inset-0 bg-linear-to-t from-ink/55 via-transparent to-transparent" />
-
-      {/* Slides further from the middle sink into the background */}
-      <motion.div
-        aria-hidden="true"
-        className="absolute inset-0 bg-ink"
-        style={{ opacity: shade }}
-      />
     </div>
   );
 
@@ -125,9 +122,15 @@ function HeroSlideItem({
     <motion.div
       data-hero-slide
       aria-hidden={isDuplicate || undefined}
-      className="absolute inset-0 m-auto h-[calc(var(--item-w)*1.333)] w-(--item-w)"
-      // Slides shrink towards their bottom edge, so the middle one stands tallest.
-      style={{ x, rotateY, scale, opacity, zIndex, transformOrigin: "50% 100%" }}
+      className="absolute inset-0 m-auto w-(--item-w)"
+      style={{
+        height: `calc(var(--item-w) * ${SLIDE_HEIGHT})`,
+        x,
+        scale,
+        rotateY,
+        opacity,
+        zIndex,
+      }}
     >
       {slide.href ? (
         <Link

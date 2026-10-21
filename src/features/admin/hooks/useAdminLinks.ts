@@ -6,6 +6,7 @@ export function useAdminLinks() {
   return [
     { to: "/admin/dashboard", label: "Overview" },
     { to: "/admin/exhibitions", label: "Exhibitions" },
+    { to: "/admin/stories", label: "Stories" },
     ...(user?.role === "super admin"
       ? [{ to: "/admin/team", label: "Team" }]
       : []),

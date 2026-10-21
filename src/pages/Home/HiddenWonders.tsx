@@ -78,7 +78,7 @@ export default function HiddenWonders() {
 
       {/* Cinematic overlay */}
       <div className="absolute inset-0 bg-ink/30" />
-      <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/20 to-ink/10" />
+      <div className="absolute inset-0 bg-linear-to-t from-ink/85 via-ink/20 to-ink/10" />
 
       <div className="container relative flex min-h-[90svh] flex-col justify-end py-16 lg:min-h-screen lg:py-24">
         <AnimatePresence mode="wait">

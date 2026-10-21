@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/auth-context";
 import Button from "../../../components/ui/Button";
 import type {
@@ -279,6 +280,7 @@ export default function AdminQuickActions({
   onCreated,
 }: AdminQuickActionsProps) {
   const { showToast } = useAuth();
+  const navigate = useNavigate();
   const [activeKind, setActiveKind] = useState<CreateContentKind | null>(null);
   const [values, setValues] = useState(emptyForm);
   const [submitting, setSubmitting] = useState(false);
@@ -486,12 +488,16 @@ export default function AdminQuickActions({
             key={action.kind}
             type="button"
             aria-expanded={activeKind === action.kind}
-            disabled={needsSection(action.kind) && !hasSections}
-            onClick={() =>
-              activeKind === action.kind
-                ? closeForm()
-                : openForm(action.kind)
-            }
+            disabled={action.kind !== "story" && needsSection(action.kind) && !hasSections}
+            onClick={() => {
+              // Stories have their own page, because a story can stand on its own.
+              if (action.kind === "story") {
+                navigate("/admin/stories?new=1");
+                return;
+              }
+              if (activeKind === action.kind) closeForm();
+              else openForm(action.kind);
+            }}
             className={`min-h-20 border-b border-r border-line px-4 py-4 text-left font-sans text-body-s font-medium transition-colors hover:bg-heritage-green/5 disabled:cursor-not-allowed disabled:opacity-45 ${
               activeKind === action.kind
                 ? "bg-deep-forest text-ivory hover:bg-deep-forest"
@@ -513,8 +519,7 @@ export default function AdminQuickActions({
       )}
       {sections !== null && sections.length === 0 && (
         <p className="mt-4 font-sans text-body-s text-muted">
-          Add a section to an exhibition before creating events, artifacts, or
-          stories.
+          Add a section to an exhibition before creating events or artifacts.
         </p>
       )}
 

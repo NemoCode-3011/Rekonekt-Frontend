@@ -1,9 +1,10 @@
 import { motion, useReducedMotion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSplash } from "../../components/splash/splash-context";
 import { heroSlides } from "../../features/home/heroSlides";
-import HeroBackdrop from "../../pages/Home/HeroBackdrop";
+import HeroBackdrop from "./HeroBackdrop";
 import HeroCarousel from "./HeroCarousel";
 
 const ease = [0.76, 0, 0.24, 1] as const;
@@ -13,7 +14,7 @@ export default function Hero() {
   const { introDone, markHomeReady } = useSplash();
   const open = reduce || introDone;
 
-  // Which slide is in the middle. The background takes its colour from it.
+  // Which slide is in the middle. The background shows that photo.
   const [activeIndex, setActiveIndex] = useState(0);
 
   // With no slides there is no picture to wait for, so don't hold the splash screen.
@@ -23,32 +24,28 @@ export default function Hero() {
 
   // Fades and lifts an element in once the intro has finished.
   const reveal = (delay: number) => ({
-    initial: reduce ? false : { opacity: 0, y: 24 },
-    animate: { opacity: open ? 1 : 0, y: open ? 0 : 24 },
+    initial: reduce ? false : { opacity: 0, y: 20 },
+    animate: { opacity: open ? 1 : 0, y: open ? 0 : 20 },
     transition: { duration: 0.9, ease, delay },
   });
 
   return (
-    <section
-      // --hl is the size of the headline. The strip below is pulled up by a
-      // share of it, so the middle photo overlaps the bottom of the letters.
-      className="relative isolate flex min-h-dvh flex-col justify-center overflow-hidden pb-8 pt-24 text-ivory [--hl:clamp(2.75rem,min(9vw,12svh),9rem)] md:pt-28"
-    >
+    <section className="relative isolate flex min-h-svh flex-col overflow-hidden pb-4 pt-24 text-ivory [@media(max-height:700px)]:pt-[5.25rem]">
       <HeroBackdrop slide={heroSlides[activeIndex]} />
 
-      {/* The words sit behind the strip */}
-      <div className="container relative z-0 flex flex-col items-center text-center">
+      {/* The words: a label, the headline, one line and one button, centred */}
+      <div className="container relative z-20 flex flex-col items-center text-center">
         <motion.p
-          className="text-label font-medium uppercase tracking-[0.22em] text-sand"
+          className="mb-4 text-label font-medium uppercase tracking-[0.22em] text-sand"
           {...reveal(0.3)}
         >
           A digital museum of Nigerian history
         </motion.p>
 
         {/* The headline rises out of a mask once the intro has finished */}
-        <div className="mt-4 overflow-hidden pb-[0.08em]">
+        <div className="overflow-hidden pb-[0.08em]">
           <motion.h1
-            className="font-display text-[length:var(--hl)] leading-[0.92] tracking-tight [text-shadow:0_4px_40px_rgba(0,0,0,0.35)]"
+            className="font-display text-[clamp(1.75rem,min(4.6vw,6.2svh),4.25rem)] leading-[1.02] tracking-tight"
             initial={reduce ? false : { y: "105%" }}
             animate={{ y: open ? 0 : "105%" }}
             transition={{ duration: 1, ease, delay: 0.5 }}
@@ -57,11 +54,36 @@ export default function Hero() {
             <span className="block">Own Your Future.</span>
           </motion.h1>
         </div>
+
+        <motion.p
+          className="mt-4 max-w-2xl text-body-m text-ivory/80 [@media(max-height:700px)]:hidden"
+          {...reveal(1)}
+        >
+          REKÒ connects the people, places, events and objects behind Nigeria&rsquo;s stories.
+        </motion.p>
+
+        <motion.div className="mt-5" {...reveal(1.15)}>
+          <Link
+            to="/explore"
+            className="group inline-flex h-12 items-center gap-4 rounded-full bg-ivory pl-7 pr-1.5 text-body-s font-medium text-ink transition-colors hover:bg-sand"
+          >
+            Explore REKÒ
+            <span className="grid size-9 place-items-center rounded-full bg-ochre text-ivory transition-transform duration-300 group-hover:translate-x-0.5">
+              <ArrowRight size={16} aria-hidden="true" />
+            </span>
+          </Link>
+        </motion.div>
       </div>
 
-      {/* The strip rises in after the words, and overlaps them a little */}
+      {/* The curved strip rises in after the words. It fills whatever height is left
+          under the words (container-type: size), and the strip works out its own
+          size from that, so on most screens it fits inside the first screen.
+          On a very short window the photos stop shrinking at a minimum size
+          (6.5rem wide, the same number as --min-item in HeroCarousel.tsx), and the
+          page scrolls a little instead. The min-height below is that minimum:
+          6.5rem x the strip's --group number, plus 3rem for the caption. */}
       <motion.div
-        className="relative z-10 -mt-[calc(var(--hl)*0.3)]"
+        className="relative z-10 min-h-[calc(6.5rem_*_2.14_+_3rem)] flex-1 [container-type:size] sm:min-h-[calc(6.5rem_*_2.91_+_3rem)] lg:min-h-[calc(6.5rem_*_3.11_+_3rem)]"
         initial={reduce ? false : { opacity: 0, y: 40 }}
         animate={{ opacity: open ? 1 : 0, y: open ? 0 : 40 }}
         transition={{ duration: 1.4, ease, delay: 1.2 }}
@@ -71,32 +93,6 @@ export default function Hero() {
           onFirstImageReady={markHomeReady}
           onActiveChange={setActiveIndex}
         />
-      </motion.div>
-
-      {/* The line of explanation and the two buttons */}
-      <motion.div
-        className="container relative z-10 mt-6 flex flex-col items-center gap-5 lg:flex-row lg:justify-between"
-        {...reveal(1.5)}
-      >
-        <p className="max-w-md text-center text-body-s text-ivory/80 lg:text-left [@media(max-height:560px)]:hidden">
-          Nigerian history is scattered across books, archives and half-remembered stories. REKÒ
-          connects the people, places, events and objects behind it — and shows you the evidence.
-        </p>
-
-        <div className="flex flex-col items-center gap-3 sm:flex-row">
-          <Link
-            to="/explore"
-            className="inline-flex h-12 items-center bg-ivory px-8 text-body-s font-medium text-ink transition-colors hover:bg-sand"
-          >
-            Explore REKÒ
-          </Link>
-          <Link
-            to="/exhibitions/the-benin-empire"
-            className="inline-flex h-12 items-center border border-ivory/40 px-8 text-body-s font-medium text-ivory transition-colors hover:bg-ivory/10"
-          >
-            Enter The Benin Empire
-          </Link>
-        </div>
       </motion.div>
     </section>
   );

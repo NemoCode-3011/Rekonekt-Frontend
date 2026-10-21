@@ -1,12 +1,18 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import type { HeroSlide } from "../../features/home/heroSlides";
-import { BACKDROP_FILTER } from "../../features/home/heroCarouselMotion";
+import {
+  BACKDROP_BLUR_PX,
+  BACKDROP_DARKNESS,
+  PHOTO_TREATMENT,
+} from "../../features/home/heroCarouselMotion";
 
-const mediaClass = "absolute inset-0 h-full w-full scale-[1.4] object-cover";
+// A little bigger than the screen, so the softened edges are never visible.
+const mediaClass = "absolute inset-0 h-full w-full scale-[1.06] object-cover";
+const mediaStyle = { filter: `blur(${BACKDROP_BLUR_PX}px) ${PHOTO_TREATMENT}` };
 
 // A video slide has no still picture, so its backdrop is the video itself.
-// On a wide screen it plays, so the glow behind the page moves with it.
+// On a wide screen it plays, so the background moves with it.
 function BackdropVideo({ src }: { src: string }) {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLVideoElement>(null);
@@ -25,42 +31,25 @@ function BackdropVideo({ src }: { src: string }) {
       playsInline
       preload="metadata"
       className={mediaClass}
-      style={{ filter: BACKDROP_FILTER }}
+      style={mediaStyle}
     />
   );
 }
 
 function BackdropMedia({ slide }: { slide: HeroSlide }) {
   if (slide.image) {
-    return (
-      <img src={slide.image} alt="" className={mediaClass} style={{ filter: BACKDROP_FILTER }} />
-    );
+    return <img src={slide.image} alt="" className={mediaClass} style={mediaStyle} />;
   }
   if (slide.video) return <BackdropVideo src={slide.video} />;
   return null;
 }
 
-// The film-like grain over the background.
-function Grain() {
-  return (
-    <svg
-      aria-hidden
-      className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.12] mix-blend-overlay"
-    >
-      <filter id="hero-grain">
-        <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch" />
-      </filter>
-      <rect width="100%" height="100%" filter="url(#hero-grain)" />
-    </svg>
-  );
-}
-
-// The room behind the hero: a huge, blurred, darkened copy of whichever
-// picture is in the middle, which fades to the next one as the strip moves.
-// The light from the screen spills into the room.
+// The hero's background is the photo in the middle of the strip, under a dark
+// overlay so the words and the strip stay readable. It fades to the next photo
+// as the strip moves.
 export default function HeroBackdrop({ slide }: { slide: HeroSlide | undefined }) {
   const reduce = useReducedMotion();
-  const fade = reduce ? 0 : 1.4;
+  const fade = reduce ? 0 : 1.2;
 
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden bg-ink">
@@ -72,7 +61,7 @@ export default function HeroBackdrop({ slide }: { slide: HeroSlide | undefined }
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             // The old picture holds until the new one has faded in over it,
-            // so the room never goes dark in between.
+            // so the background never goes dark in between.
             exit={{ opacity: 1 }}
             transition={{ duration: fade, ease: "easeInOut" }}
           >
@@ -81,13 +70,10 @@ export default function HeroBackdrop({ slide }: { slide: HeroSlide | undefined }
         )}
       </AnimatePresence>
 
-      {/* Keeps the words readable */}
-      <div className="absolute inset-0 bg-ink/35" />
+      {/* The overlay */}
+      <div className="absolute inset-0 bg-ink" style={{ opacity: BACKDROP_DARKNESS }} />
       {/* Darkens the corners, so the eye stays in the middle */}
-      <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_42%,transparent_50%,rgba(23,25,20,0.7)_100%)]" />
-      {/* Settles the bottom edge into the page */}
-      <div className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-ink/80 to-transparent" />
-      <Grain />
+      <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_45%,transparent_55%,rgba(23,25,20,0.55)_100%)]" />
     </div>
   );
 }

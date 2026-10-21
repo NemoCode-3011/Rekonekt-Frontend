@@ -80,7 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {toast && (
         <div
           role={toast.type === "error" ? "alert" : "status"}
-          className={`fixed right-4 top-4 z-[100] flex max-w-[calc(100vw-2rem)] items-center gap-4 px-5 py-4 text-body-s text-ivory shadow-xl ${
+          className={`fixed right-4 top-4 z-100 flex max-w-[calc(100vw-2rem)] items-center gap-4 px-5 py-4 text-body-s text-ivory shadow-xl ${
             toast.type === "error" ? "bg-error" : "bg-deep-forest"
           }`}
         >

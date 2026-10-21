@@ -18,7 +18,7 @@ async function post<T>(path: string, body: unknown) {
 }
 
 // Leaves out empty fields so optional values are simply not sent.
-function clean(values: Record<string, unknown>) {
+export function clean(values: Record<string, unknown>) {
   return Object.fromEntries(
     Object.entries(values).filter(([, value]) => value !== "" && value != null),
   );
@@ -37,7 +37,7 @@ export function slugify(text: string) {
 }
 
 // Slugs are made from the title. If one is already taken, try title-2, title-3...
-async function withSlug<T>(title: string, send: (slug: string) => Promise<T>) {
+export async function withSlug<T>(title: string, send: (slug: string) => Promise<T>) {
   const base = slugify(title);
 
   for (let attempt = 1; attempt <= 4; attempt++) {

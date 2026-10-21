@@ -21,6 +21,7 @@ import {
 } from "../useConnections";
 import type { DiscoverySubject, ExperienceStory } from "./types";
 import SaveButton from "../../bookmarks/components/SaveButton";
+import RichText from "../../../components/ui/RichText";
 
 // "1933–1999", "Born 1933", "Died 1999", or nothing if no dates are known.
 function lifeSpan(person: ExperiencePerson) {
@@ -271,7 +272,10 @@ function StoryDetails({ story }: { story: ExperienceStory }) {
           {story.excerpt}
         </p>
       )}
-      <Description text={story.content} />
+      <RichText
+        html={story.content}
+        className="mt-5 font-sans text-body-m leading-[1.75] text-ink/80"
+      />
     </article>
   );
 }

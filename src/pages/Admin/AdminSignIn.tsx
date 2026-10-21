@@ -25,7 +25,7 @@ export default function AdminSignIn() {
       <section className="relative flex min-h-[35vh] flex-col justify-between overflow-hidden bg-deep-forest px-6 py-7 md:px-12 md:py-10 lg:min-h-screen lg:px-16 lg:py-12">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-32 top-1/4 h-[28rem] w-[28rem] rounded-full border border-ivory/10"
+          className="pointer-events-none absolute -right-32 top-1/4 h-112d rounded-full border border-ivory/10"
         >
           <div className="absolute inset-10 rounded-full border border-ivory/10" />
           <div className="absolute inset-20 rounded-full border border-ivory/10" />
@@ -57,7 +57,7 @@ export default function AdminSignIn() {
       </section>
 
       <section className="flex min-h-[65vh] items-center justify-center bg-ivory px-5 py-14 text-ink md:px-10 lg:min-h-screen lg:px-16">
-        <div className="w-full max-w-[420px]">
+        <div className="w-full max-w-105">
           <p className="font-sans text-label uppercase tracking-[0.18em] text-ochre">
             Staff access
           </p>

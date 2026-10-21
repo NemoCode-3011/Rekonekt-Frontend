@@ -1,5 +1,10 @@
-import { Suspense, useEffect, useMemo, useRef } from "react";
-import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Canvas,
+  useFrame,
+  useThree,
+  type ThreeEvent,
+} from "@react-three/fiber";
 import {
   ContactShadows,
   Environment,
@@ -28,6 +33,7 @@ import {
 } from "three";
 import { Object3D as ThreeObject3D } from "three";
 import type { ObjectConfig, ObjectStory, Vec3 } from "./objects";
+import MuseumHall from "../object-viewer/MuseumHall";
 
 export type Phase = "loading" | "intro" | "explore";
 
@@ -94,7 +100,9 @@ function CameraRig({
   onInteract: () => void;
 }) {
   const camera = useThree((state) => state.camera) as PerspectiveCamera;
-  const controls = useThree((state) => state.controls) as unknown as ControlsLike | null;
+  const controls = useThree(
+    (state) => state.controls,
+  ) as unknown as ControlsLike | null;
   const size = useThree((state) => state.size);
 
   const start = useMemo(() => new Vector3(...START_POSITION), []);
@@ -148,7 +156,17 @@ function CameraRig({
     } else {
       moving.current = true;
     }
-  }, [phase, focus, finale, resetKey, reduced, camera, controls, rest, restTarget]);
+  }, [
+    phase,
+    focus,
+    finale,
+    resetKey,
+    reduced,
+    camera,
+    controls,
+    rest,
+    restTarget,
+  ]);
 
   // If the visitor grabs the object, stop moving the camera for them.
   useEffect(() => {
@@ -298,12 +316,28 @@ function Lighting({
       />
 
       {/* A warm edge light separates the bronze from the wall */}
-      <pointLight ref={rim} position={[0.2, 3.2, -1.5]} distance={6} decay={2} color="#d49a5b" />
+      <pointLight
+        ref={rim}
+        position={[0.2, 3.2, -1.5]}
+        distance={6}
+        decay={2}
+        color="#d49a5b"
+      />
 
       {/* A restrained green fill from the left */}
-      <pointLight ref={fill} position={[-2.8, 2.4, 1.4]} distance={7} decay={2} color="#4a795a" />
+      <pointLight
+        ref={fill}
+        position={[-2.8, 2.4, 1.4]}
+        distance={7}
+        decay={2}
+        color="#4a795a"
+      />
 
-      <mesh position={beam.position} quaternion={beam.quaternion} material={beam.material}>
+      <mesh
+        position={beam.position}
+        quaternion={beam.quaternion}
+        material={beam.material}
+      >
         <coneGeometry args={[1.5, beam.length, 48, 1, true]} />
       </mesh>
     </>
@@ -330,31 +364,35 @@ function makeGlowTexture() {
   return new CanvasTexture(canvas);
 }
 
-function Room() {
+function Room({ hall }: { hall: boolean }) {
   const glow = useMemo(makeGlowTexture, []);
   useEffect(() => () => glow.dispose(), [glow]);
 
   return (
     <group>
-      {/* Back wall */}
-      <mesh position={[0, 3, -4.2]}>
-        <planeGeometry args={[24, 12]} />
-        <meshStandardMaterial color="#0f2a20" roughness={1} />
-      </mesh>
+      {!hall && (
+        <>
+          {/* Back wall */}
+          <mesh position={[0, 3, -4.2]}>
+            <planeGeometry args={[24, 12]} />
+            <meshStandardMaterial color="#0f2a20" roughness={1} />
+          </mesh>
 
-      {/* A soft green glow behind the object */}
-      <mesh position={[0, 2, -3.9]}>
-        <planeGeometry args={[10, 10]} />
-        <meshBasicMaterial
-          map={glow}
-          color="#2f7a59"
-          transparent
-          opacity={0.5}
-          depthWrite={false}
-          blending={AdditiveBlending}
-          toneMapped={false}
-        />
-      </mesh>
+          {/* A soft green glow behind the object */}
+          <mesh position={[0, 2, -3.9]}>
+            <planeGeometry args={[10, 10]} />
+            <meshBasicMaterial
+              map={glow}
+              color="#2f7a59"
+              transparent
+              opacity={0.5}
+              depthWrite={false}
+              blending={AdditiveBlending}
+              toneMapped={false}
+            />
+          </mesh>
+        </>
+      )}
 
       {/* A doorway drawn in light: an arch and two slim pillars */}
       <mesh position={[0, 1.45, -1.65]}>
@@ -381,19 +419,36 @@ function Room() {
       ))}
 
       {/* A dark, slightly glossy floor */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.12, 0]} receiveShadow>
+      <mesh
+        rotation={[-Math.PI / 2, 0, 0]}
+        position={[0, -0.12, 0]}
+        receiveShadow
+      >
         <circleGeometry args={[16, 96]} />
-        <meshStandardMaterial color="#0c120e" roughness={0.38} metalness={0.5} envMapIntensity={0.7} />
+        <meshStandardMaterial
+          color="#0c120e"
+          roughness={0.38}
+          metalness={0.5}
+          envMapIntensity={0.7}
+        />
       </mesh>
 
       {/* The pedestal */}
       <mesh position={[0, 0.12, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[0.8, 0.95, 0.24, 64]} />
-        <meshStandardMaterial color="#101a14" roughness={0.3} metalness={0.55} />
+        <meshStandardMaterial
+          color="#101a14"
+          roughness={0.3}
+          metalness={0.55}
+        />
       </mesh>
       <mesh position={[0, 0.42, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[0.48, 0.58, 0.38, 48]} />
-        <meshStandardMaterial color="#17251c" roughness={0.42} metalness={0.35} />
+        <meshStandardMaterial
+          color="#17251c"
+          roughness={0.42}
+          metalness={0.35}
+        />
       </mesh>
       <mesh position={[0, 0.65, 0]}>
         <cylinderGeometry args={[0.52, 0.52, 0.07, 64]} />
@@ -413,10 +468,37 @@ function Room() {
 function Reflections() {
   return (
     <Environment resolution={256} frames={1}>
-      <Lightformer form="rect" intensity={2.4} color="#ffe2b8" position={[0, 6, 2]} rotation-x={Math.PI / 2} scale={[6, 4, 1]} />
-      <Lightformer form="rect" intensity={1.2} color="#8fb59a" position={[-5, 2, 1]} rotation-y={Math.PI / 2} scale={[4, 5, 1]} />
-      <Lightformer form="rect" intensity={1.8} color="#d49a5b" position={[5, 2, -3]} rotation-y={-Math.PI / 2} scale={[4, 5, 1]} />
-      <Lightformer form="ring" intensity={1} color="#f5f0e6" position={[0, 3, -6]} scale={5} />
+      <Lightformer
+        form="rect"
+        intensity={2.4}
+        color="#ffe2b8"
+        position={[0, 6, 2]}
+        rotation-x={Math.PI / 2}
+        scale={[6, 4, 1]}
+      />
+      <Lightformer
+        form="rect"
+        intensity={1.2}
+        color="#8fb59a"
+        position={[-5, 2, 1]}
+        rotation-y={Math.PI / 2}
+        scale={[4, 5, 1]}
+      />
+      <Lightformer
+        form="rect"
+        intensity={1.8}
+        color="#d49a5b"
+        position={[5, 2, -3]}
+        rotation-y={-Math.PI / 2}
+        scale={[4, 5, 1]}
+      />
+      <Lightformer
+        form="ring"
+        intensity={1}
+        color="#f5f0e6"
+        position={[0, 3, -6]}
+        scale={5}
+      />
     </Environment>
   );
 }
@@ -436,7 +518,9 @@ function prepareModel(source: Object3D) {
     mesh.castShadow = true;
     mesh.receiveShadow = true;
 
-    const material = (Array.isArray(mesh.material) ? mesh.material[0] : mesh.material) as MeshStandardMaterial;
+    const material = (
+      Array.isArray(mesh.material) ? mesh.material[0] : mesh.material
+    ) as MeshStandardMaterial;
     if (!material.isMeshStandardMaterial) return;
 
     const copy = material.clone();
@@ -458,7 +542,11 @@ function prepareModel(source: Object3D) {
   if (size.y > 0) {
     const scale = MODEL_HEIGHT / size.y;
     clone.scale.setScalar(scale);
-    clone.position.set(-center.x * scale, -bounds.min.y * scale, -center.z * scale);
+    clone.position.set(
+      -center.x * scale,
+      -bounds.min.y * scale,
+      -center.z * scale,
+    );
   }
 
   return clone;
@@ -497,7 +585,9 @@ function Marker({
     toCamera.copy(camera.position).sub(worldPosition).normalize();
 
     const amount = facing.dot(toCamera);
-    const opacity = visible ? Math.min(Math.max((amount - 0.05) / 0.25, 0), 1) : 0;
+    const opacity = visible
+      ? Math.min(Math.max((amount - 0.05) / 0.25, 0), 1)
+      : 0;
 
     wrapper.current.style.opacity = String(opacity);
     wrapper.current.style.pointerEvents = opacity > 0.5 ? "auto" : "none";
@@ -549,7 +639,14 @@ function Artifact({
   onPick,
 }: Pick<
   SceneProps,
-  "config" | "stories" | "activeIndex" | "phase" | "calibrate" | "picked" | "onSelect" | "onPick"
+  | "config"
+  | "stories"
+  | "activeIndex"
+  | "phase"
+  | "calibrate"
+  | "picked"
+  | "onSelect"
+  | "onPick"
 >) {
   const { scene } = useGLTF(config.modelUrl);
   const model = useMemo(() => prepareModel(scene), [scene]);
@@ -557,8 +654,8 @@ function Artifact({
   // In calibrate mode, clicking the model reports where you clicked,
   // relative to the pedestal, ready to paste into objects.ts.
   function handleClick(event: ThreeEvent<MouseEvent>) {
-    if (!calibrate) return;
     event.stopPropagation();
+    if (!calibrate) return;
 
     const point = event.point.clone();
     point.y -= PLINTH_TOP;
@@ -575,7 +672,24 @@ function Artifact({
 
   return (
     <group position={[0, PLINTH_TOP, 0]}>
-      <primitive object={model} onClick={handleClick} />
+      <primitive
+        object={model}
+        onClick={handleClick}
+        onPointerOver={(event: ThreeEvent<PointerEvent>) => {
+          event.stopPropagation();
+          if (phase === "explore")
+            document.body.style.cursor = calibrate ? "crosshair" : "grab";
+        }}
+        onPointerOut={() => (document.body.style.cursor = "")}
+        onPointerDown={() => {
+          if (phase === "explore" && !calibrate)
+            document.body.style.cursor = "grabbing";
+        }}
+        onPointerUp={() => {
+          if (phase === "explore" && !calibrate)
+            document.body.style.cursor = "grab";
+        }}
+      />
 
       {stories.map((story, index) => (
         <Marker
@@ -610,10 +724,40 @@ function Ready({ onReady }: { onReady: () => void }) {
 // ---------- The scene ----------
 
 export default function ObjectScene(props: SceneProps) {
-  const { config, stories, phase, activeIndex, finale, reduced, lowPower, interacted } = props;
+  const {
+    config,
+    stories,
+    phase,
+    activeIndex,
+    finale,
+    reduced,
+    lowPower,
+    interacted,
+  } = props;
 
-  const focus = activeIndex !== null && activeIndex < stories.length ? stories[activeIndex] : null;
-  const autoRotate = phase === "explore" && !interacted && activeIndex === null && !reduced;
+  const focus =
+    activeIndex !== null && activeIndex < stories.length
+      ? stories[activeIndex]
+      : null;
+  const autoRotate =
+    phase === "explore" && !interacted && activeIndex === null && !reduced;
+  // Adding ?hall=off to the address shows the plain room again
+  const hall = useMemo(
+    () => new URLSearchParams(window.location.search).get("hall") !== "off",
+    [],
+  );
+
+  // Which wall picture the camera is zoomed on (null = looking at the main object).
+  const [hallFocus, setHallFocus] = useState<number | null>(null);
+
+  // Tells the page, so the text about the main object can fade away.
+  useEffect(() => {
+    document.documentElement.toggleAttribute(
+      "data-hall-focus",
+      hallFocus !== null,
+    );
+    return () => document.documentElement.removeAttribute("data-hall-focus");
+  }, [hallFocus]);
 
   return (
     <Canvas
@@ -628,39 +772,54 @@ export default function ObjectScene(props: SceneProps) {
       <Suspense fallback={null}>
         <Reflections />
         <Lighting phase={phase} finale={finale} lowPower={lowPower} />
-        <Room />
-
-        <ContactShadows
-          position={[0, PLINTH_TOP + 0.005, 0]}
-          opacity={0.65}
-          scale={3}
-          blur={2.4}
-          far={1.6}
-          resolution={512}
-        />
-
-        {!reduced && (
-          <Sparkles
-            count={lowPower ? 30 : 70}
-            scale={[3.6, 4.4, 3.6]}
-            position={[0, 2, 0]}
-            size={2.2}
-            speed={0.25}
-            opacity={0.55}
-            color="#e8d2a6"
+        <Room hall={hall} />
+        {hall && (
+          <MuseumHall
+            lowPower={lowPower}
+            reduced={reduced}
+            phase={phase}
+            finale={finale}
+            lightPosition={LIGHT_POSITION}
+            focus={hallFocus}
+            onFocus={setHallFocus}
           />
         )}
 
-        <Artifact
-          config={config}
-          stories={stories}
-          activeIndex={activeIndex}
-          phase={phase}
-          calibrate={props.calibrate}
-          picked={props.picked}
-          onSelect={props.onSelect}
-          onPick={props.onPick}
-        />
+        {hallFocus === null && (
+          <>
+            <ContactShadows
+              position={[0, PLINTH_TOP + 0.005, 0]}
+              opacity={0.65}
+              scale={3}
+              blur={2.4}
+              far={1.6}
+              resolution={512}
+            />
+
+            {!reduced && (
+              <Sparkles
+                count={lowPower ? 30 : 70}
+                scale={[3.6, 4.4, 3.6]}
+                position={[0, 2, 0]}
+                size={2.2}
+                speed={0.25}
+                opacity={0.55}
+                color="#e8d2a6"
+              />
+            )}
+
+            <Artifact
+              config={config}
+              stories={stories}
+              activeIndex={activeIndex}
+              phase={phase}
+              calibrate={props.calibrate}
+              picked={props.picked}
+              onSelect={props.onSelect}
+              onPick={props.onPick}
+            />
+          </>
+        )}
 
         <Ready onReady={props.onReady} />
       </Suspense>

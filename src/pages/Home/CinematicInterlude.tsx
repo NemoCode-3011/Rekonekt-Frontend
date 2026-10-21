@@ -7,7 +7,7 @@ export default function CinematicInterlude() {
   const reduce = useReducedMotion();
 
   return (
-    <section className="relative h-[90svh] min-h-[600px] overflow-hidden bg-ink text-ivory">
+    <section className="relative h-[90svh] min-h-150 overflow-hidden bg-ink text-ivory">
       <motion.img
         src={interlude}
         alt="Obudu Cattle Ranch in Cross River State"

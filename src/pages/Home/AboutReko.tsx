@@ -55,7 +55,7 @@ export default function AboutReko() {
             connections between them.
           </p>
         </div>
-        <figure className="ml-auto mr-[calc(-1*var(--gutter))] mt-12 w-4/5 md:w-1/2 lg:absolute lg:right-0 lg:top-24 lg:mr-0 lg:mt-0 lg:w-[30vw]">
+        <figure className="ml-auto -mr-(--gutter) mt-12 w-4/5 md:w-1/2 lg:absolute lg:right-0 lg:top-24 lg:mr-0 lg:mt-0 lg:w-[30vw]">
           <div className="aspect-4/3 overflow-hidden bg-sand">
             <img
               src={archive}
@@ -81,13 +81,13 @@ export default function AboutReko() {
             aria-hidden
             variants={lineY}
             style={{ originY: 0 }}
-            className="absolute bottom-3.5 left-[3px] top-3.5 w-px bg-heritage-green/40 md:hidden"
+            className="absolute bottom-3.5 left-0.75 top-3.5 w-px bg-heritage-green/40 md:hidden"
           />
           <motion.span
             aria-hidden
             variants={lineX}
             style={{ originX: 0 }}
-            className="absolute inset-x-0 top-[3px] hidden h-px bg-heritage-green/40 md:block"
+            className="absolute inset-x-0 top-0.75 hidden h-px bg-heritage-green/40 md:block"
           />
 
           <ol className="grid gap-10 md:grid-cols-4 md:gap-6">
@@ -97,7 +97,7 @@ export default function AboutReko() {
                   aria-hidden
                   custom={i}
                   variants={dot}
-                  className="absolute left-0 top-[11px] size-[7px] rounded-full bg-heritage-green md:top-0"
+                  className="absolute left-0 top-2.75 size-1.75 rounded-full bg-heritage-green md:top-0"
                 />
                 <motion.span
                   custom={i}

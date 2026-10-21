@@ -75,10 +75,10 @@ export default function ComingSoon() {
         className="
         mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto
         pb-2 motion-safe:scroll-smooth
-        pl-[max(var(--gutter),calc((100vw_-_1440px)/2))]
-        pr-[max(var(--gutter),calc((100vw_-_1440px)/2))]
-        scroll-pl-[max(var(--gutter),calc((100vw_-_1440px)/2))]
-        [scrollbar-width:none]
+        pl-[max(var(--gutter),calc((100vw-1440px)/2))]
+        pr-[max(var(--gutter),calc((100vw-1440px)/2))]
+        scroll-pl-[max(var(--gutter),calc((100vw-1440px)/2))]
+        scrollbar-none
         [&::-webkit-scrollbar]:hidden
         lg:mt-14 lg:gap-6"
       >
@@ -88,7 +88,7 @@ export default function ComingSoon() {
             className="
               w-[72vw] shrink-0 snap-start
               sm:w-[44vw]
-              lg:w-[34vw] lg:max-w-[520px]
+              lg:w-[34vw] lg:max-w-130
             "
           >
             <article className="group relative aspect-3/4 w-full overflow-hidden bg-ink">
