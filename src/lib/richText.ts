@@ -41,3 +41,26 @@ export function sanitizeStoryHtml(text: string | null | undefined) {
     ALLOWED_ATTR: ["href", "target", "rel"],
   });
 }
+
+// Cuts a story's text in two, after the first `count` blocks (paragraphs,
+// headings, lists...). It is used to put a picture inside the story.
+// A story shorter than that comes back whole, with nothing in the second half.
+export function splitStoryHtml(
+  text: string | null | undefined,
+  count: number,
+): [string, string] {
+  const html = sanitizeStoryHtml(text);
+  const doc = new DOMParser().parseFromString(`<body>${html}</body>`, "text/html");
+
+  const hasLooseText = Array.from(doc.body.childNodes).some(
+    (node) => node.nodeType === 3 && node.textContent?.trim(),
+  );
+  const blocks = Array.from(doc.body.children);
+
+  if (hasLooseText || blocks.length <= count) return [html, ""];
+
+  return [
+    blocks.slice(0, count).map((block) => block.outerHTML).join(""),
+    blocks.slice(count).map((block) => block.outerHTML).join(""),
+  ];
+}

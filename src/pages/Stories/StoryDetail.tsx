@@ -7,6 +7,10 @@ import { categoryLabel } from "../../features/stories/Category";
 import type { Story } from "../../features/stories/types";
 import RichText from "../../components/ui/RichText";
 import { ApiError } from "../../services/api/client";
+import { splitStoryHtml } from "../../lib/richText";
+
+// The story image appears after this many paragraphs or headings.
+const BODY_IMAGE_AFTER = 57;
 
 type State =
   | { status: "loading" }
@@ -96,6 +100,9 @@ export default function StoryDetail() {
 
   const { story } = state;
   const label = categoryLabel(story.category);
+  const [before, after] = story.body_image_url
+    ? splitStoryHtml(story.content, BODY_IMAGE_AFTER)
+    : [story.content, ""];
 
   return (
     <article className="bg-ivory text-ink">
@@ -146,10 +153,28 @@ export default function StoryDetail() {
             </aside>
           )}
 
-          <RichText
-            html={story.content}
-            className="text-body-l leading-relaxed"
-          />
+          <RichText html={before} className="text-body-l leading-relaxed" />
+
+          {story.body_image_url && (
+            <figure className="my-12">
+              <img
+                src={story.body_image_url}
+                alt={story.body_image_alt ?? ""}
+                loading="lazy"
+                decoding="async"
+                className="max-h-[70svh] w-full object-cover"
+              />
+              {story.body_image_credit && (
+                <figcaption className="mt-3 text-label text-muted">
+                  {story.body_image_credit}
+                </figcaption>
+              )}
+            </figure>
+          )}
+
+          {after && (
+            <RichText html={after} className="text-body-l leading-relaxed" />
+          )}
         </div>
 
         {sources.length > 0 && (

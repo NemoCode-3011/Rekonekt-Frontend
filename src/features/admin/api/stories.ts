@@ -16,6 +16,12 @@ export interface AdminStory {
   cover_image_url: string | null;
   cover_image_alt: string | null;
   cover_image_credit: string | null;
+  did_you_know_image_url: string | null;
+  did_you_know_image_alt: string | null;
+  did_you_know_image_credit: string | null;
+  body_image_url: string | null;
+  body_image_alt: string | null;
+  body_image_credit: string | null;
   status: string;
   // The exhibition chapter the story is connected to. All four are null for a
   // standalone story.
@@ -34,7 +40,8 @@ async function get<T>(path: string) {
 
 export const listAdminStories = () => get<AdminStory[]>("/stories/admin");
 
-export const getAdminStory = (id: number) => get<AdminStory>(`/stories/admin/${id}`);
+export const getAdminStory = (id: number) =>
+  get<AdminStory>(`/stories/admin/${id}`);
 
 // Turns the form's values into what the backend expects. Empty fields are left out.
 function body(values: Values) {
@@ -47,13 +54,22 @@ function body(values: Values) {
     coverImageUrl: values.coverImageUrl,
     coverImageAlt: values.coverImageAlt?.trim(),
     coverImageCredit: values.imageCredit?.trim(),
+    didYouKnowImageUrl: values.didYouKnowImageUrl,
+    didYouKnowImageAlt: values.didYouKnowImageAlt?.trim(),
+    didYouKnowImageCredit: values.didYouKnowImageCredit?.trim(),
+    bodyImageUrl: values.bodyImageUrl,
+    bodyImageAlt: values.bodyImageAlt?.trim(),
+    bodyImageCredit: values.bodyImageCredit?.trim(),
   });
 }
 
 /** Creates a standalone draft. Connect it to an exhibition later, if you want to. */
 export function createAdminStory(values: Values) {
   return withSlug(values.title, async (slug) => {
-    const res = await http.post<Reply<{ id: number }>>("/stories", { slug, ...body(values) });
+    const res = await http.post<Reply<{ id: number }>>("/stories", {
+      slug,
+      ...body(values),
+    });
     return res.data.data;
   });
 }

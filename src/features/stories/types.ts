@@ -1,4 +1,3 @@
-
 export interface StorySummary {
   id: number;
   title: string;
@@ -16,6 +15,9 @@ export interface Story extends StorySummary {
   section_id: number | null;
   content: string | null;
   did_you_know: string | null;
+  body_image_url: string | null;
+  body_image_alt: string | null;
+  body_image_credit: string | null;
 }
 
 /** The story of the day, for the home page. It always has a snippet and a picture. */

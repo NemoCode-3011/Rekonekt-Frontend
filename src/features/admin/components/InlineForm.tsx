@@ -21,6 +21,7 @@ export interface FormField {
   options?: { value: string; label: string }[];
   initial?: string;
   rows?: number; // height of a textarea
+  creditField?: string; // for an image: the field that holds its credit
 }
 
 interface InlineFormProps {
@@ -117,7 +118,9 @@ export default function InlineForm({
               title: `${title} image`,
               mediaType: "image",
               description: submitted.description,
-              sourceCredit: submitted.imageCredit,
+              sourceCredit: field.creditField
+                ? submitted[field.creditField]
+                : submitted.imageCredit,
               license: submitted.imageLicense,
             },
             (progress) =>

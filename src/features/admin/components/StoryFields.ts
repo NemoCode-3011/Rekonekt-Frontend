@@ -44,22 +44,62 @@ export function storyFields(story?: AdminStory): FormField[] {
     },
     {
       name: "coverImageUrl",
-      label: "Cover image",
+      label: "Hero image",
       kind: "image",
-      hint: "Needed for the home page. It is also shown on the story's own page.",
+      hint: "The wide picture at the top of the story page. A landscape photo works best.",
       initial: story?.cover_image_url ?? "",
     },
     {
       name: "coverImageAlt",
-      label: "Describe the image",
+      label: "Hero image description",
       hint: "For people using a screen reader.",
       initial: story?.cover_image_alt ?? "",
     },
     {
       name: "imageCredit",
-      label: "Image credit",
+      label: "Hero image credit",
       hint: "The photographer, artist or archive.",
       initial: story?.cover_image_credit ?? "",
+    },
+    {
+      name: "didYouKnowImageUrl",
+      label: "Did you know image",
+      kind: "image",
+      hint: "A tall picture for the home page. Leave it empty to use the hero image instead.",
+      initial: story?.did_you_know_image_url ?? "",
+      creditField: "didYouKnowImageCredit"
+    },
+    {
+      name: "didYouKnowImageAlt",
+      label: "Did you know image description",
+      hint: "For people using a screen reader.",
+      initial: story?.did_you_know_image_alt ?? "",
+    },
+    {
+      name: "didYouKnowImageCredit",
+      label: "Did you know image credit",
+      hint: "The photographer, artist or archive.",
+      initial: story?.did_you_know_image_credit ?? "",
+    },
+    {
+      name: "bodyImageUrl",
+      label: "Story image",
+      kind: "image",
+      hint: "Shown inside the story, after the first few paragraphs.",
+      initial: story?.body_image_url ?? "",
+      creditField: "bodyImageCredit"
+    },
+    {
+      name: "bodyImageAlt",
+      label: "Story image description",
+      hint: "For people using a screen reader.",
+      initial: story?.body_image_alt ?? "",
+    },
+    {
+      name: "bodyImageCredit",
+      label: "Story image credit",
+      hint: "The photographer, artist or archive.",
+      initial: story?.body_image_credit ?? "",
     },
   ];
 }
