@@ -1,75 +1,60 @@
-# React + TypeScript + Vite
+# REKÒ — Digital Museum of Nigerian History
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+REKÒ is a digital museum experience designed to help people explore Nigerian history, culture, and the stories that shape the present. The frontend brings historical content into an experience built around discovery, exhibitions, people, places, events, and artifacts.
 
-Currently, two official plugins are available:
+> **Project status:** In development. The application is not currently deployed publicly.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## What the frontend includes
 
-## React Compiler
+- **Discovery and exploration:** Explore pages for exhibitions, experiences, stories, people, places, events, and artifacts.
+- **Exhibition and story pages:** Dedicated routes for viewing historical content and its connections.
+- **Accounts:** Sign-up, email verification, sign-in, password recovery, profile, and account settings flows.
+- **Personal learning tools:** Bookmarks, notes, and progress-related account areas.
+- **Content administration:** Protected admin routes and interfaces for managing exhibitions, stories, and related content.
+- **Immersive presentation:** A React Three Fiber / Three.js object-viewing experience alongside motion and interaction details.
+- **Search and navigation:** Search, route handling, protected pages, and not-found handling.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Frontend stack
 
-## Expanding the ESLint configuration
+- React 19 and TypeScript
+- Vite
+- React Router
+- Tailwind CSS 4
+- Three.js, React Three Fiber, and Drei
+- GSAP and Framer Motion
+- Vitest and React Testing Library
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Related repository
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+The API and data layer live in the companion repository:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- [REKÒ Backend](https://github.com/NemoCode-3011/Rekonekt-Backend) — Express and TypeScript API with PostgreSQL, Redis, authentication, content-management routes, and OpenAPI documentation.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Run locally
 
+Requirements: Node.js and npm.
+
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Useful scripts:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm run build
+npm run lint
+npm test
 ```
+
+The frontend expects the backend to be configured and running for API-backed features. See the backend README for its environment variables, database setup, and API documentation. Configure the frontend API URL according to the API client configuration before testing connected flows.
+
+## Current limitations
+
+- The project has not been deployed publicly yet.
+- Connected features depend on the companion API and local environment being configured correctly.
+- A public demo link and verified screenshots will be added when a deployment is available.
+
+## Author
+
+Built by [NemoCode-3011](https://github.com/NemoCode-3011).
