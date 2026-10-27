@@ -1,23 +1,22 @@
 # REKÒ — Digital Museum of Nigerian History
 
-REKÒ is a digital museum experience designed to help people explore Nigerian history, culture, and the stories that shape the present. The frontend brings historical content into an experience built around discovery, exhibitions, people, places, events, and artifacts.
+REKÒ helps people explore Nigerian history, culture, and the stories shaping the present. It is designed around discovery and context: visitors can move between exhibitions, experiences, stories, people, places, events, and artifacts to understand how they connect.
 
-> **Project status:** In development. The application is not currently deployed publicly.
+> **Status:** In development; no public deployment yet.
 
-## What the frontend includes
+## Product experience
 
-- **Discovery and exploration:** Explore pages for exhibitions, experiences, stories, people, places, events, and artifacts.
-- **Exhibition and story pages:** Dedicated routes for viewing historical content and its connections.
-- **Accounts:** Sign-up, email verification, sign-in, password recovery, profile, and account settings flows.
-- **Personal learning tools:** Bookmarks, notes, and progress-related account areas.
-- **Content administration:** Protected admin routes and interfaces for managing exhibitions, stories, and related content.
-- **Immersive presentation:** A React Three Fiber / Three.js object-viewing experience alongside motion and interaction details.
-- **Search and navigation:** Search, route handling, protected pages, and not-found handling.
+- **Explore:** Discover exhibitions, experiences, stories, people, places, events, and artifacts.
+- **Exhibitions and stories:** Read historical content and follow connections between related subjects.
+- **Accounts:** Sign-up, email verification, sign-in, password recovery, profile, and account settings.
+- **Learning tools:** Bookmarks, notes, and progress-related account areas.
+- **Content administration:** Protected admin interfaces for exhibitions, stories, and related content.
+- **Immersive objects:** Three.js / React Three Fiber presentation for selected objects.
+- **Navigation and search:** Search, routing, protected pages, and not-found handling.
 
-## Frontend stack
+## Stack
 
-- React 19 and TypeScript
-- Vite
+- React 19, TypeScript, and Vite
 - React Router
 - Tailwind CSS 4
 - Three.js, React Three Fiber, and Drei
@@ -26,9 +25,7 @@ REKÒ is a digital museum experience designed to help people explore Nigerian hi
 
 ## Related repository
 
-The API and data layer live in the companion repository:
-
-- [REKÒ Backend](https://github.com/NemoCode-3011/Rekonekt-Backend) — Express and TypeScript API with PostgreSQL, Redis, authentication, content-management routes, and OpenAPI documentation.
+The companion [REKÒ Backend](https://github.com/NemoCode-3011/Rekonekt-Backend) provides the Express/TypeScript API, PostgreSQL data layer, Redis support, authentication, content-management routes, and OpenAPI documentation.
 
 ## Run locally
 
@@ -39,7 +36,7 @@ npm install
 npm run dev
 ```
 
-Useful scripts:
+Available scripts:
 
 ```bash
 npm run build
@@ -47,13 +44,15 @@ npm run lint
 npm test
 ```
 
-The frontend expects the backend to be configured and running for API-backed features. See the backend README for its environment variables, database setup, and API documentation. Configure the frontend API URL according to the API client configuration before testing connected flows.
+For API-backed features, configure and run the backend first. Follow the backend README for its environment variables, database setup, and API documentation. Set the frontend API URL using the API client's configuration.
 
-## Current limitations
+## Verification
 
-- The project has not been deployed publicly yet.
-- Connected features depend on the companion API and local environment being configured correctly.
-- A public demo link and verified screenshots will be added when a deployment is available.
+The project author has tested the connected authentication, data persistence, media-upload, and admin workflows.
+
+## Deployment and media
+
+REKÒ is not publicly deployed yet, so there is no public demo link at this time. Screenshots and a live demo link can be added here when a deployment is available.
 
 ## Author
 
