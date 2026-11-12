@@ -11,7 +11,7 @@ const steps = [
   },
   {
     title: "Look closer",
-    body: "Select an artifact, person or place to open its details. Use the bookmark icon to save anything you want to come back to.",
+    body: "Select an artifact, person or place to open its details. Use the bookmark icon to save anything you want to come back to. Some chapters also hold a 3D object you can turn and examine.",
   },
   {
     title: "Follow the evidence",
@@ -68,7 +68,7 @@ function ExperienceGuide() {
   const current = steps[step];
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/85 px-5">
+    <div className="fixed inset-0 z-100 flex items-center justify-center bg-ink/85 px-5">
       <div
         role="dialog"
         aria-modal="true"

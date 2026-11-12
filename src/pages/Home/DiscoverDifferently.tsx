@@ -110,7 +110,7 @@ export default function DiscoverDifferently() {
         </div>
 
         <div className="mt-10 hidden md:block lg:mx-auto lg:w-2/3">
-          <div className="relative h-120rflow-hidden border border-line lg:h-140">
+          <div className="relative h-120 overflow-hidden border border-line lg:h-140">
             {routes.map((route, i) => (
               <motion.div
                 key={route.key}

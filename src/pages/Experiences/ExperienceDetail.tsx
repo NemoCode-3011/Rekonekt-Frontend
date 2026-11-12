@@ -104,12 +104,22 @@ function ExperienceDetail() {
   const section = sections[chapterIndex];
   const nextSection = sections[chapterIndex + 1]; // undefined on the last chapter
 
+  // 3D objects that belong to this chapter, if any.
+  const objects = slug ? getObjectsFor(slug, section.slug) : [];
+
   // The chapter's own image, then the exhibition's cover, then a plain default.
   const image =
     section.hero_image_url || experience.cover_image_url || fallbackImage;
 
   const goToChapter = (index: number) => {
     setSearchParams({ chapter: sections[index].slug }, { replace: true });
+  };
+
+  const jumpToObject = (key: string) => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document
+      .getElementById(`examine-${key}`)
+      ?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
   };
 
   return (
@@ -167,6 +177,20 @@ function ExperienceDetail() {
                   {section.title}
                 </h1>
 
+                {objects.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => jumpToObject(objects[0].key)}
+                    className="mt-8 inline-flex items-center gap-3 rounded-full border border-ivory/40 bg-ink/30 py-2 pl-2 pr-5 font-sans text-body-s backdrop-blur-sm transition-colors hover:border-sand hover:bg-ink/50"
+                  >
+                    <span className="rounded-full bg-sand px-2.5 py-1 text-label font-medium tracking-widest text-ink">
+                      3D
+                    </span>
+                    Examine an object from this chapter
+                    <span aria-hidden>↓</span>
+                  </button>
+                )}
+
                 <div className="mt-12 flex items-center gap-3">
                   {sections.map((chapter, index) => (
                     <button
@@ -187,15 +211,17 @@ function ExperienceDetail() {
             </div>
           </section>
 
-          <ChapterContent section={section} date={date ?? ""} />
-          {slug &&
-            getObjectsFor(slug, section.slug).map((object) => (
+          <ChapterContent
+            section={section}
+            date={date ?? ""}
+            objectCards={objects.map((object) => (
               <ExamineObjectCard
                 key={object.key}
                 object={object}
-                exhibitionSlug={slug}
+                exhibitionSlug={object.exhibitionSlug}
               />
             ))}
+          />
 
           {nextSection ? (
             <ChapterFooter

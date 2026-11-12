@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { getObjectsFor } from "../../object-viewer/objects";
 import type { Section } from "../types/sections";
 
 interface ChapterListProps {
@@ -34,6 +35,7 @@ function ChapterList({ experienceSlug, sections }: ChapterListProps) {
         <ol className="divide-y divide-line border-y border-line md:col-span-8">
           {sections.map((section, index) => {
             const text = blurb(section);
+            const hasObject = getObjectsFor(experienceSlug, section.slug).length > 0;
 
             return (
               <li key={section.id}>
@@ -52,6 +54,14 @@ function ChapterList({ experienceSlug, sections }: ChapterListProps) {
                     {text && (
                       <p className="mt-3 line-clamp-2 max-w-xl font-sans text-body-m leading-relaxed text-muted">
                         {text}
+                      </p>
+                    )}
+                    {hasObject && (
+                      <p className="mt-4 inline-flex items-center gap-3 font-sans text-label font-medium uppercase tracking-[0.16em] text-ochre">
+                        <span className="rounded-full border border-ochre/50 px-2 py-0.5">
+                          3D
+                        </span>
+                        Includes an object to examine
                       </p>
                     )}
                   </div>

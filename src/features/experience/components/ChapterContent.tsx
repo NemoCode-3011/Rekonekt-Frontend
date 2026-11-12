@@ -11,6 +11,8 @@ import EventMoment from "./EventMoment";
 interface ChapterContentProps {
   section: ExperienceSection;
   date: string;
+  /** Cards that invite the visitor into a 3D object. Shown right after the objects. */
+  objectCards?: ReactNode;
 }
 
 // A short status line shown while something loads or when it fails.
@@ -24,12 +26,12 @@ function Notice({ children }: { children: ReactNode }) {
 
 // Everything below a chapter's cinematic opening, top to bottom:
 //   1. the story and its dated moments   (ivory)
-//   2. objects                           (dark room)
+//   2. objects, then any 3D object cards (dark room)
 //   3. people and places                 (ivory)
 //   4. sources                           (ivory)
 // The moments and objects are loaded here. People, places and sources are
 // loaded by their own components, which hide themselves when empty.
-function ChapterContent({ section, date }: ChapterContentProps) {
+function ChapterContent({ section, date, objectCards }: ChapterContentProps) {
   const { items: events, status: eventsStatus } = useSectionEvents(section.id);
   const { items: artifacts, status: artifactsStatus } = useSectionArtifacts(
     section.id,
@@ -58,8 +60,8 @@ function ChapterContent({ section, date }: ChapterContentProps) {
                   key={index}
                   className={
                     index === 0
-                      ? "max-w-[44rem] font-display text-heading-m leading-[1.25] text-ink"
-                      : "mt-6 max-w-[44rem] font-sans text-body-m leading-[1.8] text-ink/80"
+                      ? "max-w-176t-display text-heading-m leading-tight text-ink"
+                      : "mt-6 max-w-176 font-sans text-body-m leading-[1.8] text-ink/80"
                   }
                 >
                   {paragraph}
@@ -93,6 +95,7 @@ function ChapterContent({ section, date }: ChapterContentProps) {
       </section>
 
       <ArtifactGallery artifacts={artifacts} />
+      {objectCards}
       <ChapterConnections sectionId={section.id} />
       <ChapterSources sectionId={section.id} />
     </>

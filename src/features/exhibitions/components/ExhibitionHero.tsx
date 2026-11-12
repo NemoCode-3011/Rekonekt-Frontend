@@ -48,7 +48,7 @@ function ExhibitionHero({ exhibition, chapterCount }: ExhibitionHeroProps) {
 
   return (
     <section className="container grid gap-10 py-10 md:grid-cols-12 md:gap-12 md:py-16 lg:gap-16">
-      <div className="relative order-first aspect-[4/3] overflow-hidden bg-deep-forest md:order-last md:col-span-7 md:aspect-auto md:min-h-[34rem]">
+      <div className="relative order-first aspect-4/3 overflow-hidden bg-deep-forest md:order-last md:col-span-7 md:aspect-auto md:min-h-136">
         <CoverImage exhibition={exhibition} />
       </div>
 
@@ -72,7 +72,7 @@ function ExhibitionHero({ exhibition, chapterCount }: ExhibitionHeroProps) {
         {paragraphs.map((paragraph, index) => (
           <p
             key={index}
-            className="mt-5 max-w-[34rem] font-sans text-body-m leading-[1.75] text-ink/80"
+            className="mt-5 max-w-136 font-sans text-body-m leading-[1.75] text-ink/80"
           >
             {paragraph}
           </p>
