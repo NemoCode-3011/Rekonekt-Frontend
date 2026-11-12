@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   listAdminStories,
@@ -19,18 +19,23 @@ export default function AdminStories() {
   // "?new=1" (from the dashboard's Add story button) opens the form straight away.
   const creating = params.get("new") === "1";
 
-  const load = useCallback(async () => {
-    try {
-      setItems(await listAdminStories());
-      setStatus("ready");
-    } catch {
-      setStatus("error");
-    }
-  }, []);
-
   useEffect(() => {
-    load();
-  }, [load]);
+    let cancelled = false;
+
+    listAdminStories()
+      .then((stories) => {
+        if (cancelled) return;
+        setItems(stories);
+        setStatus("ready");
+      })
+      .catch(() => {
+        if (!cancelled) setStatus("error");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   function setCreating(open: boolean) {
     setParams(open ? { new: "1" } : {}, { replace: true });
