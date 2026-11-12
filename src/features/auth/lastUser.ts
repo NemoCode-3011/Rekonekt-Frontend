@@ -14,7 +14,7 @@ export function saveLastUser(user: LastUser) {
   try {
     localStorage.setItem(KEY, JSON.stringify(user));
   } catch {
-    
+    // Storage can be unavailable in private browsing or restricted contexts.
   }
 }
 
