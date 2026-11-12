@@ -16,7 +16,6 @@ export default function AdminStories() {
   const [items, setItems] = useState<AdminStory[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
 
-  // "?new=1" (from the dashboard's Add story button) opens the form straight away.
   const creating = params.get("new") === "1";
 
   useEffect(() => {
