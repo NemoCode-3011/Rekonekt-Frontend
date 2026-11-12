@@ -5,6 +5,8 @@ import InlineForm from "../../features/admin/components/InlineForm";
 import { getAdminExhibitions } from "../../features/admin/api/dashboard";
 import { createExhibitionFromForm } from "../../features/admin/api/workspace";
 import type { DashboardExhibitionResponseItem } from "../../features/admin/types/dashboard";
+import PageLoader from "../../components/ui/PageLoader";
+import PageError from "../../components/ui/PageError";
 
 export default function Exhibitions() {
   const navigate = useNavigate();
@@ -86,18 +88,15 @@ export default function Exhibitions() {
       )}
 
       <div className="py-10">
-        {status === "loading" && (
-          <p className="font-sans text-body-s text-muted">
-            Loading exhibitions…
-          </p>
-        )}
+        {status === "loading" && <PageLoader label="Loading exhibitions…" />}
 
         {status === "error" && (
-          <p role="alert" className="font-sans text-body-m text-error">
-            We couldn't load the exhibitions. Refresh to try again.
-          </p>
+          <PageError
+            message="We couldn't load the exhibitions."
+            backTo="/admin"
+            backLabel="Back to dashboard"
+          />
         )}
-
         {status === "ready" && items.length === 0 && (
           <p className="font-sans text-body-m text-muted">
             No exhibitions yet. Create the first one above.

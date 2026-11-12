@@ -85,7 +85,7 @@ export default function AuthLayout() {
         </Link>
 
         <div className="flex flex-1 items-center justify-center py-12">
-          <div className="w-full max-w-[420px]">
+          <div className="w-full max-w-105">
             <Outlet />
           </div>
         </div>

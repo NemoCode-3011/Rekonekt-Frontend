@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSplash } from "../../components/splash/splash-context";
 import { heroSlides } from "../../features/home/heroSlides";
+import { STRIP_SIZE } from "../../features/home/heroCarouselMotion";
 import HeroBackdrop from "./HeroBackdrop";
 import HeroCarousel from "./HeroCarousel";
 
@@ -30,13 +31,13 @@ export default function Hero() {
   });
 
   return (
-    <section className="relative isolate flex min-h-svh flex-col overflow-hidden pb-4 pt-24 text-ivory [@media(max-height:700px)]:pt-[5.25rem]">
+    <section className="relative isolate flex min-h-svh flex-col overflow-hidden pb-4 pt-24 text-ivory [@media(max-height:700px)]:pt-21">
       <HeroBackdrop slide={heroSlides[activeIndex]} />
 
       {/* The words: a label, the headline, one line and one button, centred */}
       <div className="container relative z-20 flex flex-col items-center text-center">
         <motion.p
-          className="mb-4 text-label font-medium uppercase tracking-[0.22em] text-sand"
+          className="mb-4 text-label font-medium uppercase tracking-[0.22em] text-sand md:text-body-s"
           {...reveal(0.3)}
         >
           A digital museum of Nigerian history
@@ -45,7 +46,7 @@ export default function Hero() {
         {/* The headline rises out of a mask once the intro has finished */}
         <div className="overflow-hidden pb-[0.08em]">
           <motion.h1
-            className="font-display text-[clamp(1.75rem,min(4.6vw,6.2svh),4.25rem)] leading-[1.02] tracking-tight"
+            className="font-display text-[clamp(2.25rem,min(5vw,7.2svh),5rem)] leading-[1.02] tracking-tight"
             initial={reduce ? false : { y: "105%" }}
             animate={{ y: open ? 0 : "105%" }}
             transition={{ duration: 1, ease, delay: 0.5 }}
@@ -56,7 +57,7 @@ export default function Hero() {
         </div>
 
         <motion.p
-          className="mt-4 max-w-2xl text-body-m text-ivory/80 [@media(max-height:700px)]:hidden"
+          className="mt-4 max-w-2xl text-body-m text-ivory/80 [@media(max-height:600px)]:hidden"
           {...reveal(1)}
         >
           REKÒ connects the people, places, events and objects behind Nigeria&rsquo;s stories.
@@ -79,11 +80,12 @@ export default function Hero() {
           under the words (container-type: size), and the strip works out its own
           size from that, so on most screens it fits inside the first screen.
           On a very short window the photos stop shrinking at a minimum size
-          (6.5rem wide, the same number as --min-item in HeroCarousel.tsx), and the
-          page scrolls a little instead. The min-height below is that minimum:
-          6.5rem x the strip's --group number, plus 3rem for the caption. */}
+          (--min-item), and the page scrolls a little instead. The min-height
+          below is that minimum: --min-item x the strip's --group number, plus 3rem
+          for the caption. The numbers come from STRIP_SIZE, shared with
+          HeroCarousel.tsx. */}
       <motion.div
-        className="relative z-10 min-h-[calc(6.5rem_*_2.14_+_3rem)] flex-1 [container-type:size] sm:min-h-[calc(6.5rem_*_2.91_+_3rem)] lg:min-h-[calc(6.5rem_*_3.11_+_3rem)]"
+        className={`relative z-10 min-h-[calc(var(--min-item)*var(--group)+3rem)] flex-1 @container-size ${STRIP_SIZE}`}
         initial={reduce ? false : { opacity: 0, y: 40 }}
         animate={{ opacity: open ? 1 : 0, y: open ? 0 : 40 }}
         transition={{ duration: 1.4, ease, delay: 1.2 }}

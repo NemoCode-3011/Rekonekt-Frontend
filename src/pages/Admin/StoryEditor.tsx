@@ -14,11 +14,15 @@ import { storyFields } from "../../features/admin/components/StoryFields";
 import { useAuth } from "../../features/auth/auth-context";
 import { ApiError } from "../../services/api/client";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
+import PageLoader from "../../components/ui/PageLoader";
+import PageError from "../../components/ui/PageError";
+import { useGuardedLink } from "../../features/admin/unsaved/unsaved-context";
 
 export default function AdminStoryEditor() {
   const { id } = useParams<{ id: string }>();
   const storyId = Number(id);
   const navigate = useNavigate();
+  const guardedLink = useGuardedLink();
   const { showToast } = useAuth();
 
   const [story, setStory] = useState<AdminStory | null>(null);
@@ -51,7 +55,9 @@ export default function AdminStoryEditor() {
       .catch((error) => {
         if (cancelled) return;
         setStatus(
-          error instanceof ApiError && error.status === 404 ? "missing" : "error",
+          error instanceof ApiError && error.status === 404
+            ? "missing"
+            : "error",
         );
       });
 
@@ -63,6 +69,7 @@ export default function AdminStoryEditor() {
   const back = (
     <Link
       to="/admin/stories"
+      onClick={guardedLink("/admin/stories")}
       className="font-sans text-body-s text-muted hover:text-ink"
     >
       ← All stories
@@ -73,16 +80,21 @@ export default function AdminStoryEditor() {
     return (
       <div className="mx-auto w-full max-w-5xl px-5 py-8 md:px-8 md:py-12">
         {back}
-        <p
-          className="mt-8 font-sans text-body-m text-muted"
-          role={status === "loading" ? undefined : "alert"}
-        >
-          {status === "loading" && "Loading the story…"}
-          {status === "missing" &&
-            "That story doesn’t exist. It may have been deleted."}
-          {status === "error" &&
-            "We couldn’t load this story. Refresh to try again."}
-        </p>
+        {status === "loading" && <PageLoader label="Loading the story…" />}
+
+        {status === "error" && (
+          <PageError
+            message="We couldn't load this story."
+            backTo="/admin/stories"
+            backLabel="Back to stories"
+          />
+        )}
+
+        {status === "missing" && (
+          <p role="alert" className="mt-8 font-sans text-body-m text-muted">
+            That story doesn’t exist. It may have been deleted.
+          </p>
+        )}
       </div>
     );
   }

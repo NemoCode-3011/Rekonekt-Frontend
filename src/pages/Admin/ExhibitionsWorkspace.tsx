@@ -36,7 +36,10 @@ import type {
 } from "../../features/admin/types/dashboard";
 import { useAuth } from "../../features/auth/auth-context";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
-
+import PageLoader from "../../components/ui/PageLoader";
+import {
+  useGuardedLink,
+} from "../../features/admin/unsaved/unsaved-context";
 // ---------- The fields each form asks for ----------
 
 const imageFields: FormField[] = [
@@ -662,6 +665,7 @@ export default function ExhibitionWorkspace() {
   const { id } = useParams<{ id: string }>();
   const exhibitionId = Number(id);
   const { showToast } = useAuth();
+  const guardedLink = useGuardedLink();
 
   const [exhibition, setExhibition] =
     useState<DashboardExhibitionResponseItem | null>(null);
@@ -747,9 +751,7 @@ export default function ExhibitionWorkspace() {
   }, [exhibitionId]);
 
   if (status === "loading") {
-    return (
-      <p className="px-8 py-12 font-sans text-body-s text-muted">Loading…</p>
-    );
+    return <PageLoader label="Loading exhibition…" />;
   }
 
   if (status === "error" || !exhibition) {
@@ -774,6 +776,7 @@ export default function ExhibitionWorkspace() {
     <div className="mx-auto w-full max-w-5xl px-5 py-8 md:px-8 md:py-12">
       <Link
         to="/admin/exhibitions"
+        onClick={guardedLink("/admin/exhibitions")} // <-- add
         className="font-sans text-body-s text-muted hover:text-ink"
       >
         ← Exhibitions
@@ -789,6 +792,7 @@ export default function ExhibitionWorkspace() {
                 <StatusChip status="published" />
                 <Link
                   to={`/experiences/${exhibition.slug}`}
+                  onClick={guardedLink(`/experiences/${exhibition.slug}`)} // <-- add
                   className={textButton}
                 >
                   Open experience

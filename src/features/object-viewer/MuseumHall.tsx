@@ -775,7 +775,11 @@ function Hall({
   focus,
   onFocus,
 }: HallProps) {
-  const count = lowPower ? HALL.lowPowerAlcoves : HALL.alcoves;
+  // One alcove per Òrìṣà, so no portrait is ever repeated.
+  const count = Math.min(
+    lowPower ? HALL.lowPowerAlcoves : HALL.alcoves,
+    ORISHA.length,
+  );
   const assets = useMemo(() => buildAssets(lowPower, count), [lowPower, count]);
   useEffect(() => () => assets.dispose(), [assets]);
 
@@ -886,7 +890,7 @@ function Hall({
                     color: "#e9dcc0",
                   }}
                 >
-                  {ORISHA[focus % ORISHA.length].name}
+                  {ORISHA[focus].name}
                 </h2>
                 <p
                   className="mt-1 text-xs uppercase tracking-widest md:text-sm"
@@ -895,7 +899,7 @@ function Hall({
                     color: "#d6a45f",
                   }}
                 >
-                  {ORISHA[focus % ORISHA.length].title}
+                  {ORISHA[focus].title}
                 </p>
               </div>
               <button
@@ -968,7 +972,7 @@ function Hall({
           <Boundary>
             <Suspense fallback={null}>
               <Portrait
-                url={ORISHA[i % ORISHA.length].image}
+                url={ORISHA[i].image}
                 fade={assets.fade}
                 y={alcoveY + 0.09}
                 level={level}
@@ -978,8 +982,8 @@ function Hall({
           </Boundary>
 
           <Nameplate
-            name={ORISHA[i % ORISHA.length].name}
-            title={ORISHA[i % ORISHA.length].title}
+            name={ORISHA[i].name}
+            title={ORISHA[i].title}
             y={NAMEPLATE_Y}
             level={level}
           />

@@ -1,6 +1,4 @@
-// Everything you might want to tune in the hero carousel lives here.
-// Change a number, save, and the carousel updates.
-//
+// Everything to be tuned in the hero carousel
 // The slides hang in a curve, like the reference: the middle slide is
 // smallest and flat, and the slides grow and turn inwards as they go
 // outwards. Distances are in "slide widths", so the shape stays the same on
@@ -51,6 +49,23 @@ const PLACES = [
 /** Slides fade out completely between these two places. They are off screen by then. */
 export const FADE_START = 3.9;
 export const FADE_END = 4.5;
+
+// ---- Size on screen -------------------------------------------------------
+
+/**
+ * How big the strip may be on each screen size. Hero.tsx uses these numbers to
+ * keep room for the strip, and HeroCarousel.tsx uses them to size itself, so
+ * they live in one place. Change them here and both follow.
+ *   --min-item  the smallest a slide may get, so photos never look squashed
+ *   --vw-cap    the widest a slide may be, as a share of the screen's width
+ *   --group     the height of the strip plus the part that rises into the words,
+ *               in slide widths
+ *   --strip     the height of the strip, in slide widths
+ *   --lift      how far the strip rises beside the button, in slide widths
+ * (Tailwind reads these class names straight from this file.)
+ */
+export const STRIP_SIZE =
+  "[--min-item:6.5rem] [--group:2.14] [--lift:0.16] [--strip:2.3] [--vw-cap:40vw] sm:[--group:2.91] sm:[--lift:0.29] sm:[--strip:3.2] sm:[--vw-cap:15vw] lg:[--group:3.11] lg:[--lift:0.49] lg:[--strip:3.6] lg:[--vw-cap:10vw]";
 
 // ---- Look -----------------------------------------------------------------
 

@@ -7,6 +7,8 @@ interface PageErrorProps {
   onRetry?: () => void;
   tone?: "light" | "dark";
   fullScreen?: boolean;
+  backTo?: string;
+  backLabel?: string;
 }
 
 export default function PageError({
@@ -15,6 +17,8 @@ export default function PageError({
   onRetry = () => window.location.reload(),
   tone = "light",
   fullScreen = false,
+  backTo = "/",
+  backLabel = "Back to home",
 }: PageErrorProps) {
   const dark = tone === "dark";
 
@@ -43,14 +47,14 @@ export default function PageError({
           Try again
         </Button>
         <Link
-          to="/"
+          to={backTo}
           className={`inline-flex h-12 items-center border px-6 text-body-s transition-colors ${
             dark
               ? "border-ivory/40 hover:border-ivory"
               : "border-ink/40 hover:border-ink"
           }`}
         >
-          Back to home
+          {backLabel}
         </Link>
       </div>
     </div>

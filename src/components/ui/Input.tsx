@@ -43,7 +43,7 @@ export default function Input({
         {Icon && (
           <Icon
             aria-hidden="true"
-            className="pointer-events-none absolute left-4 top-1/2 size-[18px] -translate-y-1/2 text-muted"
+            className="pointer-events-none absolute left-4 top-1/2 size-4.5 -translate-y-1/2 text-muted"
           />
         )}
 
@@ -53,12 +53,12 @@ export default function Input({
             onClick={() => setShow(!show)}
             aria-label={show ? "Hide password" : "Show password"}
             aria-pressed={show}
-            className="absolute inset-y-0 right-0 flex min-w-11 items-center justify-center text-muted transition-colors hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-heritage-green"
+            className="absolute inset-y-0 right-0 flex min-w-11 items-center justify-center text-muted transition-colors hover:text-ink focus-visible:outline focus-visible:outline-offset-[-3px] focus-visible:outline-heritage-green"
           >
             {show ? (
-              <Eye aria-hidden="true" className="size-[18px]" />
+              <Eye aria-hidden="true" className="size-4.5" />
             ) : (
-              <EyeOff aria-hidden="true" className="size-[18px]" />
+              <EyeOff aria-hidden="true" className="size-4.5" />
             )}
           </button>
         )}

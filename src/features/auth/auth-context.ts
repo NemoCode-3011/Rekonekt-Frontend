@@ -13,6 +13,9 @@ export type AuthContextValue = {
   loading: boolean;
   setUser: (user: User | null) => void;
   logout: () => Promise<void>;
+  sessionExpired: boolean;
+  recheckSession: () => Promise<boolean>;
+  leaveExpiredSession: () => void;
   showToast: (message: string, type?: ToastType) => void;
 };
 

@@ -9,7 +9,8 @@ import {
 } from "../../features/admin/api/team";
 import { useAuth } from "../../features/auth/auth-context";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
-
+import PageLoader from "../../components/ui/PageLoader";
+import PageError from "../../components/ui/PageError";
 function errorMessage(error: unknown) {
   return error instanceof Error
     ? error.message
@@ -76,16 +77,14 @@ export default function Team() {
 
       <div className="grid gap-14 py-10 lg:grid-cols-[1fr_22rem]">
         <section>
-          {status === "loading" && (
-            <p className="font-sans text-body-s text-muted">
-              Loading the team…
-            </p>
-          )}
+          {status === "loading" && <PageLoader label="Loading the team…" />}
 
           {status === "error" && (
-            <p role="alert" className="font-sans text-body-m text-error">
-              We couldn't load the team. Refresh to try again.
-            </p>
+            <PageError
+              message="We couldn't load the team."
+              backTo="/admin"
+              backLabel="Back to dashboard"
+            />
           )}
 
           {status === "ready" && (

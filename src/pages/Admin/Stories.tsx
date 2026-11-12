@@ -9,12 +9,16 @@ import AdminPageHeader from "../../features/admin/components/AdminPageHeader";
 import InlineForm from "../../features/admin/components/InlineForm";
 import { storyFields } from "../../features/admin/components/StoryFields";
 import { categoryLabel } from "../../features/stories/Category";
+import PageLoader from "../../components/ui/PageLoader";
+import PageError from "../../components/ui/PageError";
 
 export default function AdminStories() {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const [items, setItems] = useState<AdminStory[]>([]);
-  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [status, setStatus] = useState<"loading" | "ready" | "error">(
+    "loading",
+  );
 
   const creating = params.get("new") === "1";
 
@@ -70,21 +74,21 @@ export default function AdminStories() {
             }}
           />
           <p className="mt-3 font-sans text-meta text-muted">
-            It is saved as a draft, and not connected to any exhibition. You can change both on the
-            next page.
+            It is saved as a draft, and not connected to any exhibition. You can
+            change both on the next page.
           </p>
         </div>
       )}
 
       <div className="py-10">
-        {status === "loading" && (
-          <p className="font-sans text-body-s text-muted">Loading stories…</p>
-        )}
+        {status === "loading" && <PageLoader label="Loading stories…" />}
 
         {status === "error" && (
-          <p role="alert" className="font-sans text-body-m text-error">
-            We couldn&rsquo;t load the stories. Refresh to try again.
-          </p>
+          <PageError
+            message="We couldn't load the stories."
+            backTo="/admin"
+            backLabel="Back to dashboard"
+          />
         )}
 
         {status === "ready" && items.length === 0 && (
@@ -108,7 +112,9 @@ export default function AdminStories() {
                     className="flex items-center justify-between gap-4 py-5 transition-colors hover:bg-heritage-green/5"
                   >
                     <div className="min-w-0">
-                      <p className="truncate font-display text-heading-s">{item.title}</p>
+                      <p className="truncate font-display text-heading-s">
+                        {item.title}
+                      </p>
                       <p className="truncate font-sans text-body-s text-muted">
                         {category ? `${category} · ` : ""}
                         {where}

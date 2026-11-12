@@ -3,6 +3,7 @@ import Button from "../../../components/ui/Button";
 import { useAuth } from "../../auth/auth-context";
 import { uploadAdminImage, type UploadedMedia } from "../api/media";
 import RichTextEditor from "./RichTextEditor";
+import { useUnsavedChanges } from "../unsaved/unsaved-context";
 export interface FormField {
   name: string;
   label: string;
@@ -65,6 +66,19 @@ export default function InlineForm({
   const [uploadProgress, setUploadProgress] = useState<Record<string, number>>(
     {},
   );
+
+  // What the form looked like when it was last saved (or first opened).
+  const [saved, setSaved] = useState<Record<string, string>>(start);
+
+  // "Dirty" = something was typed or a picture was chosen but not saved yet.
+  const dirty =
+    Object.keys(files).length > 0 ||
+    fields.some(
+      (field) =>
+        field.kind !== "image" && values[field.name] !== saved[field.name],
+    );
+
+  useUnsavedChanges(dirty);
 
   useEffect(
     () => () => {
@@ -151,6 +165,9 @@ export default function InlineForm({
         setUploadedMedia({});
         setPreviews({});
         setUploadProgress({});
+      } else {
+        setSaved(values); // after saving an edit, the form counts as clean again
+        setFiles({});
       }
     } catch (error) {
       showToast(

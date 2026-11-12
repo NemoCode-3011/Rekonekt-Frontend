@@ -1,16 +1,13 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth/auth-context";
+import PageLoader from "../../../components/ui/PageLoader";
 
 export default function RequireAdmin() {
   const { user, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
-    return (
-      <p className="grid min-h-[40svh] place-items-center font-sans text-body-s text-muted">
-        Loading…
-      </p>
-    );
+    return <PageLoader fullScreen label="Checking your session…" />;
   }
 
   if (!user) {

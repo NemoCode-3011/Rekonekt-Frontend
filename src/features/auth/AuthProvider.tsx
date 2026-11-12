@@ -12,7 +12,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<Toast | null>(null);
-
+  const [sessionExpired, setSessionExpired] = useState(false);
   // The session-expired handler runs outside React's rendering, so it reads
   // the latest user and page from refs.
   const userRef = useRef<User | null>(null);
@@ -43,19 +43,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSessionExpiredHandler(() => {
       if (!userRef.current) return; // guests have no session to lose
 
+      // In the admin, keep the page open so nothing typed is lost.
+      if (pathRef.current.startsWith("/admin")) {
+        setSessionExpired(true);
+        return;
+      }
+
       userRef.current = null; // several requests can fail at once: react once
       setUser(null);
-
-      const path = pathRef.current;
-
-      if (path.startsWith("/admin")) {
-        navigate("/admin/login", { replace: true, state: { expired: true } });
-      } else {
-        navigate("/auth/login", {
-          replace: true,
-          state: { expired: true, from: path },
-        });
-      }
+      navigate("/auth/login", {
+        replace: true,
+        state: { expired: true, from: pathRef.current },
+      });
     });
 
     return () => setSessionExpiredHandler(null);
@@ -66,6 +65,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }
 
+  // "Continue" button: ask the backend if there is a session again.
+  async function recheckSession() {
+    try {
+      setUser(await getCurrentUser());
+      setSessionExpired(false);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  // "Leave this page" button: give up and go to the sign-in page.
+  function leaveExpiredSession() {
+    userRef.current = null;
+    setUser(null);
+    setSessionExpired(false);
+    navigate("/admin/login", { replace: true, state: { expired: true } });
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -73,6 +91,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         setUser,
         logout,
+        sessionExpired,
+        recheckSession,
+        leaveExpiredSession,
         showToast: (message, type = "success") => setToast({ message, type }),
       }}
     >

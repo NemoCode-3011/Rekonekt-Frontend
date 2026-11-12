@@ -1,16 +1,20 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../auth/auth-context";
 import { useAdminLinks } from "../hooks/useAdminLinks";
+import { useGuard, useGuardedLink } from "../unsaved/unsaved-context";
 
 export default function AdminSidebar() {
   const { user, logout } = useAuth();
   const links = useAdminLinks();
+  const guard = useGuard();
+  const guardedLink = useGuardedLink();
 
   return (
     <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-deep-forest/30 bg-deep-forest text-ivory lg:flex">
       <div className="px-7 pt-8">
         <NavLink
           to="/admin/dashboard"
+          onClick={guardedLink("/admin/dashboard")}
           className="font-display text-3xl tracking-[-0.04em] text-ivory"
         >
           REKÒ
@@ -26,6 +30,7 @@ export default function AdminSidebar() {
             <li key={link.to}>
               <NavLink
                 to={link.to}
+                onClick={guardedLink(link.to)}
                 className={({ isActive }) =>
                   `block border-l-2 py-2.5 pl-3 font-sans text-body-s transition-colors ${
                     isActive
@@ -42,16 +47,24 @@ export default function AdminSidebar() {
       </nav>
 
       <div className="border-t border-ivory/15 px-7 py-6">
-        <p className="truncate font-sans text-body-s text-ivory">{user?.name}</p>
-        <p className="font-sans text-meta capitalize text-ivory/60">{user?.role}</p>
+        <p className="truncate font-sans text-body-s text-ivory">
+          {user?.name}
+        </p>
+        <p className="font-sans text-meta capitalize text-ivory/60">
+          {user?.role}
+        </p>
 
         <div className="mt-4 flex gap-5 font-sans text-meta">
-          <NavLink to="/" className="text-ivory/70 underline underline-offset-4 hover:text-ivory">
+          <NavLink
+            to="/"
+            onClick={guardedLink("/")}
+            className="text-ivory/70 underline underline-offset-4 hover:text-ivory"
+          >
             View site
           </NavLink>
           <button
             type="button"
-            onClick={logout}
+            onClick={() => guard(logout)}
             className="text-ivory/70 underline underline-offset-4 hover:text-ivory"
           >
             Sign out

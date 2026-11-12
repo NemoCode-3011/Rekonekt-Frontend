@@ -23,6 +23,7 @@ import {
   DRIFT_SLIDES_PER_SECOND,
   GLIDE_SECONDS,
   HOLD_SECONDS,
+  STRIP_SIZE,
   VIEWER_DISTANCE,
 } from "../../features/home/heroCarouselMotion";
 import HeroSlideItem from "./HeroSlideItem";
@@ -191,19 +192,13 @@ function HeroCarousel({ slides, onFirstImageReady, onActiveChange }: HeroCarouse
       aria-roledescription="carousel"
       aria-label="Photographs of Nigeria"
       // The whole strip has to fit in the space the hero gives it, so nothing is cut off.
-      //   --vw-cap  the widest a slide may be, as a share of the screen's width
-      //   --group   the height of the strip plus the part that rises into the words,
-      //             in slide widths
-      //   --strip   the height of the strip, in slide widths: bigger screens show the
-      //             tall slides at the sides, so they need more room
-      //   --lift    how far the strip rises beside the button, in slide widths, so the
-      //             middle slide ends up about 0.6 of a slide width below the button
-      //   --min-item the smallest a slide may get, so photos never look squashed
+      // --vw-cap, --group, --strip, --lift and --min-item are explained in
+      // heroCarouselMotion.ts (STRIP_SIZE). On top of those:
       //   --item-w  the width of one slide: as wide as the cap allows, or as the space left
       //             allows (100cqh is the height of the space the hero gives the strip),
       //             but never less than --min-item
       // If there is room to spare, the strip is centred in it.
-      className="absolute inset-x-0 [--min-item:6.5rem] [--group:2.14] [--lift:0.16] [--strip:2.3] [--vw-cap:28vw] sm:[--group:2.91] sm:[--lift:0.29] sm:[--strip:3.2] sm:[--vw-cap:15vw] lg:[--group:3.11] lg:[--lift:0.49] lg:[--strip:3.6] lg:[--vw-cap:10vw]"
+      className={`absolute inset-x-0 ${STRIP_SIZE}`}
       style={
         {
           "--item-w":
@@ -285,12 +280,12 @@ function HeroCarousel({ slides, onFirstImageReady, onActiveChange }: HeroCarouse
             onClick={() => setUserPaused((paused) => !paused)}
             aria-label={userPaused ? "Play slideshow" : "Pause slideshow"}
             aria-pressed={userPaused}
-            className="absolute right-(--gutter) top-[-0.4rem] grid size-9 place-items-center rounded-full border border-ivory/30 text-ivory transition-colors hover:bg-ivory/10"
+            className="absolute right-(--gutter) top-[-0.6rem] grid size-11 place-items-center rounded-full border border-ivory/30 text-ivory transition-colors hover:bg-ivory/10"
           >
             {userPaused ? (
-              <Play size={14} aria-hidden="true" />
+              <Play size={16} aria-hidden="true" />
             ) : (
-              <Pause size={14} aria-hidden="true" />
+              <Pause size={16} aria-hidden="true" />
             )}
           </button>
         )}

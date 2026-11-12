@@ -55,16 +55,16 @@ export default function AboutReko() {
             connections between them.
           </p>
         </div>
-        <figure className="ml-auto -mr-(--gutter) mt-12 w-4/5 md:w-1/2 lg:absolute lg:right-0 lg:top-24 lg:mr-0 lg:mt-0 lg:w-[30vw]">
+        <figure className="mt-12 md:ml-auto md:-mr-(--gutter) md:w-1/2 lg:absolute lg:right-0 lg:top-24 lg:mr-0 lg:mt-0 lg:w-[30vw]">
           <div className="aspect-4/3 overflow-hidden bg-sand">
             <img
               src={archive}
-              alt="A black and white archival photograph capturing a group of joyful Nigerian students and citizens marching down a London street on October 1, 1960. Many in the crowd are smiling, singing, and dancing. Several individuals wear traditional Nigerian attire, including agbadas, gele head ties, and wrapper cloths, while others are dressed in mid-century Western suits. In the background, some carry protest or celebratory signs, and classical stone buildings and a London bus stop indicator flank the street."
+              alt="Black and white photograph of Nigerian students and citizens smiling, singing and dancing down a London street on Independence Day, 1960."
               loading="lazy"
               className="h-full w-full object-cover grayscale-50 sepia-[.35]"
             />
           </div>
-          <figcaption className="mt-3 pr-5 text-meta text-muted lg:pr-8">
+          <figcaption className="mt-3 text-meta text-muted md:pr-5 lg:pr-8">
             Nigerian students and citizens celebrate Nigeria's Independence Day
             outside Nigeria House on Northumberland Avenue, London, October 1,
             1960. Photograph by William Vanderson/Fox Photos via Getty Images.
