@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import ArrowLink from "../../components/ui/ArrowLink";
 import { getExhibitions } from "../../features/exhibitions/api/exhibitions";
 import type { Exhibition } from "../../features/exhibitions/types/exhibitions";
@@ -38,7 +39,8 @@ export default function FeaturedExhibition() {
           FEATURED EXHIBITION
         </p>
 
-        <div className="relative mt-8 lg:mt-12">
+        {/* The picture and the title are one big link, so the whole thing is clickable */}
+        <Link to={href} className="group relative mt-8 block lg:mt-12">
           <div className="relative aspect-4/3 w-full overflow-hidden bg-[#090b09] lg:aspect-16/10 lg:w-2/3">
             <img
               src={image}
@@ -52,21 +54,21 @@ export default function FeaturedExhibition() {
             />
             <img
               src={image}
-              alt={title}
-              className="relative z-10 h-full w-full object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.55)]"
+              alt=""
+              className="relative z-10 h-full w-full object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.55)] transition-transform duration-700 group-hover:scale-[1.02]"
             />
           </div>
 
           <h2 className="mt-8 font-display text-display-l lg:text-[clamp(3rem,5vw,5.5rem)] uppercase leading-[0.95] tracking-normal text-ink lg:absolute lg:bottom-0 lg:left-[56%] lg:mt-0 lg:text-ivory lg:mix-blend-difference">
             {title}
           </h2>
-        </div>
+        </Link>
 
         <div className="mt-8 lg:ml-[56%] lg:mt-10 lg:max-w-md">
           <p className="text-body-l text-muted">{teaser}</p>
 
           <ArrowLink to={href} className="mt-8">
-            Enter exhibition
+            View exhibition
           </ArrowLink>
         </div>
       </div>

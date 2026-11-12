@@ -85,7 +85,7 @@ function ExhibitionHero({ exhibition, chapterCount }: ExhibitionHeroProps) {
           >
             <span>
               <span className="block font-display text-heading-s">
-                Enter Experience
+                Begin the exhibition
               </span>
               <span className="mt-1 block font-sans text-body-s text-sand">
                 {chapterCount} {chapterCount === 1 ? "chapter" : "chapters"}
