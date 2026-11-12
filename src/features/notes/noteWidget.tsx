@@ -41,15 +41,22 @@ export default function NotesWidget() {
   useEffect(() => {
     if (!open || !userId || loadedFor === userId) return;
 
-    setStatus("loading");
+    let cancelled = false;
 
     getNotes()
       .then((data) => {
+        if (cancelled) return;
         setNotes(data);
         setLoadedFor(userId);
         setStatus("ready");
       })
-      .catch(() => setStatus("error"));
+      .catch(() => {
+        if (!cancelled) setStatus("error");
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [open, userId, loadedFor]);
 
   // Esc closes the panel. The writing box is focused when it opens.
@@ -230,7 +237,8 @@ export default function NotesWidget() {
                 </div>
 
                 <div className="flex-1 overflow-y-auto px-6 py-2">
-                  {status === "loading" && (
+                  {(status === "loading" ||
+                    (Boolean(userId) && loadedFor !== userId && status !== "error")) && (
                     <p className="py-6 font-sans text-body-s text-muted">
                       Loading your notes…
                     </p>
