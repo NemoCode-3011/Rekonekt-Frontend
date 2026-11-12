@@ -35,8 +35,22 @@ export default function Team() {
   }, []);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    let cancelled = false;
+
+    getTeam()
+      .then((members) => {
+        if (cancelled) return;
+        setTeam(members);
+        setStatus("ready");
+      })
+      .catch(() => {
+        if (!cancelled) setStatus("error");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function confirmRemove() {
     if (!toRemove) return;
