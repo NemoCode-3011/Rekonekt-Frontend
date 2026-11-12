@@ -1,75 +1,59 @@
-# React + TypeScript + Vite
+# REKÒ — Digital Museum of Nigerian History
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+REKÒ helps people explore Nigerian history, culture, and the stories shaping the present. It is designed around discovery and context: visitors can move between exhibitions, experiences, stories, people, places, events, and artifacts to understand how they connect.
 
-Currently, two official plugins are available:
+> **Status:** In development; no public deployment yet.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Product experience
 
-## React Compiler
+- **Explore:** Discover exhibitions, experiences, stories, people, places, events, and artifacts.
+- **Exhibitions and stories:** Read historical content and follow connections between related subjects.
+- **Accounts:** Sign-up, email verification, sign-in, password recovery, profile, and account settings.
+- **Learning tools:** Bookmarks, notes, and progress-related account areas.
+- **Content administration:** Protected admin interfaces for exhibitions, stories, and related content.
+- **Immersive objects:** Three.js / React Three Fiber presentation for selected objects.
+- **Navigation and search:** Search, routing, protected pages, and not-found handling.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Stack
 
-## Expanding the ESLint configuration
+- React 19, TypeScript, and Vite
+- React Router
+- Tailwind CSS 4
+- Three.js, React Three Fiber, and Drei
+- GSAP and Framer Motion
+- Vitest and React Testing Library
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Related repository
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+The companion [REKÒ Backend](https://github.com/NemoCode-3011/Rekonekt-Backend) provides the Express/TypeScript API, PostgreSQL data layer, Redis support, authentication, content-management routes, and OpenAPI documentation.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Run locally
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Requirements: Node.js and npm.
 
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Available scripts:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm run build
+npm run lint
+npm test
 ```
+
+For API-backed features, configure and run the backend first. Follow the backend README for its environment variables, database setup, and API documentation. Set the frontend API URL using the API client's configuration.
+
+## Verification
+
+The project author has tested the connected authentication, data persistence, media-upload, and admin workflows.
+
+## Deployment and media
+
+REKÒ is not publicly deployed yet, so there is no public demo link at this time. Screenshots and a live demo link can be added here when a deployment is available.
+
+## Author
+
+Built by [NemoCode-3011](https://github.com/NemoCode-3011).
