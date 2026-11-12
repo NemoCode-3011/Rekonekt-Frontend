@@ -228,8 +228,22 @@ function ChapterPanel({
   }, [section.id, showToast]);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    let cancelled = false;
+
+    getChapterContent(section.id)
+      .then((chapter) => {
+        if (!cancelled) setContent(chapter);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          showToast("Couldn't load this chapter.", "error");
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [section.id, showToast]);
 
   // Runs an action, refreshes the chapter, and closes the form.
   async function run(action: () => Promise<unknown>, done: string) {
@@ -700,10 +714,37 @@ export default function ExhibitionWorkspace() {
   }, []);
 
   useEffect(() => {
-    Promise.all([loadExhibition(), loadSections(), loadLibrary()])
-      .then(() => setStatus("ready"))
-      .catch(() => setStatus("error"));
-  }, [loadExhibition, loadSections, loadLibrary]);
+    let cancelled = false;
+
+    async function loadWorkspace() {
+      try {
+        const [all, list, [p, pl]] = await Promise.all([
+          getAdminExhibitions(),
+          getAdminSections(exhibitionId),
+          Promise.all([getAdminPeople(), getAdminPlaces()]),
+        ]);
+
+        if (cancelled) return;
+        setExhibition(
+          all.exhibitions.find((item) => item.id === exhibitionId) ?? null,
+        );
+        setSections(
+          [...list].sort((a, b) => a.section_order - b.section_order),
+        );
+        setPeople(p);
+        setPlaces(pl);
+        setStatus("ready");
+      } catch {
+        if (!cancelled) setStatus("error");
+      }
+    }
+
+    void loadWorkspace();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [exhibitionId]);
 
   if (status === "loading") {
     return (
