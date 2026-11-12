@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
@@ -7,9 +7,10 @@ import type { ApiError } from "../../services/api/client";
 
 export default function Verify() {
   const navigate = useNavigate();
-  const locationState = useLocation().state as
-    | { email?: string; from?: string }
-    | null;
+  const locationState = useLocation().state as {
+    email?: string;
+    from?: string;
+  } | null;
   const stateEmail = locationState?.email;
 
   const [email, setEmail] = useState(stateEmail ?? "");
@@ -17,6 +18,15 @@ export default function Verify() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Seconds before "Resend code" works again. The server enforces this too.
+  const [wait, setWait] = useState(stateEmail ? 60 : 0);
+
+  useEffect(() => {
+    if (wait <= 0) return;
+    const timer = setTimeout(() => setWait((seconds) => seconds - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [wait]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -50,7 +60,9 @@ export default function Verify() {
 
   return (
     <>
-      <h1 className="font-display text-heading-l leading-tight">Check your email.</h1>
+      <h1 className="font-display text-heading-l leading-tight">
+        Check your email.
+      </h1>
       <p className="mt-4 text-body-m text-muted">
         {stateEmail
           ? `We sent a 6-digit code to ${stateEmail}. It expires in 5 minutes.`
@@ -88,7 +100,11 @@ export default function Verify() {
         )}
         {notice && <p className="text-body-s text-success">{notice}</p>}
 
-        <Button type="submit" disabled={loading || otp.length !== 6} className="w-full">
+        <Button
+          type="submit"
+          disabled={loading || otp.length !== 6}
+          className="w-full"
+        >
           {loading ? "Verifying…" : "Verify email"}
         </Button>
       </form>
@@ -98,9 +114,10 @@ export default function Verify() {
         <button
           type="button"
           onClick={handleResend}
-          className="py-2 font-medium text-ink underline underline-offset-4"
+          disabled={wait > 0}
+          className="py-2 font-medium text-ink underline underline-offset-4 disabled:no-underline disabled:opacity-50"
         >
-          Resend code
+          {wait > 0 ? `Resend code in ${wait}s` : "Resend code"}
         </button>
       </p>
     </>

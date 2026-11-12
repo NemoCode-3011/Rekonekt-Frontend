@@ -13,6 +13,7 @@ import StoryConnection from "../../features/admin/components/StoryConnection";
 import { storyFields } from "../../features/admin/components/StoryFields";
 import { useAuth } from "../../features/auth/auth-context";
 import { ApiError } from "../../services/api/client";
+import ConfirmDialog from "../../components/ui/ConfirmDialog";
 
 export default function AdminStoryEditor() {
   const { id } = useParams<{ id: string }>();
@@ -21,15 +22,20 @@ export default function AdminStoryEditor() {
   const { showToast } = useAuth();
 
   const [story, setStory] = useState<AdminStory | null>(null);
-  const [status, setStatus] = useState<"loading" | "ready" | "missing" | "error">("loading");
+  const [status, setStatus] = useState<
+    "loading" | "ready" | "missing" | "error"
+  >("loading");
   const [busy, setBusy] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   const load = useCallback(async () => {
     try {
       setStory(await getAdminStory(storyId));
       setStatus("ready");
     } catch (error) {
-      setStatus(error instanceof ApiError && error.status === 404 ? "missing" : "error");
+      setStatus(
+        error instanceof ApiError && error.status === 404 ? "missing" : "error",
+      );
     }
   }, [storyId]);
 
@@ -38,7 +44,10 @@ export default function AdminStoryEditor() {
   }, [load]);
 
   const back = (
-    <Link to="/admin/stories" className="font-sans text-body-s text-muted hover:text-ink">
+    <Link
+      to="/admin/stories"
+      className="font-sans text-body-s text-muted hover:text-ink"
+    >
       ← All stories
     </Link>
   );
@@ -52,15 +61,19 @@ export default function AdminStoryEditor() {
           role={status === "loading" ? undefined : "alert"}
         >
           {status === "loading" && "Loading the story…"}
-          {status === "missing" && "That story doesn’t exist. It may have been deleted."}
-          {status === "error" && "We couldn’t load this story. Refresh to try again."}
+          {status === "missing" &&
+            "That story doesn’t exist. It may have been deleted."}
+          {status === "error" &&
+            "We couldn’t load this story. Refresh to try again."}
         </p>
       </div>
     );
   }
 
   const published = story.status === "published";
-  const readyForHome = Boolean(story.did_you_know?.trim() && story.cover_image_url);
+  const readyForHome = Boolean(
+    story.did_you_know?.trim() && story.cover_image_url,
+  );
 
   async function togglePublished() {
     if (!story) return;
@@ -70,7 +83,10 @@ export default function AdminStoryEditor() {
       showToast(published ? "Story moved back to draft." : "Story published.");
       await load();
     } catch (error) {
-      showToast(error instanceof Error ? error.message : "Could not change the status.", "error");
+      showToast(
+        error instanceof Error ? error.message : "Could not change the status.",
+        "error",
+      );
     } finally {
       setBusy(false);
     }
@@ -78,7 +94,6 @@ export default function AdminStoryEditor() {
 
   async function remove() {
     if (!story) return;
-    if (!window.confirm("Delete this story? This can't be undone.")) return;
 
     setBusy(true);
     try {
@@ -86,8 +101,12 @@ export default function AdminStoryEditor() {
       showToast("Story deleted.");
       navigate("/admin/stories");
     } catch (error) {
-      showToast(error instanceof Error ? error.message : "Could not delete the story.", "error");
+      showToast(
+        error instanceof Error ? error.message : "Could not delete the story.",
+        "error",
+      );
       setBusy(false);
+      setConfirmingDelete(false);
     }
   }
 
@@ -121,7 +140,9 @@ export default function AdminStoryEditor() {
         <aside className="space-y-6">
           <section className="border border-line p-5">
             <h2 className="font-display text-heading-s">Status</h2>
-            <p className="mt-2 font-sans text-body-s capitalize text-muted">{story.status}</p>
+            <p className="mt-2 font-sans text-body-s capitalize text-muted">
+              {story.status}
+            </p>
 
             <button
               type="button"
@@ -154,10 +175,12 @@ export default function AdminStoryEditor() {
 
           <section className="border border-line p-5">
             <h2 className="font-display text-heading-s">Delete</h2>
-            <p className="mt-2 font-sans text-body-s text-muted">Removes the story for good.</p>
+            <p className="mt-2 font-sans text-body-s text-muted">
+              Removes the story for good.
+            </p>
             <button
               type="button"
-              onClick={remove}
+              onClick={() => setConfirmingDelete(true)}
               disabled={busy}
               className="mt-4 h-11 border border-error px-6 font-sans text-body-s font-medium text-error transition-colors hover:bg-error/5 disabled:opacity-60"
             >
@@ -166,6 +189,17 @@ export default function AdminStoryEditor() {
           </section>
         </aside>
       </div>
+      {confirmingDelete && (
+        <ConfirmDialog
+          title="Delete this story?"
+          message="This removes the story for good. It can't be undone."
+          confirmLabel="Delete story"
+          danger
+          busy={busy}
+          onConfirm={remove}
+          onCancel={() => setConfirmingDelete(false)}
+        />
+      )}
     </div>
   );
 }

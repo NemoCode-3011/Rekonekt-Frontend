@@ -1,25 +1,17 @@
 import ArrowLink from "../../components/ui/ArrowLink";
 import { useBookmarks } from "../../features/bookmarks/bookmarks-context";
 import { useDiscovery } from "../../features/experience/discovery/discovery-context";
-
+import PageLoader from "../../components/ui/PageLoader";
+import PageError from "../../components/ui/PageError";
 function Bookmarks() {
   const { bookmarks, status, toggle } = useBookmarks();
   const { openRef } = useDiscovery();
 
-  if (status === "loading") {
-    return (
-      <p className="font-sans text-body-s text-muted">
-        Loading your bookmarks…
-      </p>
-    );
-  }
+  if (status === "loading")
+    return <PageLoader label="Loading your bookmarks…" />;
 
   if (status === "error") {
-    return (
-      <p role="alert" className="font-sans text-body-m text-muted">
-        We couldn't load your bookmarks. Refresh to try again.
-      </p>
-    );
+    return <PageError message="We couldn't load your bookmarks." />;
   }
 
   if (bookmarks.length === 0) {

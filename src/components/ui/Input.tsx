@@ -56,9 +56,9 @@ export default function Input({
             className="absolute inset-y-0 right-0 flex min-w-11 items-center justify-center text-muted transition-colors hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-heritage-green"
           >
             {show ? (
-              <EyeOff aria-hidden="true" className="size-[18px]" />
-            ) : (
               <Eye aria-hidden="true" className="size-[18px]" />
+            ) : (
+              <EyeOff aria-hidden="true" className="size-[18px]" />
             )}
           </button>
         )}

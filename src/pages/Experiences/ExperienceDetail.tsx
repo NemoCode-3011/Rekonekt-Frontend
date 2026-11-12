@@ -16,6 +16,8 @@ import NotesWidget from "../../features/notes/noteWidget";
 import fallbackImage from "../../assets/hero.png";
 import ExamineObjectCard from "../../features/experience/components/ExamineObjectCard";
 import { getObjectsFor } from "../../features/object-viewer/objects";
+import PageLoader from "../../components/ui/PageLoader";
+import PageError from "../../components/ui/PageError";
 
 function ExperienceDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -75,20 +77,17 @@ function ExperienceDetail() {
   const date = useChapterDate(sections[chapterIndex]?.id);
 
   if (loading) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-ink text-white">
-        <p className="font-sans text-sm text-white/60">Loading experience...</p>
-      </main>
-    );
+    return <PageLoader tone="dark" fullScreen label="Loading experience…" />;
   }
 
   if (error || !experience) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-ink px-5 text-white">
-        <p className="font-sans text-sm text-white/60">
-          {error ?? "Experience not found."}
-        </p>
-      </main>
+      <PageError
+        tone="dark"
+        fullScreen
+        title={error ? "Something went wrong" : "Experience not found"}
+        message={error ?? "It may have moved, or it isn't published yet."}
+      />
     );
   }
 

@@ -8,7 +8,8 @@ import {
   isStoryCategory,
 } from "../../features/stories/Category";
 import type { StorySummary } from "../../features/stories/types";
-
+import PageLoader from "../../components/ui/PageLoader";
+import PageError from "../../components/ui/PageError";
 // The words on this page. Change them here.
 const copy = {
   label: "STORIES",
@@ -20,7 +21,13 @@ const copy = {
   error: "We couldn't load the stories. Please try again in a moment.",
 };
 
-function Cover({ story, className }: { story: StorySummary; className: string }) {
+function Cover({
+  story,
+  className,
+}: {
+  story: StorySummary;
+  className: string;
+}) {
   const [failed, setFailed] = useState(false);
 
   if (!story.cover_image_url || failed) {
@@ -53,7 +60,9 @@ function Kicker({ story }: { story: StorySummary }) {
   if (!label) return null;
 
   return (
-    <p className="text-label font-medium uppercase tracking-[0.18em] text-ochre">{label}</p>
+    <p className="text-label font-medium uppercase tracking-[0.18em] text-ochre">
+      {label}
+    </p>
   );
 }
 
@@ -72,7 +81,9 @@ function Featured({ story }: { story: StorySummary }) {
           {story.title}
         </h2>
         {story.excerpt && (
-          <p className="mt-5 line-clamp-4 text-body-l text-muted">{story.excerpt}</p>
+          <p className="mt-5 line-clamp-4 text-body-l text-muted">
+            {story.excerpt}
+          </p>
         )}
         <span className="mt-8 inline-flex items-center gap-3 border-b border-current pb-1 text-body-m font-medium">
           Read the story <span aria-hidden>→</span>
@@ -92,7 +103,9 @@ function Item({ story }: { story: StorySummary }) {
           {story.title}
         </h3>
         {story.excerpt && (
-          <p className="mt-2 line-clamp-3 text-body-s text-muted">{story.excerpt}</p>
+          <p className="mt-2 line-clamp-3 text-body-s text-muted">
+            {story.excerpt}
+          </p>
         )}
       </div>
     </Link>
@@ -101,7 +114,9 @@ function Item({ story }: { story: StorySummary }) {
 
 export default function Stories() {
   const [stories, setStories] = useState<StorySummary[]>([]);
-  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [status, setStatus] = useState<"loading" | "ready" | "error">(
+    "loading",
+  );
   const [params, setParams] = useSearchParams();
 
   useEffect(() => {
@@ -129,11 +144,16 @@ export default function Stories() {
 
   // Only offer groups that have at least one story.
   const available = useMemo(
-    () => STORY_CATEGORIES.filter((category) => stories.some((story) => story.category === category)),
+    () =>
+      STORY_CATEGORIES.filter((category) =>
+        stories.some((story) => story.category === category),
+      ),
     [stories],
   );
 
-  const shown = active ? stories.filter((story) => story.category === active) : stories;
+  const shown = active
+    ? stories.filter((story) => story.category === active)
+    : stories;
   const [featured, ...rest] = shown;
 
   function choose(category: string | null) {
@@ -151,14 +171,20 @@ export default function Stories() {
     <div className="bg-ivory text-ink">
       <section className="border-b border-line">
         <div className="container pb-12 pt-16 md:pb-16 md:pt-24">
-          <p className="text-label font-medium tracking-[0.2em] text-ochre">{copy.label}</p>
+          <p className="text-label font-medium tracking-[0.2em] text-ochre">
+            {copy.label}
+          </p>
           <h1 className="mt-5 max-w-3xl font-display text-display-m leading-[0.98]">
             {copy.heading}
           </h1>
           <p className="mt-6 max-w-xl text-body-l text-muted">{copy.intro}</p>
 
           {available.length > 1 && (
-            <div className="mt-10 flex flex-wrap gap-2" role="group" aria-label="Filter stories">
+            <div
+              className="mt-10 flex flex-wrap gap-2"
+              role="group"
+              aria-label="Filter stories"
+            >
               <button
                 type="button"
                 onClick={() => choose(null)}
@@ -185,17 +211,8 @@ export default function Stories() {
 
       <section>
         <div className="container py-14 md:py-20">
-          {status === "loading" && (
-            <p className="text-body-m text-muted" aria-live="polite">
-              Loading stories…
-            </p>
-          )}
-
-          {status === "error" && (
-            <p role="alert" className="text-body-m text-muted">
-              {copy.error}
-            </p>
-          )}
+          {status === "loading" && <PageLoader label="Loading stories…" />}
+          {status === "error" && <PageError message={copy.error} />}
 
           {status === "ready" && shown.length === 0 && (
             <p className="text-body-m text-muted">

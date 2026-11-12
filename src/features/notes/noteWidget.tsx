@@ -3,7 +3,7 @@ import { useAuth } from "../auth/auth-context";
 import SignInPrompt from "../auth/components/Signinprompt";
 import { formatLongDate } from "../../lib/dates";
 import { createNote, deleteNote, getNotes, updateNote, type Note } from "./api";
-
+import ConfirmDialog from "../../components/ui/ConfirmDialog";
 // Today as YYYY-MM-DD in the visitor's own timezone.
 function today() {
   const now = new Date();
@@ -35,6 +35,7 @@ export default function NotesWidget() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
 
   // Load the notes the first time the panel opens for a signed-in visitor.
   useEffect(() => {
@@ -104,16 +105,19 @@ export default function NotesWidget() {
     }
   }
 
-  async function remove(note: Note) {
-    if (!window.confirm("Delete this note? This can't be undone.")) return;
-
+  async function confirmDelete() {
+    if (!noteToDelete) return;
     try {
-      await deleteNote(note.id);
-      setNotes((current) => current.filter((item) => item.id !== note.id));
-      if (editingId === note.id) resetForm();
+      await deleteNote(noteToDelete.id);
+      setNotes((current) =>
+        current.filter((item) => item.id !== noteToDelete.id),
+      );
+      if (editingId === noteToDelete.id) resetForm();
       showToast("Note deleted.");
     } catch (error) {
       showToast(errorMessage(error), "error");
+    } finally {
+      setNoteToDelete(null);
     }
   }
 
@@ -268,7 +272,7 @@ export default function NotesWidget() {
                             </button>
                             <button
                               type="button"
-                              onClick={() => remove(note)}
+                              onClick={() => setNoteToDelete(note)}
                               className="text-muted underline underline-offset-4 hover:text-error"
                             >
                               Delete
@@ -290,6 +294,16 @@ export default function NotesWidget() {
           title="Sign in to keep notes."
           body="Your notes are private and saved to your account."
           onClose={() => setPromptOpen(false)}
+        />
+      )}
+      {noteToDelete && (
+        <ConfirmDialog
+          title="Delete this note?"
+          message="This can't be undone."
+          confirmLabel="Delete note"
+          danger
+          onConfirm={confirmDelete}
+          onCancel={() => setNoteToDelete(null)}
         />
       )}
     </>

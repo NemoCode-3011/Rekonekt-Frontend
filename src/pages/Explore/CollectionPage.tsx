@@ -7,7 +7,8 @@ import {
   type CollectionKind,
 } from "../../features/collections/api";
 import { useDiscovery } from "../../features/experience/discovery/discovery-context";
-
+import PageLoader from "../../components/ui/PageLoader";
+import PageError from "../../components/ui/PageError";
 // The words that change between the four pages.
 const copy: Record<
   CollectionKind,
@@ -194,14 +195,9 @@ export default function CollectionPage({ kind }: { kind: CollectionKind }) {
       {/* Collection */}
       <section className="py-16 md:py-24">
         <div className="container">
-          {status === "loading" && (
-            <p className="text-body-m text-muted">Loading…</p>
-          )}
-
+          {status === "loading" && <PageLoader />}
           {status === "error" && (
-            <p role="alert" className="text-body-m text-error">
-              We couldn't load this collection. Please try again.
-            </p>
+            <PageError message="We couldn't load this collection." />
           )}
 
           {status === "ready" && items.length === 0 && (

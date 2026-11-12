@@ -23,9 +23,9 @@ export default function AdminSignIn() {
   return (
     <main className="min-h-screen bg-ink text-ivory lg:grid lg:grid-cols-[1.1fr_0.9fr]">
       <section className="relative flex min-h-[35vh] flex-col justify-between overflow-hidden bg-deep-forest px-6 py-7 md:px-12 md:py-10 lg:min-h-screen lg:px-16 lg:py-12">
-        <div
+        <div 
           aria-hidden="true"
-          className="pointer-events-none absolute -right-32 top-1/4 h-112d rounded-full border border-ivory/10"
+          className="pointer-events-none absolute -right-32 top-1/4 h-[28r3m] w-[28r3m] rounded-full border border-ivory/10"
         >
           <div className="absolute inset-10 rounded-full border border-ivory/10" />
           <div className="absolute inset-20 rounded-full border border-ivory/10" />

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
-
 import { getExhibitions } from "../../features/exhibitions/api/exhibitions";
+import PageLoader from "../../components/ui/PageLoader";
+import PageError from "../../components/ui/PageError";
 
 export default function Exhibitions() {
   const reduce = useReducedMotion();
@@ -61,17 +62,8 @@ export default function Exhibitions() {
       {/* Exhibition collection */}
       <section className="py-20 md:py-28 lg:py-40">
         <div className="container">
-          {loading && (
-            <p className="text-body-m text-muted">
-              Loading exhibitions...
-            </p>
-          )}
-
-          {error && (
-            <p className="text-body-m text-error">
-              {error}
-            </p>
-          )}
+          {loading && <PageLoader label="Loading exhibitions…" />}
+          {error && <PageError message={error} />}
 
           {!loading && !error && exhibitions.length === 0 && (
             <p className="text-body-m text-muted">
@@ -133,7 +125,8 @@ export default function Exhibitions() {
                                 {exhibition.title}
                               </h3>
 
-                              {(exhibition.start_date || exhibition.end_date) && (
+                              {(exhibition.start_date ||
+                                exhibition.end_date) && (
                                 <p className="mt-5 text-meta tracking-[0.12em] text-ivory/65">
                                   {exhibition.start_date &&
                                     formatYear(exhibition.start_date)}

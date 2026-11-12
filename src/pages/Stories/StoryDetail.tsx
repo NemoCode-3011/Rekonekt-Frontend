@@ -8,7 +8,8 @@ import type { Story } from "../../features/stories/types";
 import RichText from "../../components/ui/RichText";
 import { ApiError } from "../../services/api/client";
 import { splitStoryHtml } from "../../lib/richText";
-
+import PageLoader from "../../components/ui/PageLoader";
+import PageError from "../../components/ui/PageError";
 // The story image appears after this many paragraphs or headings.
 const BODY_IMAGE_AFTER = 57;
 
@@ -82,17 +83,20 @@ export default function StoryDetail() {
       <div className="bg-ivory text-ink">
         <div className="container py-16 md:py-24">
           {back}
-          <p
-            role={state.status === "loading" ? undefined : "alert"}
-            aria-live={state.status === "loading" ? "polite" : undefined}
-            className="mt-10 max-w-xl text-body-l text-muted"
-          >
-            {state.status === "loading" && "Loading the story…"}
-            {state.status === "not-found" &&
-              "We couldn't find that story. It may have moved or isn't published yet."}
-            {state.status === "error" &&
-              "We couldn't load this story. Please try again in a moment."}
-          </p>
+          {state.status === "loading" && (
+            <PageLoader label="Loading the story…" />
+          )}
+
+          {state.status === "error" && (
+            <PageError message="We couldn't load this story." />
+          )}
+
+          {state.status === "not-found" && (
+            <p role="alert" className="mt-10 max-w-xl text-body-l text-muted">
+              We couldn't find that story. It may have moved or isn't published
+              yet.
+            </p>
+          )}
         </div>
       </div>
     );

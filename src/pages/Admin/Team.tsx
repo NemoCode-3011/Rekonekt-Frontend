@@ -8,6 +8,7 @@ import {
   type TeamMember,
 } from "../../features/admin/api/team";
 import { useAuth } from "../../features/auth/auth-context";
+import ConfirmDialog from "../../components/ui/ConfirmDialog";
 
 function errorMessage(error: unknown) {
   return error instanceof Error
@@ -21,6 +22,8 @@ export default function Team() {
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading",
   );
+  const [toRemove, setToRemove] = useState<TeamMember | null>(null);
+  const [removing, setRemoving] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -35,21 +38,18 @@ export default function Team() {
     load();
   }, [load]);
 
-  async function remove(member: TeamMember) {
-    if (
-      !window.confirm(
-        `Remove ${member.name} as an admin? Their account will be deleted and they won't be able to sign in unless you add them again.`
-      )
-    ) {
-      return;
-    }
-
+  async function confirmRemove() {
+    if (!toRemove) return;
+    setRemoving(true);
     try {
-      await revokeAdmin(member.id);
-      showToast(`${member.name} is no longer an admin.`);
+      await revokeAdmin(toRemove.id);
+      showToast(`${toRemove.name} is no longer an admin.`);
       await load();
     } catch (error) {
       showToast(errorMessage(error), "error");
+    } finally {
+      setRemoving(false);
+      setToRemove(null);
     }
   }
 
@@ -101,7 +101,7 @@ export default function Team() {
                     {member.role === "admin" && (
                       <button
                         type="button"
-                        onClick={() => remove(member)}
+                        onClick={() => setToRemove(member)}
                         className="font-sans text-body-s text-muted underline underline-offset-4 hover:text-error"
                       >
                         Remove access
@@ -145,12 +145,25 @@ export default function Team() {
                 ...(preferredLanguage ? { preferredLanguage } : {}),
               });
 
-              showToast("Invitation sent. The admin can set their password from the email.");
+              showToast(
+                "Invitation sent. The admin can set their password from the email.",
+              );
               await load();
             }}
           />
         </section>
       </div>
+      {toRemove && (
+        <ConfirmDialog
+          title={`Remove ${toRemove.name}?`}
+          message="Their account will be deleted and they won't be able to sign in unless you add them again."
+          confirmLabel="Remove access"
+          danger
+          busy={removing}
+          onConfirm={confirmRemove}
+          onCancel={() => setToRemove(null)}
+        />
+      )}
     </div>
   );
 }

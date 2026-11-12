@@ -3,9 +3,10 @@ import ArrowLink from "../../components/ui/ArrowLink";
 import { formatLongDate } from "../../lib/dates";
 import { useProgress } from "../../features/progress/useProgress";
 import type { ProgressEntry } from "../../features/progress/types";
+import PageLoader from "../../components/ui/PageLoader";
+import PageError from "../../components/ui/PageError";
 
-// Where "Continue" leads: straight to the chapter the visitor left off at.
-// A finished experience opens at the beginning instead.
+
 function resumeLink(entry: ProgressEntry) {
   const start = `/experiences/${entry.exhibition_slug}`;
 
@@ -23,18 +24,11 @@ function statusLine(entry: ProgressEntry) {
 function Progress() {
   const { entries, status } = useProgress();
 
-  if (status === "loading") {
-    return (
-      <p className="font-sans text-body-s text-muted">Loading your progress…</p>
-    );
-  }
+  if (status === "loading")
+    return <PageLoader label="Loading your progress…" />;
 
   if (status === "error") {
-    return (
-      <p role="alert" className="font-sans text-body-m text-muted">
-        We couldn't load your progress. Refresh to try again.
-      </p>
-    );
+    return <PageError message="We couldn't load your progress." />;
   }
 
   if (entries.length === 0) {

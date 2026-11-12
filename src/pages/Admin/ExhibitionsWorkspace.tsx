@@ -35,6 +35,7 @@ import type {
   DashboardSection,
 } from "../../features/admin/types/dashboard";
 import { useAuth } from "../../features/auth/auth-context";
+import ConfirmDialog from "../../components/ui/ConfirmDialog";
 
 // ---------- The fields each form asks for ----------
 
@@ -659,6 +660,26 @@ export default function ExhibitionWorkspace() {
   const [openId, setOpenId] = useState<number | null>(null);
   const [editing, setEditing] = useState(false);
   const [addingChapter, setAddingChapter] = useState(false);
+  const [confirmingUnpublish, setConfirmingUnpublish] = useState(false);
+  const [unpublishing, setUnpublishing] = useState(false);
+
+  async function unpublish() {
+    if (!exhibition) return;
+    setUnpublishing(true);
+    try {
+      await unpublishExhibition(exhibition.id);
+      await loadExhibition();
+      showToast("Exhibition unpublished.");
+    } catch (error) {
+      showToast(
+        error instanceof Error ? error.message : "Couldn't unpublish.",
+        "error",
+      );
+    } finally {
+      setUnpublishing(false);
+      setConfirmingUnpublish(false);
+    }
+  }
 
   const loadExhibition = useCallback(async () => {
     const all = await getAdminExhibitions();
@@ -733,32 +754,22 @@ export default function ExhibitionWorkspace() {
                 </Link>
                 <button
                   type="button"
-                  onClick={async () => {
-                    if (
-                      !window.confirm(
-                        "Unpublish this exhibition? Visitors will no longer see it or anything inside it.",
-                      )
-                    ) {
-                      return;
-                    }
-
-                    try {
-                      await unpublishExhibition(exhibition.id);
-                      await loadExhibition();
-                      showToast("Exhibition unpublished.");
-                    } catch (error) {
-                      showToast(
-                        error instanceof Error
-                          ? error.message
-                          : "Couldn't unpublish.",
-                        "error",
-                      );
-                    }
-                  }}
+                  onClick={() => setConfirmingUnpublish(true)}
                   className={textButton}
                 >
                   Unpublish
                 </button>
+                {confirmingUnpublish && (
+                  <ConfirmDialog
+                    title="Unpublish this exhibition?"
+                    message="Visitors will no longer see it or anything inside it."
+                    confirmLabel="Unpublish"
+                    danger
+                    busy={unpublishing}
+                    onConfirm={unpublish}
+                    onCancel={() => setConfirmingUnpublish(false)}
+                  />
+                )}
               </div>
             ) : (
               <button
