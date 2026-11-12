@@ -135,21 +135,23 @@ export default function CollectionPage({ kind }: { kind: CollectionKind }) {
 
   // Runs again when the visitor moves between People, Events, Places and
   // Artifacts, because they all use this one page.
+  const [loadedKind, setLoadedKind] = useState<CollectionKind | null>(null);
+
   useEffect(() => {
     let cancelled = false;
-
-    setStatus("loading");
-    setItems([]);
-    setQuery("");
 
     getCollection(kind)
       .then((data) => {
         if (cancelled) return;
         setItems(data);
+        setLoadedKind(kind);
         setStatus("ready");
       })
       .catch(() => {
-        if (!cancelled) setStatus("error");
+        if (!cancelled) {
+          setLoadedKind(kind);
+          setStatus("error");
+        }
       });
 
     return () => {
@@ -157,14 +159,17 @@ export default function CollectionPage({ kind }: { kind: CollectionKind }) {
     };
   }, [kind]);
 
+  const currentStatus = loadedKind === kind ? status : "loading";
+  const currentItems = loadedKind === kind ? items : [];
+
   const search = query.trim().toLowerCase();
   const visible = search
-    ? items.filter((item) =>
+    ? currentItems.filter((item) =>
         `${item.title} ${item.description ?? ""}`
           .toLowerCase()
           .includes(search),
       )
-    : items;
+    : currentItems;
 
   return (
     <div className="bg-ivory text-ink">
@@ -195,16 +200,16 @@ export default function CollectionPage({ kind }: { kind: CollectionKind }) {
       {/* Collection */}
       <section className="py-16 md:py-24">
         <div className="container">
-          {status === "loading" && <PageLoader />}
-          {status === "error" && (
+          {currentStatus === "loading" && <PageLoader />}
+          {currentStatus === "error" && (
             <PageError message="We couldn't load this collection." />
           )}
 
-          {status === "ready" && items.length === 0 && (
+          {currentStatus === "ready" && currentItems.length === 0 && (
             <p className="text-body-m text-muted">{words.empty}</p>
           )}
 
-          {status === "ready" && items.length > 0 && (
+          {currentStatus === "ready" && currentItems.length > 0 && (
             <>
               <div className="mb-14 max-w-sm">
                 <label htmlFor="collection-search" className="sr-only">

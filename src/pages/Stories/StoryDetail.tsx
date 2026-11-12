@@ -17,7 +17,7 @@ type State =
   | { status: "loading" }
   | { status: "not-found" }
   | { status: "error" }
-  | { status: "ready"; story: Story };
+  | { status: "ready"; story: Story; slug: string };
 
 export default function StoryDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -29,13 +29,11 @@ export default function StoryDetail() {
     if (!slug) return;
     let cancelled = false;
 
-    setState({ status: "loading" });
-    setSources([]);
-
     getStory(slug)
       .then((story) => {
         if (cancelled) return;
-        setState({ status: "ready", story });
+        setSources([]);
+        setState({ status: "ready", story, slug });
 
         // The sources are extra. If they can't be loaded, the story still reads fine.
         getStorySources(story.id)
@@ -58,8 +56,13 @@ export default function StoryDetail() {
     };
   }, [slug]);
 
+  const currentState: State =
+    state.status === "ready" && state.slug !== slug
+      ? { status: "loading" }
+      : state;
+
   // Put the story's title in the browser tab.
-  const title = state.status === "ready" ? state.story.title : null;
+  const title = currentState.status === "ready" ? currentState.story.title : null;
   useEffect(() => {
     if (!title) return;
     const previous = document.title;
@@ -78,20 +81,20 @@ export default function StoryDetail() {
     </Link>
   );
 
-  if (state.status !== "ready") {
+  if (currentState.status !== "ready") {
     return (
       <div className="bg-ivory text-ink">
         <div className="container py-16 md:py-24">
           {back}
-          {state.status === "loading" && (
+          {currentState.status === "loading" && (
             <PageLoader label="Loading the story…" />
           )}
 
-          {state.status === "error" && (
+          {currentState.status === "error" && (
             <PageError message="We couldn't load this story." />
           )}
 
-          {state.status === "not-found" && (
+          {currentState.status === "not-found" && (
             <p role="alert" className="mt-10 max-w-xl text-body-l text-muted">
               We couldn't find that story. It may have moved or isn't published
               yet.
@@ -102,7 +105,7 @@ export default function StoryDetail() {
     );
   }
 
-  const { story } = state;
+  const { story } = currentState;
   const label = categoryLabel(story.category);
   const [before, after] = story.body_image_url
     ? splitStoryHtml(story.content, BODY_IMAGE_AFTER)
