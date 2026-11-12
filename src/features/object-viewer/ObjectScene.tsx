@@ -116,10 +116,16 @@ function CameraRig({
   const introDone = useRef(false);
 
   // On a phone the picture is tall, so widen the lens a little.
+  const cameraRef = useRef<PerspectiveCamera | null>(null);
+
   useEffect(() => {
+    cameraRef.current = camera;
+    const activeCamera = cameraRef.current;
+    if (!activeCamera) return;
+
     const aspect = size.width / size.height;
-    camera.fov = aspect < 0.75 ? 52 : aspect < 1 ? 44 : 36;
-    camera.updateProjectionMatrix();
+    activeCamera.fov = aspect < 0.75 ? 52 : aspect < 1 ? 44 : 36;
+    activeCamera.updateProjectionMatrix();
   }, [camera, size.width, size.height]);
 
   // Decide where the camera should be whenever the selection changes.
@@ -238,6 +244,7 @@ function Lighting({
   }, []);
 
   // A cone of light from the lamp down to the object.
+  const beamMaterial = useRef<ShaderMaterial>(null);
   const beam = useMemo(() => {
     const from = new Vector3(...LIGHT_POSITION);
     const to = new Vector3(...BEAM_BASE);
@@ -251,36 +258,10 @@ function Lighting({
         new Vector3(0, 1, 0),
         direction.normalize(),
       ),
-      material: new ShaderMaterial({
-        transparent: true,
-        depthWrite: false,
-        blending: AdditiveBlending,
-        side: DoubleSide,
-        uniforms: {
-          uColor: { value: new Color("#ffd9a0") },
-          uLevel: { value: 0 },
-        },
-        vertexShader: `
-          varying float vHeight;
-          void main() {
-            vHeight = uv.y;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-        `,
-        fragmentShader: `
-          varying float vHeight;
-          uniform vec3 uColor;
-          uniform float uLevel;
-          void main() {
-            float alpha = pow(vHeight, 1.4) * 0.2 * uLevel;
-            gl_FragColor = vec4(uColor, alpha);
-          }
-        `,
-      }),
     };
   }, []);
 
-  useEffect(() => () => beam.material.dispose(), [beam]);
+  useEffect(() => () => beamMaterial.current?.dispose(), []);
 
   useFrame((_, delta) => {
     const goal = phase === "loading" ? 0 : finale ? 0.38 : 1;
@@ -291,7 +272,9 @@ function Lighting({
     if (spot.current) spot.current.intensity = 65 * level.current;
     if (rim.current) rim.current.intensity = 7 * level.current;
     if (fill.current) fill.current.intensity = 4 * level.current;
-    beam.material.uniforms.uLevel.value = level.current;
+    if (beamMaterial.current) {
+      beamMaterial.current.uniforms.uLevel.value = level.current;
+    }
   });
 
   return (
@@ -333,12 +316,35 @@ function Lighting({
         color="#4a795a"
       />
 
-      <mesh
-        position={beam.position}
-        quaternion={beam.quaternion}
-        material={beam.material}
-      >
+      <mesh position={beam.position} quaternion={beam.quaternion}>
         <coneGeometry args={[1.5, beam.length, 48, 1, true]} />
+        <shaderMaterial
+          ref={beamMaterial}
+          transparent
+          depthWrite={false}
+          blending={AdditiveBlending}
+          side={DoubleSide}
+          uniforms={{
+            uColor: { value: new Color("#ffd9a0") },
+            uLevel: { value: 0 },
+          }}
+          vertexShader={`
+            varying float vHeight;
+            void main() {
+              vHeight = uv.y;
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+          `}
+          fragmentShader={`
+            varying float vHeight;
+            uniform vec3 uColor;
+            uniform float uLevel;
+            void main() {
+              float alpha = pow(vHeight, 1.4) * 0.2 * uLevel;
+              gl_FragColor = vec4(uColor, alpha);
+            }
+          `}
+        />
       </mesh>
     </>
   );
@@ -365,7 +371,7 @@ function makeGlowTexture() {
 }
 
 function Room({ hall }: { hall: boolean }) {
-  const glow = useMemo(makeGlowTexture, []);
+  const glow = useMemo(() => makeGlowTexture(), []);
   useEffect(() => () => glow.dispose(), [glow]);
 
   return (
