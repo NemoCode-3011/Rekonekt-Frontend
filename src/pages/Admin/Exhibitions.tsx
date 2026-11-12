@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AdminPageHeader from "../../features/admin/components/AdminPageHeader";
 import InlineForm from "../../features/admin/components/InlineForm";
@@ -14,18 +14,23 @@ export default function Exhibitions() {
   );
   const [creating, setCreating] = useState(false);
 
-  const load = useCallback(async () => {
-    try {
-      setItems((await getAdminExhibitions()).exhibitions);
-      setStatus("ready");
-    } catch {
-      setStatus("error");
-    }
-  }, []);
-
   useEffect(() => {
-    load();
-  }, [load]);
+    let cancelled = false;
+
+    getAdminExhibitions()
+      .then(({ exhibitions }) => {
+        if (cancelled) return;
+        setItems(exhibitions);
+        setStatus("ready");
+      })
+      .catch(() => {
+        if (!cancelled) setStatus("error");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className="mx-auto w-full max-w-5xl px-5 py-8 md:px-8 md:py-12">
