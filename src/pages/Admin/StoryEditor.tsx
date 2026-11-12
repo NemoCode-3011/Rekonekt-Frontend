@@ -40,8 +40,25 @@ export default function AdminStoryEditor() {
   }, [storyId]);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    let cancelled = false;
+
+    getAdminStory(storyId)
+      .then((result) => {
+        if (cancelled) return;
+        setStory(result);
+        setStatus("ready");
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        setStatus(
+          error instanceof ApiError && error.status === 404 ? "missing" : "error",
+        );
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [storyId]);
 
   const back = (
     <Link
