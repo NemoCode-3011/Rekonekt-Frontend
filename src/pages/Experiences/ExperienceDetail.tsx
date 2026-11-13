@@ -15,6 +15,7 @@ import NotesWidget from "../../features/notes/noteWidget";
 // Only used when a chapter and its exhibition bith have no image.
 import fallbackImage from "../../assets/hero.png";
 import ExamineObjectCard from "../../features/experience/components/ExamineObjectCard";
+import UrnMark from "../../features/experience/components/UrnMark";
 import { getObjectsFor } from "../../features/object-viewer/objects";
 import PageLoader from "../../components/ui/PageLoader";
 import PageError from "../../components/ui/PageError";
@@ -181,12 +182,10 @@ function ExperienceDetail() {
                   <button
                     type="button"
                     onClick={() => jumpToObject(objects[0].key)}
-                    className="mt-8 inline-flex items-center gap-3 rounded-full border border-ivory/40 bg-ink/30 py-2 pl-2 pr-5 font-sans text-body-s backdrop-blur-sm transition-colors hover:border-sand hover:bg-ink/50"
+                    className="mt-8 inline-flex items-center gap-3 rounded-full border border-ivory/40 bg-ink/30 py-3 pl-4 pr-6 font-sans text-body-s backdrop-blur-sm transition-colors hover:border-sand hover:bg-ink/50 motion-safe:animate-beacon-ring"
                   >
-                    <span className="rounded-full bg-sand px-2.5 py-1 text-label font-medium tracking-widest text-ink">
-                      3D
-                    </span>
-                    Examine an object from this chapter
+                    <UrnMark className="size-6 text-sand" />
+                    Examine a 3D object from this chapter
                     <span aria-hidden>↓</span>
                   </button>
                 )}
