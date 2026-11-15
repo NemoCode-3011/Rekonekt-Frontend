@@ -105,7 +105,7 @@ export default function Explore() {
       <section className="py-20 md:py-28 lg:py-40">
         <div className="container">
           <div className="mb-16 max-w-2xl md:mb-20">
-            <p className="text-label font-medium tracking-[0.2em] text-ochre">
+            <p className="text-label font-medium tracking-[0.2em] text-ochre-deep">
               CHOOSE YOUR PATH
             </p>
 
@@ -135,7 +135,7 @@ export default function Explore() {
                           className={[
                             "pt-2 text-meta transition-colors duration-300",
                             isActive
-                              ? "text-ochre"
+                              ? "text-ochre-deep"
                               : "text-muted",
                           ].join(" ")}
                         >

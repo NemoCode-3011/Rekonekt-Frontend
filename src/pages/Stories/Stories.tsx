@@ -60,7 +60,7 @@ function Kicker({ story }: { story: StorySummary }) {
   if (!label) return null;
 
   return (
-    <p className="text-label font-medium uppercase tracking-[0.18em] text-ochre">
+    <p className="text-label font-medium uppercase tracking-[0.18em] text-ochre-deep">
       {label}
     </p>
   );
@@ -171,7 +171,7 @@ export default function Stories() {
     <div className="bg-ivory text-ink">
       <section className="border-b border-line">
         <div className="container pb-12 pt-16 md:pb-16 md:pt-24">
-          <p className="text-label font-medium tracking-[0.2em] text-ochre">
+          <p className="text-label font-medium tracking-[0.2em] text-ochre-deep">
             {copy.label}
           </p>
           <h1 className="mt-5 max-w-3xl font-display text-display-m leading-[0.98]">

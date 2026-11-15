@@ -45,7 +45,7 @@ export default function DidYouKnow() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.6 }}
-          className="mb-12 text-label font-medium tracking-[0.2em] text-ochre md:mb-16"
+          className="mb-12 text-label font-medium tracking-[0.2em] text-ochre-deep md:mb-16"
         >
           DID YOU KNOW?
         </motion.p>

@@ -43,7 +43,7 @@ export default function Exhibitions() {
             }}
             className="max-w-5xl"
           >
-            <p className="text-label font-medium tracking-[0.2em] text-ochre">
+            <p className="text-label font-medium tracking-[0.2em] text-ochre-deep">
               EXPLORE EXHIBITIONS
             </p>
 
@@ -154,7 +154,7 @@ export default function Exhibitions() {
                     ].join(" ")}
                   >
                     {exhibition.start_date && (
-                      <p className="text-meta tracking-[0.12em] text-ochre">
+                      <p className="text-meta tracking-[0.12em] text-ochre-deep">
                         {formatYear(exhibition.start_date)}
                         {exhibition.end_date &&
                           ` — ${formatYear(exhibition.end_date)}`}

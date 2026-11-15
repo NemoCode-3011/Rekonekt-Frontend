@@ -117,7 +117,7 @@ export default function StoryDetail() {
         {back}
 
         {label && (
-          <p className="mt-10 text-label font-medium uppercase tracking-[0.2em] text-ochre">
+          <p className="mt-10 text-label font-medium uppercase tracking-[0.2em] text-ochre-deep">
             {label}
           </p>
         )}
@@ -151,7 +151,7 @@ export default function StoryDetail() {
         <div className="max-w-2xl">
           {story.did_you_know && (
             <aside className="mb-12 border-l-2 border-ochre pl-5">
-              <p className="text-label font-medium tracking-[0.2em] text-ochre">
+              <p className="text-label font-medium tracking-[0.2em] text-ochre-deep">
                 DID YOU KNOW?
               </p>
               <p className="mt-2 font-display text-heading-s leading-snug">

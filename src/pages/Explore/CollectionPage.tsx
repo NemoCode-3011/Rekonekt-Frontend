@@ -84,7 +84,7 @@ function Card({ item, onOpen }: { item: CollectionItem; onOpen: () => void }) {
       )}
 
       {item.meta && (
-        <p className="mt-5 font-display text-heading-s text-ochre">
+        <p className="mt-5 font-display text-heading-s text-ochre-deep">
           {item.meta}
         </p>
       )}
@@ -182,7 +182,7 @@ export default function CollectionPage({ kind }: { kind: CollectionKind }) {
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
             className="max-w-5xl"
           >
-            <p className="text-label font-medium tracking-[0.2em] text-ochre">
+            <p className="text-label font-medium tracking-[0.2em] text-ochre-deep">
               {words.label}
             </p>
 
