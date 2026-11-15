@@ -114,7 +114,7 @@ function StoryFallback({
           ← Back to the exhibition
         </Link>
 
-        <p className="mt-12 font-sans text-label uppercase tracking-[0.2em] text-ochre">
+        <p className="mt-12 font-sans text-label uppercase tracking-[0.2em] text-ochre-light">
           {config.eyebrow}
         </p>
         <h1 className="mt-4 font-display text-heading-l leading-tight">
@@ -128,7 +128,7 @@ function StoryFallback({
         <ol className="mt-12 space-y-12">
           {stories.map((story, index) => (
             <li key={story.id}>
-              <p className="font-sans text-label uppercase tracking-[0.18em] text-ochre">
+              <p className="font-sans text-label uppercase tracking-[0.18em] text-ochre-light">
                 {pad(index + 1)} / {story.eyebrow}
               </p>
               <h2 className="mt-2 font-display text-heading-m">
@@ -142,7 +142,7 @@ function StoryFallback({
           ))}
 
           <li>
-            <p className="font-sans text-label uppercase tracking-[0.18em] text-ochre">
+            <p className="font-sans text-label uppercase tracking-[0.18em] text-ochre-light">
               {config.finale.eyebrow}
             </p>
             <h2 className="mt-2 font-display text-heading-m">
@@ -310,7 +310,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
           aria-label="REKÒ home"
           className="pointer-events-auto font-display text-[1.7rem] tracking-[-0.04em]"
         >
-          REKÒ<span className="text-ochre">.</span>
+          REKÒ<span className="text-ochre-light">.</span>
         </Link>
 
         <button
@@ -334,7 +334,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
             className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-[#050806]"
           >
             <p className="font-display text-[2.6rem] tracking-[-0.04em]">
-              REKÒ<span className="text-ochre">.</span>
+              REKÒ<span className="text-ochre-light">.</span>
             </p>
             <div className="mt-8 h-px w-48 bg-ivory/15">
               <div
@@ -360,7 +360,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
             transition={{ delay: 1.6, duration: 1.6 }}
             className="pointer-events-none absolute inset-x-0 bottom-[14%] z-10 px-6 text-center"
           >
-            <p className="font-sans text-xs uppercase tracking-[0.28em] text-ochre">
+            <p className="font-sans text-xs uppercase tracking-[0.28em] text-ochre-light">
               {config.eyebrow}
             </p>
             <h1 className="mt-4 font-display text-[clamp(2.6rem,7vw,5.5rem)] leading-[0.95] tracking-[-0.03em]">
@@ -376,7 +376,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
       {/* What this object is */}
       {exploring && (
         <div className="pointer-events-none absolute left-5 top-20 z-10 md:bottom-8 md:left-10 md:top-auto hide-in-hall">
-          <p className="font-sans text-xs uppercase tracking-[0.2em] text-ochre">
+          <p className="font-sans text-xs uppercase tracking-[0.2em] text-ochre-light">
             {config.eyebrow}
           </p>
           <p className="mt-1 max-w-[16rem] font-display text-[1.15rem] leading-tight md:max-w-xs md:text-[1.4rem]">
@@ -436,7 +436,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
               <button
                 type="button"
                 onClick={() => select(finaleIndex)}
-                className="px-3 py-1.5 font-sans text-xs uppercase tracking-[0.16em] text-ivory/85 transition-colors hover:text-ochre"
+                className="px-3 py-1.5 font-sans text-xs uppercase tracking-[0.16em] text-ivory/85 transition-colors hover:text-ochre-light"
               >
                 Where is it now?
               </button>
@@ -503,7 +503,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
                   ← Previous
                 </button>
 
-                <span className="font-sans text-meta tabular-nums text-ochre">
+                <span className="font-sans text-meta tabular-nums text-ochre-light">
                   {Math.min((activeIndex ?? 0) + 1, finaleIndex + 1)} /{" "}
                   {finaleIndex + 1}
                 </span>
@@ -544,7 +544,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
             </button>
           )}
           {!config.credit.model && (
-            <p className="mt-3 text-ochre">
+            <p className="mt-3 text-ochre-light">
               Reminder: fill in credit.model in objects.ts before showing this
               to anyone.
             </p>
@@ -584,7 +584,7 @@ export default function ObjectViewer() {
         </p>
         <Link
           to={slug ? `/experiences/${slug}` : "/"}
-          className="mt-6 font-sans text-body-s underline underline-offset-4 hover:text-ochre"
+          className="mt-6 font-sans text-body-s underline underline-offset-4 hover:text-ochre-light"
         >
           Back to the exhibition
         </Link>
