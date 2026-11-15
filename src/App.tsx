@@ -33,12 +33,13 @@ import AdminExhibitions from "./pages/Admin/Exhibitions";
 import AdminStories from "./pages/Admin/Stories";
 import AdminStoryEditor from "./pages/Admin/StoryEditor";
 import ExhibitionWorkspace from "./pages/Admin/ExhibitionsWorkspace";
-import AdminContentLibrary from "./pages/Admin/AdminContentLibrary";
 import Team from "./pages/Admin/Team";
 import AdminSettings from "./pages/Admin/AdminSettings";
 import RequireSuperAdmin from "./features/admin/components/RequireSuperAdmin";
 import AdminSetupPassword from "./pages/Admin/AdminSetupPassword";
 import Scrolltotop from "./components/navigation/ScrollToTop";
+import PageChange from "./components/navigation/PageChange";
+import SkipLink from "./components/navigation/SkipLink";
 import { lazy, Suspense } from "react";
 import { SplashProvider } from "./components/splash/SplashProvider";
 import { SplashLayer } from "./components/splash/SplashScreen";
@@ -48,9 +49,11 @@ const ObjectViewer = lazy(() => import("./pages/Experiences/ObjectViewer"));
 function App() {
   return (
     <SplashProvider>
+      <SkipLink />
       <SplashLayer />
       <DiscoveryProvider>
         <Scrolltotop />
+        <PageChange />
         <BookmarksProvider>
           <Routes>
             {/* Public / visitor experience */}
@@ -113,30 +116,6 @@ function App() {
                 />
                 <Route path="stories" element={<AdminStories />} />
                 <Route path="stories/:id" element={<AdminStoryEditor />} />
-                <Route
-                  path="events"
-                  element={<AdminContentLibrary kind="events" />}
-                />
-                <Route
-                  path="events/:id"
-                  element={<AdminContentLibrary kind="events" />}
-                />
-                <Route
-                  path="people"
-                  element={<AdminContentLibrary kind="people" />}
-                />
-                <Route
-                  path="people/:id"
-                  element={<AdminContentLibrary kind="people" />}
-                />
-                <Route
-                  path="places"
-                  element={<AdminContentLibrary kind="places" />}
-                />
-                <Route
-                  path="places/:id"
-                  element={<AdminContentLibrary kind="places" />}
-                />
                 <Route path="settings" element={<AdminSettings />} />
                 <Route element={<RequireSuperAdmin />}>
                   <Route path="team" element={<Team />} />
