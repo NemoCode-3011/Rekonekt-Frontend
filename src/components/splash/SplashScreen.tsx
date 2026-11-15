@@ -14,11 +14,14 @@ import { useSplashSequence } from "./useSplashSequence";
 const EASE = [0.22, 1, 0.36, 1] as const;
 const LAST = milestones.length - 1;
 
+// Old film: a little colour, a little warmth, and darker than life.
+const PHOTO_FILTER = "grayscale(0.5) sepia(0.4) contrast(1.05) brightness(0.72)";
+
 function Grain() {
   return (
     <svg
       aria-hidden
-      className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.05]"
+      className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.09]"
     >
       <filter id="splash-grain">
         <feTurbulence
@@ -35,12 +38,50 @@ function Grain() {
   );
 }
 
+// The picture behind the numbers. Each one fades in over the last as the count
+// sets off, and drifts slowly the whole time it is on screen, like a camera move.
+function Photographs({ scene, show }: { scene: number; show: boolean }) {
+  const milestone = milestones[scene];
+  // The drift goes one way, then the other, so no two cuts feel the same.
+  const drift = scene % 2 === 0 ? "2.5%" : "-2.5%";
+
+  return (
+    <AnimatePresence>
+      {show && milestone && (
+        <motion.div
+          key={milestone.id}
+          aria-hidden
+          className="absolute inset-0"
+          style={{ filter: PHOTO_FILTER }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, transition: { duration: 0.8, ease: EASE } }}
+          exit={{ opacity: 0, transition: { duration: 0.7, ease: EASE } }}
+        >
+          <motion.img
+            src={milestone.image}
+            alt=""
+            draggable={false}
+            className="h-full w-full object-cover"
+            style={{ objectPosition: milestone.focus ?? "center" }}
+            initial={{ scale: 1.16, x: drift }}
+            animate={{
+              scale: 1.04,
+              x: drift.startsWith("-") ? "2.5%" : "-2.5%",
+              transition: { duration: 7, ease: "linear" },
+            }}
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 export default function SplashScreen() {
   const { finishIntro, homeReady } = useSplash();
   const reduced = useReducedMotion() ?? false;
   const [showSkip, setShowSkip] = useState(false);
 
-  const { year, reached, resting, showIdentity, skip } = useSplashSequence({
+  const { year, reached, scene, resting, showIdentity, skip } = useSplashSequence({
     reduced,
     homeReady,
     onFinish: finishIntro,
@@ -95,12 +136,30 @@ export default function SplashScreen() {
       }}
       exit={{ opacity: 0, transition: { duration: 0.55, ease: EASE } }}
     >
+      {/* The film: a picture for each stop, darkened so the numbers stay clear */}
+      <Photographs scene={scene} show={!reduced && !showIdentity} />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_48%,rgba(7,11,8,0.35)_0%,rgba(7,11,8,0.88)_100%)]"
+      />
+
+      {/* A faint flash at every cut, like a projector catching */}
+      {!reduced && scene > 0 && !showIdentity && (
+        <motion.div
+          key={scene}
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-ivory"
+          initial={{ opacity: 0.14 }}
+          animate={{ opacity: 0, transition: { duration: 0.6, ease: "easeOut" } }}
+        />
+      )}
+
       <Grain />
 
       <div className="relative flex w-full flex-col items-center px-6">
         {/* Stage: the number and REKÒ take turns in this same box.
             The big font lives here so that "em" means the big size. */}
-        <div className="relative h-[1.15em] w-full overflow-hidden whitespace-nowrap text-center font-display text-splash-year-sm leading-none tracking-tight text-ivory lining-nums tabular-nums md:text-splash-year">
+        <div className="relative h-[1.15em] w-full overflow-hidden whitespace-nowrap text-center [text-shadow:0_4px_60px_rgba(0,0,0,0.6)] font-display text-splash-year-sm leading-none tracking-tight text-ivory lining-nums tabular-nums md:text-splash-year">
           <AnimatePresence initial={false}>
             {!showIdentity && (
               <motion.div
@@ -219,6 +278,26 @@ export default function SplashScreen() {
         </div>
       </div>
 
+      {/* Cinema bars: they close in at the start and open as the intro ends */}
+      {!reduced && (
+        <>
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 z-20 h-[7svh] bg-black"
+            initial={{ y: "-100%" }}
+            animate={{ y: 0, transition: { duration: 0.9, ease: EASE } }}
+            exit={{ y: "-100%", transition: { duration: 0.55, ease: EASE } }}
+          />
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[7svh] bg-black"
+            initial={{ y: "100%" }}
+            animate={{ y: 0, transition: { duration: 0.9, ease: EASE } }}
+            exit={{ y: "100%", transition: { duration: 0.55, ease: EASE } }}
+          />
+        </>
+      )}
+
       {/* Skip: sits in the corner of the screen, quiet and late */}
       <AnimatePresence>
         {showSkip && (
@@ -226,7 +305,7 @@ export default function SplashScreen() {
             type="button"
             onClick={skip}
             aria-label="Skip introduction"
-            className="absolute bottom-6 right-6 inline-flex min-h-11 min-w-11 items-center justify-center border border-ivory/25 px-4 font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-ivory/80 transition-colors hover:border-ochre hover:text-ivory focus-visible:outline-ivory"
+            className="absolute bottom-6 right-6 z-30 inline-flex min-h-11 min-w-11 items-center justify-center border border-ivory/25 px-4 font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-ivory/80 transition-colors hover:border-ochre hover:text-ivory focus-visible:outline-ivory"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

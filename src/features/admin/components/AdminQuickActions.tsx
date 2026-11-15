@@ -366,7 +366,6 @@ export default function AdminQuickActions({
           imageFile,
           {
             title: `${title} image`,
-            mediaType: "image",
             description: values.description,
           },
           setUploadProgress,
@@ -473,12 +472,10 @@ export default function AdminQuickActions({
   }
 
   const requiresSection =
-    activeKind === "event" ||
-    activeKind === "artifact" ||
-    activeKind === "story";
+    activeKind === "artifact" || activeKind === "story";
   const hasSections = sections !== null && sections.length > 0;
   const needsSection = (kind: CreateContentKind) =>
-    kind === "event" || kind === "artifact" || kind === "story";
+    kind === "artifact" || kind === "story";
 
   return (
     <div>
@@ -493,6 +490,18 @@ export default function AdminQuickActions({
               // Stories have their own page, because a story can stand on its own.
               if (action.kind === "story") {
                 navigate("/admin/stories?new=1");
+                return;
+              }
+              if (action.kind === "event") {
+                navigate("/admin/events?new=1");
+                return;
+              }
+              if (action.kind === "person") {
+                navigate("/admin/people?new=1");
+                return;
+              }
+              if (action.kind === "place") {
+                navigate("/admin/places?new=1");
                 return;
               }
               if (activeKind === action.kind) closeForm();
@@ -519,7 +528,7 @@ export default function AdminQuickActions({
       )}
       {sections !== null && sections.length === 0 && (
         <p className="mt-4 font-sans text-body-s text-muted">
-          Add a section to an exhibition before creating events or artifacts.
+          Add a section to an exhibition before creating artifacts.
         </p>
       )}
 

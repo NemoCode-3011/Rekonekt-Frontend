@@ -130,7 +130,6 @@ export default function InlineForm({
             file,
             {
               title: `${title} image`,
-              mediaType: "image",
               description: submitted.description,
               sourceCredit: field.creditField
                 ? submitted[field.creditField]

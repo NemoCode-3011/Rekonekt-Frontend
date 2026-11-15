@@ -6,6 +6,7 @@ const FONT_WAIT_MS = 250;
 const IDENTITY_HOLD_MS = 900;
 const READY_CAP_MS = 1400;
 const REDUCED_HOLD_MS = 1100;
+const FIRST_PICTURE_WAIT_MS = 900;
 
 // Starts fast, then slows down a long way before it stops.
 const COUNT_EASE = [0.2, 0, 0, 1] as const;
@@ -31,6 +32,16 @@ async function waitForFonts() {
   await Promise.race([loading.catch(() => undefined), wait(FONT_WAIT_MS)]);
 }
 
+// Decode every picture ahead of time, so a cut never stalls. Only the first one
+// is waited for, and only for a moment.
+function preloadPictures() {
+  return milestones.map((milestone) => {
+    const picture = new Image();
+    picture.src = milestone.image;
+    return picture.decode().catch(() => undefined);
+  });
+}
+
 type Options = {
   reduced: boolean;
   homeReady: boolean;
@@ -42,6 +53,9 @@ export function useSplashSequence({ reduced, homeReady, onFinish }: Options) {
   const year = useMotionValue(milestones[0].year);
 
   const [reached, setReached] = useState(0); // the last stop we arrived at
+  // The stop whose picture is on screen. It changes as the count sets off for a
+  // stop, so the new picture arrives with the numbers. -1 means not started yet.
+  const [scene, setScene] = useState(-1);
   const [resting, setResting] = useState(false); // true while we sit on a stop
   const [showIdentity, setShowIdentity] = useState(false);
   const [identityHeld, setIdentityHeld] = useState(false);
@@ -69,6 +83,8 @@ export function useSplashSequence({ reduced, homeReady, onFinish }: Options) {
       });
 
     async function play() {
+      const pictures = reduced ? [] : preloadPictures();
+
       await waitForFonts();
       if (cancelled) return;
 
@@ -77,12 +93,17 @@ export function useSplashSequence({ reduced, homeReady, onFinish }: Options) {
         return;
       }
 
+      await Promise.race([pictures[0], wait(FIRST_PICTURE_WAIT_MS)]);
+      if (cancelled) return;
+
+      setScene(0);
       setResting(true);
       await wait(milestones[0].holdMs);
 
       for (let i = 1; i < milestones.length; i++) {
         if (cancelled) return;
         setResting(false);
+        setScene(i);
 
         await countTo(
           milestones[i].year,
@@ -128,5 +149,5 @@ export function useSplashSequence({ reduced, homeReady, onFinish }: Options) {
     }
   }, [showIdentity, identityHeld, homeReady, readyCapped, finish]);
 
-  return { year, reached, resting, showIdentity, skip: finish };
+  return { year, reached, scene, resting, showIdentity, skip: finish };
 }

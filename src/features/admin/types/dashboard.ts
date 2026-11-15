@@ -149,7 +149,7 @@ export interface CreateExhibitionInput {
 }
 
 export interface CreateEventInput {
-  sectionId: number;
+  sectionId?: number | null;
   title: string;
   slug: string;
   description?: string;
@@ -185,7 +185,7 @@ export interface CreateArtifactInput {
 }
 
 export interface CreateStoryInput {
-  sectionId: number;
+  sectionId?: number;
   title: string;
   slug: string;
   content: string;

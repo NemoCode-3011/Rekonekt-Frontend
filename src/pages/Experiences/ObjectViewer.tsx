@@ -270,6 +270,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
   return (
     <main
       aria-label={`${config.title}, interactive 3D view`}
+      data-lenis-prevent
       className="relative h-svh min-h-140 w-full overflow-hidden bg-[#050806] text-ivory"
     >
       {/* The 3D scene */}

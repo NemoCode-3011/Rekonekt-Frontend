@@ -5,6 +5,7 @@ import type {
   DashboardPerson,
   DashboardPlace,
 } from "../types/dashboard";
+import { parseCoordinates } from "./coordinates";
 
 type Values = Record<string, string>;
 type Reply<T> = { message: string; data: T };
@@ -56,7 +57,7 @@ export async function withSlug<T>(title: string, send: (slug: string) => Promise
 }
 
 // Records an image that lives at a web address and attaches it to one item.
-async function attachImage(
+export async function attachImage(
   values: Values,
   title: string,
   target: Record<string, number>,
@@ -256,20 +257,11 @@ export function addPerson(sectionId: number, values: Values) {
 }
 
 export async function addPlace(sectionId: number, values: Values) {
-  // One field like "6.3350, 5.6037", the way Google Maps shows coordinates.
-  const match = values.coordinates.match(
-    /^\s*(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)\s*$/,
-  );
-
-  if (!match) {
-    throw new Error(
-      "Enter coordinates like 6.3350, 5.6037 (copy them from Google Maps).",
-    );
-  }
+  const { latitude, longitude } = parseCoordinates(values.coordinates);
 
   const place = await post<{ id: number }>("/places", {
-    latitude: Number(match[1]),
-    longitude: Number(match[2]),
+    latitude,
+    longitude,
     ...clean({ name: values.name.trim(), description: values.description }),
   });
 
@@ -291,6 +283,14 @@ export function linkExisting(
     [kind === "people" ? "personId" : "placeId"]: id,
     displayOrder: 0,
   });
+}
+
+export function unlinkSectionContent(
+  kind: "people" | "places",
+  sectionId: number,
+  id: number,
+) {
+  return http.delete(`/sections/${sectionId}/${kind}/${id}`);
 }
 
 export async function addSource(sectionId: number, values: Values) {

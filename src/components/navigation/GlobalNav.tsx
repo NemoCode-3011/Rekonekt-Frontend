@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../features/auth/auth-context";
+import { useScrollLock } from "./useScrollLock";
 
 const links = [
   { to: "/explore", label: "Explore" },
@@ -85,12 +86,7 @@ export default function GlobalNav() {
   const [signingOut, setSigningOut] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [menuOpen]);
+  useScrollLock(menuOpen);
 
   useEffect(() => {
     if (!menuOpen && !accountOpen) return;

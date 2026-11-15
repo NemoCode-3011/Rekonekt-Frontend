@@ -90,12 +90,6 @@
     overflow-x: none;
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    html {
-      scroll-behavior: smooth;
-    }
-  }
-
   body {
     min-width: 320px;
     background: var(--color-ivory);
@@ -121,10 +115,6 @@
     outline: 2px solid var(--color-heritage-green);
     outline-offset: 3px;
   }
-}
-
-* {
-  scroll-behavior: smooth;
 }
 
 .scrollbar-none {

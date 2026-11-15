@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
+import { useLenis } from "lenis/react";
 import ExperienceNav from "../../features/experience/components/ExperienceNav";
 import ExperienceGuide from "../../features/experience/components/ExperienceGuide";
 import CinematicImage from "../../features/experience/components/CinematicImage";
@@ -23,6 +24,7 @@ import PageError from "../../components/ui/PageError";
 function ExperienceDetail() {
   const { slug } = useParams<{ slug: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
+  const lenis = useLenis();
 
   const [experience, setExperience] = useState<Experience | null>(null);
   const [loading, setLoading] = useState(true);
@@ -117,10 +119,16 @@ function ExperienceDetail() {
   };
 
   const jumpToObject = (key: string) => {
+    const target = document.getElementById(`examine-${key}`);
+    if (!target) return;
+
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    document
-      .getElementById(`examine-${key}`)
-      ?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    if (lenis) {
+      // 80 matches the card's scroll margin (scroll-mt-20)
+      lenis.scrollTo(target, { offset: -80, immediate: reduce });
+    } else {
+      target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    }
   };
 
   return (
@@ -132,7 +140,10 @@ function ExperienceDetail() {
       {/* When one chapter has faded out, jump to the top for the next one */}
       <AnimatePresence
         mode="wait"
-        onExitComplete={() => window.scrollTo({ top: 0, behavior: "instant" })}
+        onExitComplete={() => {
+          if (lenis) lenis.scrollTo(0, { immediate: true });
+          else window.scrollTo({ top: 0, behavior: "instant" });
+        }}
       >
         <motion.div
           key={section.id}

@@ -20,6 +20,7 @@ import {
   addSource,
   getChapterContent,
   linkExisting,
+  unlinkSectionContent,
   publishExhibition,
   setPublished,
   updateChapter,
@@ -161,11 +162,13 @@ function Row({
   meta,
   status,
   onToggle,
+  onRemove,
 }: {
   title: string;
   meta?: string | null;
   status?: string;
   onToggle?: () => void;
+  onRemove?: () => void;
 }) {
   return (
     <li className="flex items-center justify-between gap-4 py-3">
@@ -185,6 +188,15 @@ function Row({
             className={`${textButton} text-meta`}
           >
             {status === "published" ? "Unpublish" : "Publish"}
+          </button>
+        )}
+        {onRemove && (
+          <button
+            type="button"
+            onClick={onRemove}
+            className={`${textButton} text-meta text-muted hover:text-error`}
+          >
+            Remove from chapter
           </button>
         )}
       </div>
@@ -263,6 +275,23 @@ function ChapterPanel({
     } catch (error) {
       showToast(
         error instanceof Error ? error.message : "Couldn't change that.",
+        "error",
+      );
+    }
+  }
+
+  async function removeFromChapter(kind: "people" | "places", id: number) {
+    try {
+      await unlinkSectionContent(kind, section.id, id);
+      await load();
+      showToast(
+        kind === "people"
+          ? "Person removed from chapter."
+          : "Place removed from chapter.",
+      );
+    } catch (error) {
+      showToast(
+        error instanceof Error ? error.message : "Could not remove this link.",
         "error",
       );
     }
@@ -480,6 +509,7 @@ function ChapterPanel({
               title={item.name}
               status={item.status}
               onToggle={() => toggle("people", item.id, item.status)}
+              onRemove={() => void removeFromChapter("people", item.id)}
             />
           ))}
         </ul>
@@ -558,6 +588,7 @@ function ChapterPanel({
               title={item.name}
               status={item.status}
               onToggle={() => toggle("places", item.id, item.status)}
+              onRemove={() => void removeFromChapter("places", item.id)}
             />
           ))}
         </ul>

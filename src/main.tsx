@@ -5,13 +5,16 @@ import "./index.css";
 import App from "./App";
 import { AuthProvider } from "./features/auth/AuthProvider";
 import ErrorBoundary from "./components/ErrorBoundary";
+import SmoothScroll from "./components/navigation/SmoothScroll";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ErrorBoundary>
       <BrowserRouter>
         <AuthProvider>
-          <App />
+          <SmoothScroll>
+            <App />
+          </SmoothScroll>
         </AuthProvider>
       </BrowserRouter>
     </ErrorBoundary>
