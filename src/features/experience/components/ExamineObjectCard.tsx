@@ -77,7 +77,7 @@ export default function ExamineObjectCard({
           <span className="rounded-full border border-sand/60 px-3.5 py-1.5 font-sans text-label font-medium uppercase tracking-[0.2em] text-sand">
             Interactive 3D
           </span>
-          <p className="font-sans text-label font-medium uppercase tracking-[0.22em] text-ochre">
+          <p className="font-sans text-label font-medium uppercase tracking-[0.22em] text-ochre-light">
             Examine the object
           </p>
         </div>

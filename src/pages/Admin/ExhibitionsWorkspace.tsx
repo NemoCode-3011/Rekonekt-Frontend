@@ -20,7 +20,6 @@ import {
   addSource,
   getChapterContent,
   linkExisting,
-  unlinkSectionContent,
   publishExhibition,
   setPublished,
   updateChapter,
@@ -37,10 +36,7 @@ import type {
 } from "../../features/admin/types/dashboard";
 import { useAuth } from "../../features/auth/auth-context";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
-import PageLoader from "../../components/ui/PageLoader";
-import {
-  useGuardedLink,
-} from "../../features/admin/unsaved/unsaved-context";
+
 // ---------- The fields each form asks for ----------
 
 const imageFields: FormField[] = [
@@ -150,7 +146,7 @@ function Group({
   return (
     <section className="py-6">
       <h3 className="font-sans text-label font-medium uppercase tracking-widest text-muted">
-        {title} <span className="ml-1 text-ochre">{count}</span>
+        {title} <span className="ml-1 text-ochre-deep">{count}</span>
       </h3>
       {children}
     </section>
@@ -162,13 +158,11 @@ function Row({
   meta,
   status,
   onToggle,
-  onRemove,
 }: {
   title: string;
   meta?: string | null;
   status?: string;
   onToggle?: () => void;
-  onRemove?: () => void;
 }) {
   return (
     <li className="flex items-center justify-between gap-4 py-3">
@@ -188,15 +182,6 @@ function Row({
             className={`${textButton} text-meta`}
           >
             {status === "published" ? "Unpublish" : "Publish"}
-          </button>
-        )}
-        {onRemove && (
-          <button
-            type="button"
-            onClick={onRemove}
-            className={`${textButton} text-meta text-muted hover:text-error`}
-          >
-            Remove from chapter
           </button>
         )}
       </div>
@@ -275,23 +260,6 @@ function ChapterPanel({
     } catch (error) {
       showToast(
         error instanceof Error ? error.message : "Couldn't change that.",
-        "error",
-      );
-    }
-  }
-
-  async function removeFromChapter(kind: "people" | "places", id: number) {
-    try {
-      await unlinkSectionContent(kind, section.id, id);
-      await load();
-      showToast(
-        kind === "people"
-          ? "Person removed from chapter."
-          : "Place removed from chapter.",
-      );
-    } catch (error) {
-      showToast(
-        error instanceof Error ? error.message : "Could not remove this link.",
         "error",
       );
     }
@@ -509,7 +477,6 @@ function ChapterPanel({
               title={item.name}
               status={item.status}
               onToggle={() => toggle("people", item.id, item.status)}
-              onRemove={() => void removeFromChapter("people", item.id)}
             />
           ))}
         </ul>
@@ -588,7 +555,6 @@ function ChapterPanel({
               title={item.name}
               status={item.status}
               onToggle={() => toggle("places", item.id, item.status)}
-              onRemove={() => void removeFromChapter("places", item.id)}
             />
           ))}
         </ul>
@@ -696,7 +662,6 @@ export default function ExhibitionWorkspace() {
   const { id } = useParams<{ id: string }>();
   const exhibitionId = Number(id);
   const { showToast } = useAuth();
-  const guardedLink = useGuardedLink();
 
   const [exhibition, setExhibition] =
     useState<DashboardExhibitionResponseItem | null>(null);
@@ -782,7 +747,9 @@ export default function ExhibitionWorkspace() {
   }, [exhibitionId]);
 
   if (status === "loading") {
-    return <PageLoader label="Loading exhibition…" />;
+    return (
+      <p className="px-8 py-12 font-sans text-body-s text-muted">Loading…</p>
+    );
   }
 
   if (status === "error" || !exhibition) {
@@ -807,7 +774,6 @@ export default function ExhibitionWorkspace() {
     <div className="mx-auto w-full max-w-5xl px-5 py-8 md:px-8 md:py-12">
       <Link
         to="/admin/exhibitions"
-        onClick={guardedLink("/admin/exhibitions")} // <-- add
         className="font-sans text-body-s text-muted hover:text-ink"
       >
         ← Exhibitions
@@ -823,7 +789,6 @@ export default function ExhibitionWorkspace() {
                 <StatusChip status="published" />
                 <Link
                   to={`/experiences/${exhibition.slug}`}
-                  onClick={guardedLink(`/experiences/${exhibition.slug}`)} // <-- add
                   className={textButton}
                 >
                   Open experience
@@ -951,7 +916,7 @@ export default function ExhibitionWorkspace() {
               className="flex w-full items-center justify-between gap-4 py-5 text-left transition-colors hover:bg-heritage-green/5"
             >
               <span className="flex items-baseline gap-4">
-                <span className="font-display text-heading-s text-ochre">
+                <span className="font-display text-heading-s text-ochre-deep">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <span className="font-display text-heading-s">

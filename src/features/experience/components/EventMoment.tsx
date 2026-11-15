@@ -20,7 +20,7 @@ function EventMoment({ event }: EventMomentProps) {
       <div className="grid gap-6 md:grid-cols-[minmax(0,0.9fr)_minmax(0,2fr)] md:gap-16">
         <div>
           {label && (
-            <p className="font-display text-[clamp(2.25rem,4.6vw,4.25rem)] leading-[0.95] tracking-[-0.04em] text-ochre md:sticky md:top-28">
+            <p className="font-display text-[clamp(2.25rem,4.6vw,4.25rem)] leading-[0.95] tracking-[-0.04em] text-ochre-deep md:sticky md:top-28">
               {label}
             </p>
           )}

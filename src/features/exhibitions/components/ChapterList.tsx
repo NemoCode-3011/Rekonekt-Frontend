@@ -43,7 +43,7 @@ function ChapterList({ experienceSlug, sections }: ChapterListProps) {
                   to={`/experiences/${experienceSlug}?chapter=${section.slug}`}
                   className="group grid grid-cols-[2.75rem_1fr_auto] items-baseline gap-4 py-8 md:grid-cols-[4.5rem_1fr_auto] md:gap-8 md:py-10"
                 >
-                  <span className="font-display text-heading-m leading-none text-ochre">
+                  <span className="font-display text-heading-m leading-none text-ochre-deep">
                     {String(index + 1).padStart(2, "0")}
                   </span>
 
@@ -57,7 +57,7 @@ function ChapterList({ experienceSlug, sections }: ChapterListProps) {
                       </p>
                     )}
                     {hasObject && (
-                      <p className="mt-4 inline-flex items-center gap-3 font-sans text-label font-medium uppercase tracking-[0.16em] text-ochre">
+                      <p className="mt-4 inline-flex items-center gap-3 font-sans text-label font-medium uppercase tracking-[0.16em] text-ochre-deep">
                         <span className="rounded-full border border-ochre/50 px-2 py-0.5">
                           3D
                         </span>

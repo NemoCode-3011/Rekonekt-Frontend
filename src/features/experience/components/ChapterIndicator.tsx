@@ -6,7 +6,7 @@ interface ChapterIndicatorProps {
 function ChapterIndicator({ number, title }: ChapterIndicatorProps) {
   return (
     <div className="flex items-center gap-4 font-sans text-label uppercase tracking-[0.16em]">
-      <span className="text-ochre">
+      <span className="text-ochre-light">
         {String(number).padStart(2, "0")}
       </span>
 

@@ -503,7 +503,7 @@ export default function AdminQuickActions({
                 : "text-ink"
             }`}
           >
-            <span className="mr-2 text-ochre" aria-hidden="true">
+            <span className="mr-2 text-ochre-light" aria-hidden="true">
               {activeKind === action.kind ? "−" : "+"}
             </span>
             {action.label}
@@ -530,7 +530,7 @@ export default function AdminQuickActions({
         >
           <div className="flex items-start justify-between gap-6 border-b border-line pb-5">
             <div>
-              <p className="font-sans text-label uppercase tracking-[0.16em] text-ochre">
+              <p className="font-sans text-label uppercase tracking-[0.16em] text-ochre-deep">
                 New record
               </p>
               <h3 className="mt-1 font-display text-heading-m">

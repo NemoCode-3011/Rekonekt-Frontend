@@ -264,7 +264,7 @@ export default function NotesWidget() {
                     <ul className="divide-y divide-line">
                       {notes.map((note) => (
                         <li key={note.id} className="py-5">
-                          <p className="font-sans text-meta uppercase tracking-widest text-ochre">
+                          <p className="font-sans text-meta uppercase tracking-widest text-ochre-deep">
                             {formatLongDate(note.note_date ?? note.created_at)}
                           </p>
                           <p className="mt-2 whitespace-pre-line font-sans text-body-m">

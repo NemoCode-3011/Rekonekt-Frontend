@@ -143,7 +143,7 @@ function Label({ tag, piece, className = "" }: { tag: string; piece: Piece; clas
   return (
     <figcaption className={`mt-4 ${className}`}>
       <div className="grid grid-cols-[3.5rem_1fr] gap-x-4 md:grid-cols-[4.5rem_1fr]">
-        <span className="pt-1 text-label font-medium text-ochre">{tag}</span>
+        <span className="pt-1 text-label font-medium text-ochre-deep">{tag}</span>
         <div>
           <p className="font-display text-heading-s leading-tight">{piece.title}</p>
           {piece.detail && <p className="mt-1 text-body-s text-muted">{piece.detail}</p>}

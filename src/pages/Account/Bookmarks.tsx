@@ -44,7 +44,7 @@ function Bookmarks() {
             className="group text-left"
           >
             {bookmark.date_display && (
-              <span className="block font-display text-heading-s text-ochre">
+              <span className="block font-display text-heading-s text-ochre-deep">
                 {bookmark.date_display}
               </span>
             )}

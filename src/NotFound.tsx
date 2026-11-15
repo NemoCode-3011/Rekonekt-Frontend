@@ -6,7 +6,7 @@ export default function NotFound() {
       <div className="container py-28 md:py-40">
         <p
           aria-hidden
-          className="font-display text-display-xl leading-none text-ochre"
+          className="font-display text-display-xl leading-none text-ochre-deep"
         >
           404
         </p>

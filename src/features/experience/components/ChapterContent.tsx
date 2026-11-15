@@ -47,7 +47,7 @@ function ChapterContent({ section, date, objectCards }: ChapterContentProps) {
                 The story
               </p>
 
-              <p className="mt-5 font-display text-heading-s text-ochre">
+              <p className="mt-5 font-display text-heading-s text-ochre-deep">
                 {date}
               </p>
 
@@ -60,8 +60,8 @@ function ChapterContent({ section, date, objectCards }: ChapterContentProps) {
                   key={index}
                   className={
                     index === 0
-                      ? "max-w-176t-display text-heading-m leading-tight text-ink"
-                      : "mt-6 max-w-176 font-sans text-body-m leading-[1.8] text-ink/80"
+                      ? "max-w-[44rem] font-display text-heading-m leading-[1.25] text-ink"
+                      : "mt-6 max-w-[44rem] font-sans text-body-m leading-[1.8] text-ink/80"
                   }
                 >
                   {paragraph}

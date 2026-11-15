@@ -15,7 +15,7 @@ export default function AccountLayout() {
   return (
     <div className="bg-ivory text-ink">
       <div className="container py-12 md:py-20">
-        <p className="font-display text-heading-s text-ochre">Your account</p>
+        <p className="font-display text-heading-s text-ochre-deep">Your account</p>
         <h1 className="mt-3 text-display-m leading-[0.95]">{user?.name}</h1>
 
         <nav

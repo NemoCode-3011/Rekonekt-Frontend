@@ -68,14 +68,14 @@ function ExperienceGuide() {
   const current = steps[step];
 
   return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center bg-ink/85 px-5">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/85 px-5">
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="guide-title"
         className="w-full max-w-lg bg-ivory p-8 text-ink md:p-10"
       >
-        <p className="font-sans text-label font-medium uppercase tracking-[0.18em] text-ochre">
+        <p className="font-sans text-label font-medium uppercase tracking-[0.18em] text-ochre-deep">
           How this works · {step + 1} of {steps.length}
         </p>
 

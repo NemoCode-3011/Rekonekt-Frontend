@@ -6,7 +6,6 @@ import type {
   DashboardData,
   DashboardRecord,
 } from "../../features/admin/types/dashboard";
-import PageLoader from "../../components/ui/PageLoader";
 
 const collections = [
   { key: "exhibitions", label: "Exhibitions" },
@@ -44,14 +43,21 @@ function getRecentContent(data: DashboardData) {
     .filter((record) => Boolean(record.updated_at))
     .sort(
       (a, b) =>
-        new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
+        new Date(b.updated_at).getTime() -
+        new Date(a.updated_at).getTime(),
     )
     .slice(0, 8);
 }
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const { data, loading, refreshing, error, refresh } = useDashboardData();
+  const {
+    data,
+    loading,
+    refreshing,
+    error,
+    refresh,
+  } = useDashboardData();
 
   const recentContent = data ? getRecentContent(data) : [];
 
@@ -70,7 +76,7 @@ export default function Dashboard() {
       <section className="mt-10" aria-labelledby="content-overview-heading">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="font-sans text-label uppercase tracking-[0.18em] text-ochre">
+            <p className="font-sans text-label uppercase tracking-[0.18em] text-ochre-deep">
               The collection
             </p>
             <h2
@@ -87,10 +93,20 @@ export default function Dashboard() {
           )}
         </div>
 
-        {loading && <PageLoader label="Loading content records…" />}
+        {loading && (
+          <p
+            role="status"
+            className="mt-6 border-y border-line py-8 font-sans text-body-m text-muted"
+          >
+            Loading content records…
+          </p>
+        )}
 
         {error && (
-          <div role="alert" className="mt-6 border-y border-error/30 py-6">
+          <div
+            role="alert"
+            className="mt-6 border-y border-error/30 py-6"
+          >
             <p className="font-sans text-body-m text-error">{error}</p>
             <button
               type="button"
@@ -167,7 +183,9 @@ export default function Dashboard() {
                         {publishedCount}
                       </p>
                     </div>
-                    <div className="border-l border-line pt-3 pl-4">
+                    <div
+                      className="border-l border-line pt-3 pl-4"
+                    >
                       <p className="font-sans text-label uppercase tracking-[0.12em] text-muted">
                         Drafts
                       </p>
@@ -188,7 +206,7 @@ export default function Dashboard() {
         aria-labelledby="quick-actions-heading"
       >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <p className="font-sans text-label uppercase tracking-[0.18em] text-ochre">
+          <p className="font-sans text-label uppercase tracking-[0.18em] text-ochre-deep">
             The workbench
           </p>
           <div className="sm:text-right">
@@ -217,7 +235,7 @@ export default function Dashboard() {
       <section className="mt-16" aria-labelledby="recent-content-heading">
         <div className="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
           <div>
-            <p className="font-sans text-label uppercase tracking-[0.18em] text-ochre">
+            <p className="font-sans text-label uppercase tracking-[0.18em] text-ochre-deep">
               The archive, in motion
             </p>
             <h2
@@ -255,7 +273,7 @@ export default function Dashboard() {
                   <p className="font-sans text-label uppercase tracking-[0.14em] text-muted">
                     {record.kind}
                     {record.status && (
-                      <span className="px-2 text-ochre">·</span>
+                      <span className="px-2 text-ochre-deep">·</span>
                     )}
                     {record.status}
                   </p>

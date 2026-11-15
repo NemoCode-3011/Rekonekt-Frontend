@@ -142,7 +142,7 @@ function PersonDetails({ person }: { person: ExperiencePerson }) {
       <Picture media={media} alt={person.name} shape="aspect-[4/5]" />
 
       {years && (
-        <p className="font-display text-heading-s text-ochre">{years}</p>
+        <p className="font-display text-heading-s text-ochre-deep">{years}</p>
       )}
       <h2 className="mt-2 text-heading-l leading-[1.05]">{person.name}</h2>
       <Description text={person.description} />
@@ -190,7 +190,7 @@ function EventDetails({ event }: { event: ExperienceEvent }) {
   return (
     <article>
       {event.date_display && (
-        <p className="font-display text-heading-m leading-none tracking-[-0.03em] text-ochre">
+        <p className="font-display text-heading-m leading-none tracking-[-0.03em] text-ochre-deep">
           {event.date_display}
         </p>
       )}
@@ -216,7 +216,7 @@ function ArtifactDetails({ artifact }: { artifact: ExperienceArtifact }) {
       <Picture media={media} alt={artifact.title} shape="" />
 
       {artifact.date_display && (
-        <p className="font-display text-heading-s text-ochre">
+        <p className="font-display text-heading-s text-ochre-deep">
           {artifact.date_display}
         </p>
       )}
