@@ -43,6 +43,7 @@ import SkipLink from "./components/navigation/SkipLink";
 import { lazy, Suspense } from "react";
 import { SplashProvider } from "./components/splash/SplashProvider";
 import { SplashLayer } from "./components/splash/SplashScreen";
+import PersonPage from "./pages/People/PersonPage"
 
 const ObjectViewer = lazy(() => import("./pages/Experiences/ObjectViewer"));
 
@@ -82,6 +83,7 @@ function App() {
               <Route path="/about" element={<About />} />
               <Route path="/stories" element={<Stories />} />
               <Route path="/stories/:slug" element={<StoryDetail />} />
+              <Route path="/people/:slug" element={<PersonPage />} />
 
               {/* Visitor account */}
               <Route path="/account" element={<RequireAuth />}>

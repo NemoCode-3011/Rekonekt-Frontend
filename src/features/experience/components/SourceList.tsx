@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useBookCover } from "../useBookCover";
 import type { ExperienceSource } from "../types";
 
 // Books, papers and online catalogues go under "Further reading".
@@ -35,62 +35,74 @@ function TitleLink({ source }: { source: ExperienceSource }) {
 }
 
 // A book cover. Shows a plain tile when there is no cover or it fails to load.
-function Cover({ source }: { source: ExperienceSource }) {
-  const [failed, setFailed] = useState(false);
+function CoverTile({ source }: { source: ExperienceSource }) {
+  return (
+    <div className="flex aspect-2/3 w-24 shrink-0 flex-col justify-between bg-heritage-green p-3 text-ivory sm:w-28">
+      <span className="font-sans text-label uppercase tracking-[0.15em] text-ochre">
+        {source.source_type}
+      </span>
+      <span className="line-clamp-5 font-display text-body-s leading-tight">
+        {source.title}
+      </span>
+      <span className="line-clamp-2 font-sans text-label text-ivory/70">
+        {source.author}
+      </span>
+    </div>
+  );
+}
 
-  if (!source.cover_image_url || failed) {
-    return (
-      <div className="flex aspect-2/3 w-20 shrink-0 items-center justify-center bg-sand/40">
-        <span className="font-sans text-label uppercase tracking-wide text-ink/65">
-          {source.source_type}
-        </span>
-      </div>
-    );
-  }
+function Cover({ source }: { source: ExperienceSource }) {
+  const { src, onError, onLoad } = useBookCover(source);
+
+  if (!src) return <CoverTile source={source} />;
 
   return (
     <img
-      src={source.cover_image_url}
-      alt=""
+      src={src}
+      alt={`Cover of ${source.title}`}
       loading="lazy"
-      onError={() => setFailed(true)}
-      className="aspect-2/3 w-20 shrink-0 object-cover"
+      onError={onError}
+      onLoad={onLoad}
+      className="aspect-2/3 w-24 shrink-0 bg-sand/40 object-cover shadow-md sm:w-28"
     />
   );
 }
 
 function ReadingList({ sources }: { sources: ExperienceSource[] }) {
   return (
-    <div className="mb-10">
+    <div className="@container mb-12">
       <h3 className="font-display text-heading-s">Further reading</h3>
 
-      <ul className="mt-5 grid gap-6 sm:grid-cols-2">
+      <ul className="mt-6 grid gap-5 @2xl:grid-cols-2">
         {sources.map((source) => {
           const details = describe(source);
 
           return (
-            <li key={source.id} className="flex gap-4">
+            <li
+              key={source.id}
+              className="flex gap-5 border border-line bg-sand/20 p-5 sm:gap-6 sm:p-6"
+            >
               <Cover source={source} />
 
-              <div>
+              <div className="min-w-0 break-words">
                 <p className="font-display text-heading-s leading-snug">
                   <TitleLink source={source} />
                 </p>
 
                 {details && (
-                  <p className="mt-1 font-sans text-body-s text-muted">
+                  <p className="mt-2 font-sans text-body-s text-muted">
                     {details}
                   </p>
                 )}
 
                 {source.perspective_note && (
-                  <p className="mt-2 font-sans text-body-s leading-relaxed text-ink/80">
+                  <p className="mt-3 font-sans text-body-s leading-relaxed text-ink/80">
                     {source.perspective_note}
                   </p>
                 )}
 
                 {source.rights_statement && (
-                  <p className="mt-2 font-sans text-label text-muted">
+                  <p className="mt-3 font-sans text-label text-muted">
                     {source.rights_statement}
                   </p>
                 )}

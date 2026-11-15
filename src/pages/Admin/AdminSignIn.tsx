@@ -25,7 +25,7 @@ export default function AdminSignIn() {
       <section className="relative flex min-h-[35vh] flex-col justify-between overflow-hidden bg-deep-forest px-6 py-7 md:px-12 md:py-10 lg:min-h-screen lg:px-16 lg:py-12">
         <div 
           aria-hidden="true"
-          className="pointer-events-none absolute -right-32 top-1/4 h-[28rem] w-[28rem] rounded-full border border-ivory/10"
+          className="pointer-events-none absolute -right-32 top-1/4 h-11228rem] rounded-full border border-ivory/10"
         >
           <div className="absolute inset-10 rounded-full border border-ivory/10" />
           <div className="absolute inset-20 rounded-full border border-ivory/10" />

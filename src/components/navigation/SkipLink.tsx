@@ -15,7 +15,7 @@ export default function SkipLink() {
     <a
       href="#main-content"
       onClick={goToContent}
-      className="sr-only fixed left-4 top-4 z-[200] bg-ivory px-5 py-3 font-sans text-body-s font-medium text-ink focus:not-sr-only"
+      className="sr-only fixed left-4 top-4 z-200 bg-ivory px-5 py-3 font-sans text-body-s font-medium text-ink focus:not-sr-only"
     >
       Skip to main content
     </a>

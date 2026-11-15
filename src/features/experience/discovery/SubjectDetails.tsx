@@ -22,6 +22,7 @@ import {
 import type { DiscoverySubject, ExperienceStory } from "./types";
 import SaveButton from "../../bookmarks/components/SaveButton";
 import RichText from "../../../components/ui/RichText";
+import { Link } from "react-router-dom";
 
 // "1933–1999", "Born 1933", "Died 1999", or nothing if no dates are known.
 function lifeSpan(person: ExperiencePerson) {
@@ -136,6 +137,7 @@ function PersonDetails({ person }: { person: ExperiencePerson }) {
   const { items: media } = usePersonMedia(person.id);
   const { items: sources, status } = usePersonSources(person.id);
   const years = lifeSpan(person);
+  const paragraphs = toParagraphs(person.description);
 
   return (
     <article>
@@ -145,7 +147,16 @@ function PersonDetails({ person }: { person: ExperiencePerson }) {
         <p className="font-display text-heading-s text-ochre-deep">{years}</p>
       )}
       <h2 className="mt-2 text-heading-l leading-[1.05]">{person.name}</h2>
-      <Description text={person.description} />
+      <Description text={paragraphs[0] ?? null} />
+
+      {paragraphs.length > 1 && (
+        <Link
+          to={`/people/${person.slug}`}
+          className="mt-8 inline-flex items-center gap-2 border-b border-ink font-sans text-body-m font-medium transition-colors hover:text-heritage-green"
+        >
+          Read their full story <span aria-hidden>→</span>
+        </Link>
+      )}
 
       <SourcesBlock sources={sources} status={status} />
     </article>

@@ -68,7 +68,7 @@ function ExperienceGuide() {
   const current = steps[step];
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/85 px-5">
+    <div className="fixed inset-0 z-100 flex items-center justify-center bg-ink/85 px-5">
       <div
         role="dialog"
         aria-modal="true"

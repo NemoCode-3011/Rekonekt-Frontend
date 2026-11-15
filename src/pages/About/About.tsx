@@ -143,7 +143,7 @@ function Label({ tag, piece, className = "" }: { tag: string; piece: Piece; clas
   return (
     <figcaption className={`mt-4 ${className}`}>
       <div className="grid grid-cols-[3.5rem_1fr] gap-x-4 md:grid-cols-[4.5rem_1fr]">
-        <span className="pt-1 text-label font-medium text-ochre-deep">{tag}</span>
+        <span className="pt-1 text-label font-medium text-ochre">{tag}</span>
         <div>
           <p className="font-display text-heading-s leading-tight">{piece.title}</p>
           {piece.detail && <p className="mt-1 text-body-s text-muted">{piece.detail}</p>}
@@ -183,7 +183,7 @@ function Opening() {
 
   return (
     // "sticky" keeps this in place while the rest of the page scrolls over it.
-    <section className="sticky top-0 isolate h-svh min-h-[520px] overflow-hidden bg-deep-forest text-ivory">
+    <section className="sticky top-0 isolate h-svh min-h-130 overflow-hidden bg-deep-forest text-ivory">
       {src && (
         <motion.div
           className="absolute inset-0"
@@ -345,7 +345,7 @@ export default function About() {
                   const tag = `No. ${String(index + 2).padStart(2, "0")}`;
                   const content = (
                     <figure>
-                      <Plate piece={piece} className="aspect-[4/5] w-full" />
+                      <Plate piece={piece} className="aspect-4/5-full" />
                       <Label tag={tag} piece={piece} />
                     </figure>
                   );
@@ -425,12 +425,12 @@ export default function About() {
 
               <div className="mt-12 grid gap-10 md:grid-cols-2 md:gap-10">
                 <figure>
-                  <Plate piece={thenPiece} className="aspect-[5/4] w-full" />
+                  <Plate piece={thenPiece} className="aspect-5/4-full" />
                   <Label tag="Then" piece={thenPiece} />
                 </figure>
 
                 <figure>
-                  <Plate piece={nowPiece} className="aspect-[5/4] w-full" />
+                  <Plate piece={nowPiece} className="aspect-5/4 w-full" />
                   <Label tag="Now" piece={nowPiece} />
                 </figure>
               </div>

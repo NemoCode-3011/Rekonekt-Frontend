@@ -45,7 +45,7 @@ export default function Hero() {
   });
 
   return (
-    <section className="relative isolate flex min-h-svh flex-col overflow-hidden pb-4 pt-24 text-ivory [@media(max-height:700px)]:pt-[5.25rem]">
+    <section className="relative isolate flex min-h-svh flex-col overflow-hidden pb-4 pt-24 text-ivory [@media(max-height:700px)]:pt-21">
       <HeroBackdrop slide={heroSlides[activeIndex]} />
 
       {/* The words: a label, the headline, one line and one button, centred */}
@@ -99,7 +99,7 @@ export default function Hero() {
           for the caption. The numbers come from STRIP_SIZE, shared with
           HeroCarousel.tsx. */}
       <motion.div
-        className={`relative z-10 min-h-[calc(var(--min-item)_*_var(--group)_+_3rem)] flex-1 [container-type:size] ${STRIP_SIZE}`}
+        className={`relative z-10 min-h-[calc(var(--min-item)*var(--group)+3rem)] flex-1 @container-size ${STRIP_SIZE}`}
         initial={reduce ? false : { opacity: 0, y: 40 }}
         animate={{ opacity: open ? 1 : 0, y: open ? 0 : 40 }}
         transition={{ duration: 1.4, ease, delay: 1.2 }}

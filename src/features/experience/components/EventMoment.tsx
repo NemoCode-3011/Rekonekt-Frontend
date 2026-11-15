@@ -27,7 +27,7 @@ function EventMoment({ event }: EventMomentProps) {
         </div>
 
         <div>
-          <h3 className="max-w-[36rem] font-display text-heading-m leading-[1.15]">
+          <h3 className="max-w-xl font-display text-heading-m leading-[1.15]">
             {event.title}
           </h3>
 
