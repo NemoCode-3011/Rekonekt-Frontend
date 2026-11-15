@@ -269,7 +269,7 @@ function HeroCarousel({ slides, onFirstImageReady, onActiveChange }: HeroCarouse
               className="text-body-s text-ivory/90"
             >
               {current.caption}
-              {current.credit && <span className="text-ivory/55"> · {current.credit}</span>}
+              {current.credit && <span className="text-ivory/70"> · {current.credit}</span>}
             </motion.p>
           </AnimatePresence>
         </div>

@@ -94,7 +94,7 @@ export default function DiscoverDifferently() {
               onFocus={() => select(i)}
               onClick={() => select(i)}
               className={`relative py-5 text-left font-display text-heading-m leading-none transition-colors duration-300 ${
-                active === i ? "text-ink" : "text-ink/35 hover:text-ink/60"
+                active === i ? "text-ink" : "text-ink/55 hover:text-ink/80"
               }`}
             >
               {route.label}
@@ -154,7 +154,7 @@ export default function DiscoverDifferently() {
               >
                 <span
                   className={`font-display text-heading-m leading-none transition-colors duration-300 ${
-                    active === i ? "text-ink" : "text-ink/35"
+                    active === i ? "text-ink" : "text-ink/55"
                   }`}
                 >
                   {route.label}

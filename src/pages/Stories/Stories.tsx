@@ -34,7 +34,7 @@ function Cover({
     // A quiet tile instead of a broken or missing picture.
     return (
       <div className={`flex items-end bg-sand/40 p-4 ${className}`}>
-        <span className="text-label uppercase tracking-wide text-ink/40">
+        <span className="text-label uppercase tracking-wide text-ink/65">
           {categoryLabel(story.category) ?? "Story"}
         </span>
       </div>
