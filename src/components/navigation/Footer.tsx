@@ -44,7 +44,7 @@ export default function Footer() {
               Know Your Roots. Own Your Future.
             </p>
 
-            <p className="mt-8 max-w-md text-body-s leading-relaxed text-ivory/50">
+            <p className="mt-8 max-w-md text-body-s leading-relaxed text-ivory/65">
               Exploring Nigeria's history, culture, and the stories shaping
               its present.
             </p>
@@ -103,7 +103,7 @@ export default function Footer() {
 
         {/* Bottom line */}
         <div className="border-t border-line-light py-6">
-          <div className="flex flex-col gap-2 text-meta text-ivory/45 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-2 text-meta text-ivory/65 sm:flex-row sm:items-center sm:justify-between">
             <p>© 2026 REKÒ</p>
             <p>Nigeria's history, culture, and stories.</p>
           </div>

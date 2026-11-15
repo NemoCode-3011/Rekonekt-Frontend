@@ -30,7 +30,7 @@ export default function Exhibitions() {
   }, []);
 
   return (
-    <main className="bg-ivory text-ink">
+    <div className="bg-ivory text-ink">
       {/* Opening */}
       <section className="border-b border-line">
         <div className="container py-24 md:py-32 lg:py-40">
@@ -191,7 +191,7 @@ export default function Exhibitions() {
           )}
         </div>
       </section>
-    </main>
+    </div>
   );
 }
 

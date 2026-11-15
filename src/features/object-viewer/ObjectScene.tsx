@@ -615,7 +615,7 @@ function Marker({
             )}
 
             <span
-              className={`relative grid size-7 place-items-center rounded-full border font-sans text-[10px] font-medium tracking-wider transition-colors group-focus-visible:ring-2 group-focus-visible:ring-ivory ${
+              className={`relative grid size-7 place-items-center rounded-full border font-sans text-xs font-medium tracking-wider transition-colors group-focus-visible:ring-2 group-focus-visible:ring-ivory ${
                 active
                   ? "border-ivory bg-ivory text-ink"
                   : "border-ivory/70 bg-ink/60 text-ivory backdrop-blur-sm group-hover:border-ivory group-hover:bg-ochre"
@@ -624,7 +624,7 @@ function Marker({
               {index + 1}
             </span>
 
-            <span className="pointer-events-none absolute left-full top-1/2 ml-3 hidden -translate-y-1/2 whitespace-nowrap bg-ink/85 px-3 py-1.5 font-sans text-[10px] uppercase tracking-[0.18em] text-ivory opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 md:block">
+            <span className="pointer-events-none absolute left-full top-1/2 ml-3 hidden -translate-y-1/2 whitespace-nowrap bg-ink/85 px-3 py-1.5 font-sans text-xs uppercase tracking-[0.18em] text-ivory opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 md:block">
               {story.label}
             </span>
           </button>

@@ -41,7 +41,7 @@ function Cover({ source }: { source: ExperienceSource }) {
   if (!source.cover_image_url || failed) {
     return (
       <div className="flex aspect-2/3 w-20 shrink-0 items-center justify-center bg-sand/40">
-        <span className="font-sans text-label uppercase tracking-wide text-ink/40">
+        <span className="font-sans text-label uppercase tracking-wide text-ink/65">
           {source.source_type}
         </span>
       </div>

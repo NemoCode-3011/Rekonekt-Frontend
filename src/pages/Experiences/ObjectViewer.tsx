@@ -70,7 +70,7 @@ class SceneBoundary extends Component<
 function Sources({ sources }: { sources: ObjectSource[] }) {
   return (
     <div className="mt-6 border-t border-ivory/15 pt-4">
-      <p className="font-sans text-[10px] uppercase tracking-[0.18em] text-ivory/50">
+      <p className="font-sans text-xs uppercase tracking-[0.18em] text-ivory/65">
         Sources and further reading
       </p>
       <ul className="mt-3 space-y-2">
@@ -318,7 +318,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
           onClick={() =>
             navigate(`/experiences/${slug}?chapter=${config.sectionSlug}`)
           }
-          className="pointer-events-auto border border-ivory/30 bg-ink/40 px-4 py-2.5 font-sans text-[10px] uppercase tracking-[0.16em] backdrop-blur-sm transition-colors hover:border-ochre hover:bg-ochre/10"
+          className="pointer-events-auto border border-ivory/30 bg-ink/40 px-4 py-2.5 font-sans text-xs uppercase tracking-[0.16em] backdrop-blur-sm transition-colors hover:border-ochre hover:bg-ochre/10"
         >
           Back to exhibition <span aria-hidden>↗</span>
         </button>
@@ -342,7 +342,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
                 style={{ width: `${Math.round(progress)}%` }}
               />
             </div>
-            <p className="mt-4 font-sans text-[10px] uppercase tracking-[0.2em] text-ivory/50">
+            <p className="mt-4 font-sans text-xs uppercase tracking-[0.2em] text-ivory/65">
               Preparing the gallery
             </p>
           </motion.div>
@@ -360,7 +360,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
             transition={{ delay: 1.6, duration: 1.6 }}
             className="pointer-events-none absolute inset-x-0 bottom-[14%] z-10 px-6 text-center"
           >
-            <p className="font-sans text-[10px] uppercase tracking-[0.28em] text-ochre">
+            <p className="font-sans text-xs uppercase tracking-[0.28em] text-ochre">
               {config.eyebrow}
             </p>
             <h1 className="mt-4 font-display text-[clamp(2.6rem,7vw,5.5rem)] leading-[0.95] tracking-[-0.03em]">
@@ -376,18 +376,18 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
       {/* What this object is */}
       {exploring && (
         <div className="pointer-events-none absolute left-5 top-20 z-10 md:bottom-8 md:left-10 md:top-auto hide-in-hall">
-          <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-ochre">
+          <p className="font-sans text-xs uppercase tracking-[0.2em] text-ochre">
             {config.eyebrow}
           </p>
           <p className="mt-1 max-w-[16rem] font-display text-[1.15rem] leading-tight md:max-w-xs md:text-[1.4rem]">
             {config.title}
           </p>
-          <p className="mt-1 font-sans text-meta text-ivory/55">
+          <p className="mt-1 font-sans text-meta text-ivory/65">
             {config.subtitle}
           </p>
 
           {config.credit.model && (
-            <p className="mt-3 hidden max-w-xs font-sans text-meta text-ivory/40 md:block">
+            <p className="mt-3 hidden max-w-xs font-sans text-meta text-ivory/65 md:block">
               Digital model: {config.credit.model}
               {config.credit.original && (
                 <> · Original: {config.credit.original}</>
@@ -406,7 +406,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ delay: 0.6, duration: 0.8 }}
-            className="pointer-events-none absolute inset-x-0 bottom-24 z-10 px-6 text-center font-sans text-[10px] uppercase tracking-[0.2em] text-ivory/60 md:bottom-8 hide-in-hall"
+            className="pointer-events-none absolute inset-x-0 bottom-24 z-10 px-6 text-center font-sans text-xs uppercase tracking-[0.2em] text-ivory/60 md:bottom-8 hide-in-hall"
           >
             Drag to turn · Select a numbered point to look closer
           </motion.p>
@@ -426,7 +426,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
                   type="button"
                   onClick={() => select(index)}
                   aria-label={`Look closer: ${item.title}`}
-                  className="grid size-8 place-items-center rounded-full border border-ivory/30 font-sans text-[11px] transition-colors hover:border-ivory hover:bg-ochre"
+                  className="grid size-8 place-items-center rounded-full border border-ivory/30 font-sans text-xs transition-colors hover:border-ivory hover:bg-ochre"
                 >
                   {index + 1}
                 </button>
@@ -436,7 +436,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
               <button
                 type="button"
                 onClick={() => select(finaleIndex)}
-                className="px-3 py-1.5 font-sans text-[10px] uppercase tracking-[0.16em] text-ivory/85 transition-colors hover:text-ochre"
+                className="px-3 py-1.5 font-sans text-xs uppercase tracking-[0.16em] text-ivory/85 transition-colors hover:text-ochre"
               >
                 Where is it now?
               </button>
@@ -449,7 +449,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
         <button
           type="button"
           onClick={() => setResetKey((key) => key + 1)}
-          className="absolute bottom-6 right-5 z-20 hidden border border-ivory/30 bg-ink/50 px-4 py-2.5 font-sans text-[10px] uppercase tracking-[0.16em] backdrop-blur-sm transition-colors hover:border-ochre md:right-10 md:bottom-8 md:block hide-in-hall"
+          className="absolute bottom-6 right-5 z-20 hidden border border-ivory/30 bg-ink/50 px-4 py-2.5 font-sans text-xs uppercase tracking-[0.16em] backdrop-blur-sm transition-colors hover:border-ochre md:right-10 md:bottom-8 md:block hide-in-hall"
         >
           Full view
         </button>
@@ -472,7 +472,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
               className="pointer-events-auto max-h-[56svh] overflow-y-auto border border-ivory/15 border-t-2 border-t-ochre bg-[#0a110d]/90 p-6 backdrop-blur-xl md:max-h-full"
             >
               <div className="flex items-center justify-between gap-4">
-                <p className="font-sans text-[10px] uppercase tracking-[0.18em] text-ivory/60">
+                <p className="font-sans text-xs uppercase tracking-[0.18em] text-ivory/60">
                   {content.eyebrow}
                 </p>
                 <button
@@ -498,7 +498,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
                 <button
                   type="button"
                   onClick={() => step(-1)}
-                  className="font-sans text-[10px] uppercase tracking-[0.16em] text-ivory/70 transition-colors hover:text-ivory"
+                  className="font-sans text-xs uppercase tracking-[0.16em] text-ivory/70 transition-colors hover:text-ivory"
                 >
                   ← Previous
                 </button>
@@ -511,7 +511,7 @@ function Viewer({ config, slug }: { config: ObjectConfig; slug: string }) {
                 <button
                   type="button"
                   onClick={() => step(1)}
-                  className="font-sans text-[10px] uppercase tracking-[0.16em] text-ivory/70 transition-colors hover:text-ivory"
+                  className="font-sans text-xs uppercase tracking-[0.16em] text-ivory/70 transition-colors hover:text-ivory"
                 >
                   Next →
                 </button>

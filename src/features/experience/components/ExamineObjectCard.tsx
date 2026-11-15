@@ -103,7 +103,7 @@ export default function ExamineObjectCard({
           </span>
         </Link>
 
-        <p className="mt-6 font-sans text-meta text-ivory/50">
+        <p className="mt-6 font-sans text-meta text-ivory/65">
           A 3D model you can turn, zoom and explore.
         </p>
       </div>

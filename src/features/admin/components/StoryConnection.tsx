@@ -6,7 +6,7 @@ import { connectStory, type AdminStory } from "../api/stories";
 import type { DashboardExhibitionResponseItem, DashboardSection } from "../types/dashboard";
 
 const selectClass =
-  "w-full border border-line bg-transparent px-3 py-2.5 font-sans text-body-s outline-none transition-colors focus:border-heritage-green disabled:opacity-50";
+  "w-full border border-line bg-transparent px-3 py-2.5 font-sans text-body-s transition-colors focus:border-heritage-green disabled:opacity-50";
 
 const labelClass =
   "mb-1.5 block font-sans text-label font-medium uppercase tracking-widest text-muted";

@@ -19,7 +19,7 @@ const languages = [
 const labelClass =
   "mb-2 block text-label font-medium uppercase tracking-widest text-muted";
 const selectClass =
-  "h-12 w-full border border-line bg-transparent px-4 text-body-m outline-none transition-colors focus:border-heritage-green";
+  "h-12 w-full border border-line bg-transparent px-4 text-body-m transition-colors focus:border-heritage-green";
 
 function errorMessage(error: unknown) {
   return error instanceof Error

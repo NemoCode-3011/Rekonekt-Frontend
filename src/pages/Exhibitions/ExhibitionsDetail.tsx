@@ -6,7 +6,7 @@ import { useExhibitionDetail } from "../../features/exhibitions/hooks/useExhibit
 
 function LoadingState() {
   return (
-    <main
+    <div
       aria-busy="true"
       aria-label="Loading exhibition"
       className="container grid gap-10 py-10 md:grid-cols-12 md:gap-12 md:py-16"
@@ -17,17 +17,17 @@ function LoadingState() {
         <div className="h-24 w-full animate-pulse bg-sand/50 motion-reduce:animate-none" />
         <div className="h-20 w-5/6 animate-pulse bg-sand/50 motion-reduce:animate-none" />
       </div>
-    </main>
+    </div>
   );
 }
 
 function MessageState({ title, body }: { title: string; body: string }) {
   return (
-    <main className="container flex min-h-[50svh] flex-col items-start justify-center gap-6 py-20">
+    <div className="container flex min-h-[50svh] flex-col items-start justify-center gap-6 py-20">
       <h1 className="text-heading-l">{title}</h1>
       <p className="max-w-md font-sans text-body-m text-muted">{body}</p>
       <ArrowLink to="/explore/exhibitions">Browse exhibitions</ArrowLink>
-    </main>
+    </div>
   );
 }
 
@@ -58,10 +58,10 @@ function ExhibitionDetail() {
   const { exhibition, sections } = state;
 
   return (
-    <main>
+    <div>
       <ExhibitionHero exhibition={exhibition} chapterCount={sections.length} />
       <ChapterList experienceSlug={exhibition.slug} sections={sections} />
-    </main>
+    </div>
   );
 }
 

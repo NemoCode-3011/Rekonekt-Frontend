@@ -221,7 +221,7 @@ export default function CollectionPage({ kind }: { kind: CollectionKind }) {
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="Search this page"
-                  className="h-12 w-full border border-line bg-transparent px-4 text-body-m outline-none transition-colors focus:border-heritage-green"
+                  className="h-12 w-full border border-line bg-transparent px-4 text-body-m transition-colors focus:border-heritage-green"
                 />
               </div>
 

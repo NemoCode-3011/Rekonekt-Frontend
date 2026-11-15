@@ -5,6 +5,7 @@ import "./index.css";
 import App from "./App";
 import { AuthProvider } from "./features/auth/AuthProvider";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { MotionConfig } from "framer-motion";
 import SmoothScroll from "./components/navigation/SmoothScroll";
 
 createRoot(document.getElementById("root")!).render(
@@ -12,9 +13,11 @@ createRoot(document.getElementById("root")!).render(
     <ErrorBoundary>
       <BrowserRouter>
         <AuthProvider>
-          <SmoothScroll>
-            <App />
-          </SmoothScroll>
+          <MotionConfig reducedMotion="user">
+            <SmoothScroll>
+              <App />
+            </SmoothScroll>
+          </MotionConfig>
         </AuthProvider>
       </BrowserRouter>
     </ErrorBoundary>

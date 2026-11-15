@@ -51,7 +51,7 @@ export default function AdminSignIn() {
           </p>
         </div>
 
-        <p className="relative z-10 hidden font-sans text-label text-ivory/45 lg:block">
+        <p className="relative z-10 hidden font-sans text-label text-ivory/65 lg:block">
           REKÒ · ADMINISTRATION
         </p>
       </section>

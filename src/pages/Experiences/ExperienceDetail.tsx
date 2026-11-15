@@ -97,7 +97,7 @@ function ExperienceDetail() {
   if (sections.length === 0) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-ink px-5 text-white">
-        <p className="font-sans text-sm text-white/60">
+        <p className="font-sans text-sm text-white/75">
           This experience has no chapters yet.
         </p>
       </main>

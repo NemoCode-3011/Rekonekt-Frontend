@@ -194,6 +194,7 @@ export default function NotesWidget() {
                 <div className="border-b border-line px-6 py-5">
                   <textarea
                     ref={textareaRef}
+                    aria-label="Write a note"
                     value={text}
                     onChange={(event) => setText(event.target.value)}
                     onKeyDown={(event) => {
@@ -206,8 +207,7 @@ export default function NotesWidget() {
                     }}
                     rows={5}
                     placeholder="Write a note…"
-                    aria-label="Write a note"
-                    className="w-full resize-none border border-line bg-transparent px-4 py-3 font-sans text-body-m outline-none transition-colors focus:border-heritage-green"
+                    className="w-full resize-none border border-line bg-transparent px-4 py-3 font-sans text-body-m transition-colors focus:border-heritage-green"
                   />
 
                   <div className="mt-3 flex items-center gap-4">

@@ -305,7 +305,7 @@ export default function SplashScreen() {
             type="button"
             onClick={skip}
             aria-label="Skip introduction"
-            className="absolute bottom-6 right-6 z-30 inline-flex min-h-11 min-w-11 items-center justify-center border border-ivory/25 px-4 font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-ivory/80 transition-colors hover:border-ochre hover:text-ivory focus-visible:outline-ivory"
+            className="absolute bottom-6 right-6 z-30 inline-flex min-h-11 min-w-11 items-center justify-center border border-ivory/25 px-4 font-sans text-xs font-medium uppercase tracking-[0.18em] text-ivory/80 transition-colors hover:border-ochre hover:text-ivory focus-visible:outline-ivory"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
