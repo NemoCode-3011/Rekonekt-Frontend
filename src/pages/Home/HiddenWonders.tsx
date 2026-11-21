@@ -1,7 +1,12 @@
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import {
+  motion,
+  AnimatePresence,
+  useInView,
+  useReducedMotion,
+} from "framer-motion";
 import ArrowLink from "../../components/ui/ArrowLink";
-import awhum from "../../assets/images/hero/Awhuhm.png";
+import awhum from "../../assets/images/hero/Awhuhm-optimized.jpg";
 import idanre from "../../assets/images/hero/Idanre-Hill.jpg";
 import agbokim from "../../assets/images/hero/Agbokim.jpg";
 
@@ -37,22 +42,27 @@ const INTERVAL = 6000;
 
 export default function HiddenWonders() {
   const reduce = useReducedMotion();
+  const sectionRef = useRef<HTMLElement>(null);
+  const inView = useInView(sectionRef, { margin: "100px" });
   const [active, setActive] = useState(0);
 
   useEffect(() => {
-    if (reduce) return;
+    if (reduce || !inView) return;
 
     const timer = window.setInterval(() => {
       setActive((current) => (current + 1) % wonders.length);
     }, INTERVAL);
 
     return () => window.clearInterval(timer);
-  }, [reduce]);
+  }, [inView, reduce]);
 
   const wonder = wonders[active];
 
   return (
-    <section className="relative min-h-[90svh] overflow-hidden bg-ink text-ivory lg:min-h-screen">
+    <section
+      ref={sectionRef}
+      className="relative min-h-[90svh] overflow-hidden bg-ink text-ivory lg:min-h-screen"
+    >
       <AnimatePresence mode="sync">
         <motion.div
           key={wonder.image}
@@ -65,6 +75,8 @@ export default function HiddenWonders() {
           <motion.img
             src={wonder.image}
             alt={`${wonder.name}, ${wonder.location}`}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover"
             initial={reduce ? { scale: 1 } : { scale: 1.06 }}
             animate={{ scale: 1 }}

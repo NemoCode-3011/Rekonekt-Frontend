@@ -1,6 +1,6 @@
 import { useRef } from "react";
 
-import war from "../../assets/images/hero/civilwar.jpeg";
+import war from "../../assets/images/hero/civilwar-optimized.jpg";
 import fela from "../../assets/images/hero/fela3.jpg";
 import lagos from "../../assets/images/hero/lagos3.jpg";
 

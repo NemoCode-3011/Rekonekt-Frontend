@@ -23,19 +23,18 @@ export default function Hero() {
     if (heroSlides.length === 0) markHomeReady();
   }, [markHomeReady]);
 
-  // Decode the background pictures ahead of time. Otherwise the browser does it
-  // the moment the strip is halfway through a glide, which is when the hero stutters.
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      for (const slide of heroSlides) {
-        if (!slide.image) continue;
-        const picture = new Image();
-        picture.src = slide.image;
-        picture.decode().catch(() => {});
-      }
+      const next = heroSlides[(activeIndex + 1) % heroSlides.length];
+      if (!next?.image) return;
+
+      const picture = new Image();
+      picture.src = next.image;
+      picture.decode().catch(() => {});
     }, 1200);
+
     return () => window.clearTimeout(timer);
-  }, []);
+  }, [activeIndex]);
 
   // Fades and lifts an element in once the intro has finished.
   const reveal = (delay: number) => ({

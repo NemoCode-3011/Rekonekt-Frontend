@@ -13,6 +13,8 @@ export function PeopleStage({ sample }: StageProps) {
           <img
             src={sample.image}
             alt={sample.title}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover grayscale"
           />
         )}
@@ -83,6 +85,8 @@ export function PlacesStage({ sample }: StageProps) {
           <img
             src={sample.image}
             alt={sample.title}
+            loading="lazy"
+            decoding="async"
             className="absolute inset-0 h-full w-full object-cover opacity-80"
           />
         )}
@@ -123,6 +127,8 @@ export function ArtifactsStage({ sample }: StageProps) {
             <img
               src={sample.image}
               alt={sample.title}
+              loading="lazy"
+              decoding="async"
               className="h-4/5 w-4/5 object-contain"
             />
           )}

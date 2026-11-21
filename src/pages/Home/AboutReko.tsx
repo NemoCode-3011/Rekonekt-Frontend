@@ -61,6 +61,7 @@ export default function AboutReko() {
               src={archive}
               alt="Black and white photograph of Nigerian students and citizens smiling, singing and dancing down a London street on Independence Day, 1960."
               loading="lazy"
+              decoding="async"
               className="h-full w-full object-cover grayscale-50 sepia-[.35]"
             />
           </div>

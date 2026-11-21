@@ -46,6 +46,8 @@ export default function FeaturedExhibition() {
               src={image}
               alt=""
               aria-hidden="true"
+              loading="lazy"
+              decoding="async"
               className="absolute inset-0 h-full w-full scale-110 object-cover opacity-25 blur-2xl"
             />
             <div
@@ -55,6 +57,8 @@ export default function FeaturedExhibition() {
             <img
               src={image}
               alt=""
+              loading="lazy"
+              decoding="async"
               className="relative z-10 h-full w-full object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.55)] transition-transform duration-700 group-hover:scale-[1.02]"
             />
           </div>

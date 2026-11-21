@@ -38,7 +38,17 @@ function BackdropVideo({ src }: { src: string }) {
 
 function BackdropMedia({ slide }: { slide: HeroSlide }) {
   if (slide.image) {
-    return <img src={slide.image} alt="" className={mediaClass} style={mediaStyle} />;
+    return (
+      <img
+        src={slide.image}
+        alt=""
+        loading="eager"
+        fetchPriority="high"
+        decoding="async"
+        className={mediaClass}
+        style={mediaStyle}
+      />
+    );
   }
   if (slide.video) return <BackdropVideo src={slide.video} />;
   return null;

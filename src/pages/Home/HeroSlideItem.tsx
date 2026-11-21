@@ -82,7 +82,7 @@ function HeroSlideItem({
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="none"
           aria-label={isDuplicate ? undefined : slide.alt}
           onLoadedData={isFirst ? onFirstImageReady : undefined}
           onError={() => {
@@ -103,7 +103,8 @@ function HeroSlideItem({
           width={900}
           height={1260}
           draggable={false}
-          loading={isDuplicate ? "lazy" : "eager"}
+          loading={isFirst ? "eager" : "lazy"}
+          fetchPriority={isFirst ? "high" : "auto"}
           decoding="async"
           onLoad={isFirst ? onFirstImageReady : undefined}
           onError={() => {
