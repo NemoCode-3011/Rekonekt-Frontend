@@ -482,7 +482,10 @@ function Portrait({
   return (
     <mesh
       position={[0, y, 0.3]}
-      onClick={onSelect}
+      onClick={(event) => {
+        event.stopPropagation();
+        onSelect();
+      }}
       onPointerOver={() => (document.body.style.cursor = "pointer")}
       onPointerOut={() => (document.body.style.cursor = "")}
     >

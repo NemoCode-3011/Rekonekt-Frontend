@@ -135,27 +135,11 @@ export default function Team() {
             fields={[
               { name: "name", label: "Name", required: true },
               { name: "email", label: "Email", kind: "email", required: true },
-              {
-                name: "preferredLanguage",
-                label: "Preferred language (optional)",
-                kind: "select",
-                options: [
-                  { value: "", label: "Choose later" },
-                  { value: "en", label: "English" },
-                  { value: "yo", label: "Yoruba" },
-                  { value: "ig", label: "Igbo" },
-                  { value: "ha", label: "Hausa" },
-                ],
-              },
             ]}
             onSubmit={async (values) => {
-              const preferredLanguage = (
-                ["en", "yo", "ig", "ha"] as const
-              ).find((language) => language === values.preferredLanguage);
               await createAdmin({
                 name: values.name.trim(),
                 email: values.email.trim().toLowerCase(),
-                ...(preferredLanguage ? { preferredLanguage } : {}),
               });
 
               showToast(

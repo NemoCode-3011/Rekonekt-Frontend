@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../auth/auth-context";
+import { registerUserDataCache } from "../auth/userDataCache";
 import SignInPrompt from "../auth/components/Signinprompt";
 import { formatLongDate } from "../../lib/dates";
 import { createNote, deleteNote, getNotes, updateNote, type Note } from "./api";
@@ -36,6 +37,18 @@ export default function NotesWidget() {
   const [saving, setSaving] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
+
+  useEffect(
+    () =>
+      registerUserDataCache(() => {
+        setNotes([]);
+        setLoadedFor(null);
+        setStatus("idle");
+        setText("");
+        setEditingId(null);
+      }),
+    [],
+  );
 
   // Load the notes the first time the panel opens for a signed-in visitor.
   useEffect(() => {

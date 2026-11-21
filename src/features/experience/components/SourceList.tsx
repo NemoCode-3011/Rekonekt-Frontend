@@ -84,7 +84,7 @@ function ReadingList({ sources }: { sources: ExperienceSource[] }) {
             >
               <Cover source={source} />
 
-              <div className="min-w-0 break-words">
+              <div className="min-w-0 wrap-break-word">
                 <p className="font-display text-heading-s leading-snug">
                   <TitleLink source={source} />
                 </p>

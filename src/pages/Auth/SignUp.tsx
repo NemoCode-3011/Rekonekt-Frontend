@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
@@ -12,27 +12,103 @@ export default function SignUp() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [nextAction, setNextAction] = useState<"signin" | "verify" | "retry" | null>(
+    null,
+  );
+  const [retryAfterSeconds, setRetryAfterSeconds] = useState<number>();
+  const [wait, setWait] = useState(0);
+
+  useEffect(() => {
+    if (wait <= 0) return;
+    const timer = window.setTimeout(() => setWait((seconds) => seconds - 1), 1000);
+    return () => window.clearTimeout(timer);
+  }, [wait]);
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
+  async function submitSignup() {
     setError("");
+    setNextAction(null);
+    setRetryAfterSeconds(undefined);
+    setWait(0);
     setLoading(true);
 
     try {
-      await signUp(form);
-      navigate("/auth/verify", { state: { email: form.email, from } });
+      const response = await signUp(form);
+      if (response.code !== "OTP_SENT") {
+        setError("We couldn't complete account creation. Please try again.");
+        return;
+      }
+      navigate("/auth/verify", {
+        state: {
+          email: form.email.trim().toLowerCase(),
+          name: form.name,
+          from,
+          expiresInSeconds: response.data?.expiresInSeconds,
+          resendAfterSeconds: response.data?.resendAfterSeconds ?? 0,
+        },
+      });
     } catch (err) {
-      const { status, message } = err as ApiError;
-      setError(
-        status === 409 ? "An account with this email already exists." : message,
-      );
+      const apiError = err as ApiError;
+      switch (apiError.code) {
+        case "EMAIL_ALREADY_EXISTS":
+          setError("An account with this email already exists. Sign in to continue.");
+          setNextAction("signin");
+          break;
+        case "EMAIL_REQUIRES_VERIFICATION":
+          setError("This email still needs verification. Continue when you're ready.");
+          setNextAction("verify");
+          break;
+        case "OTP_DELIVERY_FAILED":
+          setError("Your account was created, but the code couldn't be delivered. You can request another code.");
+          setNextAction("verify");
+          break;
+        case "OTP_COOLDOWN":
+          setRetryAfterSeconds(apiError.retryAfterSeconds);
+          setWait(apiError.retryAfterSeconds ?? 0);
+          setError(
+            "Your account is ready for verification. Check your email for a code, or continue and request one when the cooldown ends.",
+          );
+          setNextAction("verify");
+          break;
+        case "RATE_LIMITED":
+          setRetryAfterSeconds(apiError.retryAfterSeconds);
+          setWait(apiError.retryAfterSeconds ?? 0);
+          setError("Account creation is temporarily limited. Please wait before trying again.");
+          break;
+        case "RATE_LIMIT_STORE_UNAVAILABLE":
+          setError("Account creation is temporarily unavailable. You can try again shortly.");
+          setNextAction("retry");
+          break;
+        default:
+          setError(
+            apiError.status === 0
+              ? "Can't reach the server. Check your connection and try again."
+              : "We couldn't create your account. Please try again.",
+          );
+      }
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    void submitSignup();
+  }
+
+  function continueVerification() {
+    navigate("/auth/verify", {
+      state: {
+        email: form.email.trim().toLowerCase(),
+        name: form.name,
+        from,
+        resume: true,
+        resendAfterSeconds: retryAfterSeconds ?? 0,
+      },
+    });
   }
 
   return (
@@ -78,9 +154,45 @@ export default function SignUp() {
             {error}
           </p>
         )}
+        {nextAction === "signin" && (
+          <Link
+            to="/auth/login"
+            state={{ email: form.email.trim().toLowerCase() }}
+            className="inline-block text-body-s font-medium text-ink underline underline-offset-4"
+          >
+            Go to sign in
+          </Link>
+        )}
+        {nextAction === "verify" && (
+          <Button
+            type="button"
+            onClick={continueVerification}
+            className="w-full"
+          >
+            Continue to verification
+          </Button>
+        )}
+        {nextAction === "retry" && (
+          <Button
+            type="button"
+            onClick={() => void submitSignup()}
+            disabled={loading}
+            className="w-full"
+          >
+            Try again
+          </Button>
+        )}
 
-        <Button type="submit" disabled={loading} className="w-full">
-          {loading ? "Creating account…" : "Create account"}
+        <Button
+          type="submit"
+          disabled={loading || wait > 0 || nextAction !== null}
+          className="w-full"
+        >
+          {loading
+            ? "Creating account…"
+            : wait > 0
+              ? `Try again in ${wait}s`
+              : "Create account"}
         </Button>
       </form>
 
@@ -96,7 +208,7 @@ export default function SignUp() {
         </div>
 
         <div className="mt-5">
-          <GoogleAuthButton mode="signup"/>
+          <GoogleAuthButton mode="signup" />
         </div>
       </div>
 

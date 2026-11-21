@@ -1,11 +1,11 @@
 import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../auth-context";
+import PageError from "../../../components/ui/PageError";
 
-// Wraps pages that need a signed-in visitor. Everyone else is sent to sign
-// in, and brought back here afterwards.
+// All pages that need a signed-in visitor. Everyone else is sent to sign in and back here.
 function RequireAuth() {
-  const { user, loading } = useAuth();
+  const { user, loading, authUnavailable, refreshUser } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -17,6 +17,16 @@ function RequireAuth() {
       },
       "Loading…"
     );
+  }
+
+  if (authUnavailable) {
+    return React.createElement(PageError, {
+      title: "We couldn't check your session",
+      message: "The sign-in service is temporarily unavailable. Try again before continuing.",
+      onRetry: () => {
+        void refreshUser().catch(() => undefined);
+      },
+    });
   }
 
   if (!user) {

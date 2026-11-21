@@ -1,6 +1,7 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ApiError } from "../../services/api/client";
 import { useAuth } from "../auth/auth-context";
+import { registerUserDataCache } from "../auth/userDataCache";
 import type { LoadStatus } from "../experience/useCachedList";
 import { addBookmark, getBookmarks, removeBookmark } from "./api";
 import { BookmarksContext } from "./bookmarks-context";
@@ -17,12 +18,24 @@ interface State {
 export function BookmarksProvider({ children }: { children: ReactNode }) {
   const { user, showToast } = useAuth();
   const userId = user?.id ?? null;
+  const userIdRef = useRef(userId);
+  useEffect(() => {
+    userIdRef.current = userId;
+  }, [userId]);
 
   const [state, setState] = useState<State>({
     userId: null,
     status: "loading",
     bookmarks: [],
   });
+
+  useEffect(
+    () =>
+      registerUserDataCache(() => {
+        setState({ userId: null, status: "ready", bookmarks: [] });
+      }),
+    [],
+  );
 
   // Load the list whenever someone signs in.
   useEffect(() => {
@@ -55,7 +68,9 @@ export function BookmarksProvider({ children }: { children: ReactNode }) {
   async function reload() {
     if (userId === null) return;
     const bookmarks = await getBookmarks();
-    setState({ userId, status: "ready", bookmarks });
+    if (userIdRef.current === userId) {
+      setState({ userId, status: "ready", bookmarks });
+    }
   }
 
   async function toggle(artifactId: number) {

@@ -3,11 +3,18 @@ import axios from "axios";
 export class ApiError extends Error {
   status: number;
   code?: string;
+  retryAfterSeconds?: number;
 
-  constructor(status: number, message: string, code?: string) {
+  constructor(
+    status: number,
+    message: string,
+    code?: string,
+    retryAfterSeconds?: number,
+  ) {
     super(message);
     this.status = status;
     this.code = code;
+    this.retryAfterSeconds = retryAfterSeconds;
   }
 }
 
@@ -44,18 +51,34 @@ http.interceptors.response.use(
     if (axios.isAxiosError(error) && error.response) {
       const { status, data } = error.response;
 
-      const code: string | undefined = data?.data?.code;
+      const code: string | undefined =
+        data?.code ?? data?.data?.code ?? data?.error?.code;
+      const retryHeader =
+        error.response.headers?.["retry-after"] ??
+        error.response.headers?.["ratelimit-reset"] ??
+        error.response.headers?.["x-ratelimit-reset"];
+      const retryFromHeader = parseRetryAfter(retryHeader);
+      const retryAfterSeconds =
+        typeof data?.data?.retryAfterSeconds === "number"
+          ? data.data.retryAfterSeconds
+          : typeof data?.retryAfterSeconds === "number"
+            ? data.retryAfterSeconds
+            : retryFromHeader;
+      const serverMessage =
+        typeof data?.message === "string" ? data.message : undefined;
+      const safeMessage =
+        status === 429
+          ? "Too many requests. Please wait before trying again."
+          : status >= 500
+            ? "The service is temporarily unavailable. Please try again shortly."
+            : serverMessage ?? "Something went wrong. Please try again.";
 
       if (status === 401 && !EXPECTED_401.includes(error.config?.url ?? "")) {
         onSessionExpired?.();
       }
 
       return Promise.reject(
-        new ApiError(
-          status,
-          data?.message ?? "Something went wrong. Please try again.",
-          code,
-        ),
+        new ApiError(status, safeMessage, code, retryAfterSeconds),
       );
     }
     return Promise.reject(
@@ -66,3 +89,20 @@ http.interceptors.response.use(
     );
   },
 );
+
+function parseRetryAfter(value: unknown): number | undefined {
+  if (typeof value !== "string" && typeof value !== "number") return undefined;
+  const parsed = Number(value);
+  if (Number.isFinite(parsed)) {
+    const seconds =
+      parsed > 1_000_000_000 ? parsed - Date.now() / 1000 : parsed;
+    return Math.max(0, Math.ceil(seconds));
+  }
+  if (typeof value === "string") {
+    const date = Date.parse(value);
+    if (Number.isFinite(date)) {
+      return Math.max(0, Math.ceil((date - Date.now()) / 1000));
+    }
+  }
+  return undefined;
+}

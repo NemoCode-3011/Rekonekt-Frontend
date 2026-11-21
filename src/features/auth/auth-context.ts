@@ -11,7 +11,10 @@ export type Toast = {
 export type AuthContextValue = {
   user: User | null;
   loading: boolean;
+  authUnavailable: boolean;
   setUser: (user: User | null) => void;
+  refreshUser: () => Promise<User>;
+  clearLocalSession: () => void;
   logout: () => Promise<void>;
   sessionExpired: boolean;
   recheckSession: () => Promise<boolean>;

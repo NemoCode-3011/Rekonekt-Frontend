@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   ArrowRight,
@@ -12,11 +12,6 @@ import {
 } from "lucide-react";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
-import {
-  clearLastUser,
-  getLastUser,
-  saveLastUser,
-} from "../../features/auth/lastUser";
 import { signIn } from "../../features/auth/api";
 import type { ApiError } from "../../services/api/client";
 import { useAuth } from "../../features/auth/auth-context";
@@ -30,7 +25,7 @@ interface SignInProps {
 
 export default function SignIn({ mode = "visitor" }: SignInProps) {
   const navigate = useNavigate();
-  const { setUser, logout, showToast } = useAuth();
+  const { logout, refreshUser, showToast } = useAuth();
 
   const state = useLocation().state as {
     email?: string;
@@ -42,10 +37,6 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
 
   const isAdminLogin = mode === "admin";
 
-  const [returning, setReturning] = useState(() =>
-    state?.email || isAdminLogin ? null : getLastUser(),
-  );
-
   const [form, setForm] = useState({
     email: state?.email ?? "",
     password: "",
@@ -53,19 +44,21 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [wait, setWait] = useState(0);
 
-  const email = returning?.email ?? form.email;
+  useEffect(() => {
+    if (wait <= 0) return;
+    const timer = window.setTimeout(() => setWait((seconds) => seconds - 1), 1000);
+    return () => window.clearTimeout(timer);
+  }, [wait]);
+
+  const email = form.email;
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     setForm({
       ...form,
       [e.target.name]: e.target.value,
     });
-  }
-
-  function handleNotYou() {
-    clearLastUser();
-    setReturning(null);
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -75,7 +68,13 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
     setLoading(true);
 
     try {
-      const user = await signIn(email, form.password);
+      const response = await signIn(email, form.password);
+      if (response.code !== "LOGIN_SUCCESS") {
+        setError("We couldn't complete sign in. Please try again.");
+        return;
+      }
+
+      const user = await refreshUser();
 
       const isAdmin = user.role === "admin" || user.role === "super admin";
 
@@ -85,13 +84,6 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
         return;
       }
 
-      setUser(user);
-
-      saveLastUser({
-        name: user.name,
-        email: user.email,
-      });
-
       showToast("You're signed in.");
 
       if (isAdmin) {
@@ -100,14 +92,26 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
         navigate(state?.from ?? "/", { replace: true });
       }
     } catch (err) {
-      const { status, message } = err as ApiError;
+      const apiError = err as ApiError;
 
-      if (status === 403) {
+      if (apiError.code === "EMAIL_NOT_VERIFIED") {
         navigate("/auth/verify", {
-          state: { email },
+          state: { email, resume: true },
         });
+      } else if (apiError.code === "INVALID_CREDENTIALS") {
+        setError("Email or password is incorrect.");
+      } else if (
+        apiError.code === "RATE_LIMITED" ||
+        apiError.code === "RATE_LIMIT_STORE_UNAVAILABLE"
+      ) {
+        setError("Sign in is temporarily unavailable. Please try again shortly.");
+        if (apiError.code === "RATE_LIMITED") {
+          setWait(apiError.retryAfterSeconds ?? 0);
+        }
+      } else if (apiError.status === 0) {
+        setError("Can't reach the server. Check your connection and try again.");
       } else {
-        setError(message);
+        setError("We couldn't sign you in. Please try again.");
       }
     } finally {
       setLoading(false);
@@ -119,23 +123,8 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
       <h1 className="font-display text-heading-l leading-tight">
         {isAdminLogin
           ? "Sign in to REKÒ Admin."
-          : returning
-            ? `Welcome back, ${returning.name.split(" ")[0]}.`
-            : "Pick up where you left off."}
+          : "Pick up where you left off."}
       </h1>
-
-      {returning && !isAdminLogin && (
-        <p className="mt-4 text-body-m text-muted">
-          Signing in as {returning.email}.{" "}
-          <button
-            type="button"
-            onClick={handleNotYou}
-            className="py-2 font-medium text-ink underline underline-offset-4"
-          >
-            Not you?
-          </button>
-        </p>
-      )}
 
       {isAdminLogin && (
         <p className="mt-4 flex items-center gap-2 text-body-m text-muted">
@@ -182,7 +171,7 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
         aria-busy={loading}
         className="mt-10 space-y-5"
       >
-        {!returning && (
+        {(
           <Input
             label="Email"
             name="email"
@@ -231,7 +220,7 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
 
         <Button
           type="submit"
-          disabled={loading}
+          disabled={loading || wait > 0}
           aria-busy={loading}
           className="w-full"
         >
@@ -243,6 +232,8 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
               />
               Signing in…
             </>
+          ) : wait > 0 ? (
+            <>Please wait {wait}s</>
           ) : (
             <>
               Sign in
@@ -255,9 +246,7 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
       {!isAdminLogin && (
         <div className="mt-8">
           <p className="mb-4 text-center text-body-s text-muted">or</p>
-          <div className="flex justify-center">
-            <GoogleAuthButton mode="signin"/>
-          </div>
+          <GoogleAuthButton mode="signin" />
         </div>
       )}
 

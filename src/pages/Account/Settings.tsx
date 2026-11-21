@@ -8,6 +8,7 @@ import {
   updateProfile,
   type CulturalGroup,
 } from "../../features/auth/api";
+import { ApiError } from "../../services/api/client";
 
 const languages = [
   { code: "en", label: "English" },
@@ -69,6 +70,17 @@ function Settings() {
     {},
   );
   const [changing, setChanging] = useState(false);
+  const [passwordUpdated, setPasswordUpdated] = useState(false);
+  const [passwordWait, setPasswordWait] = useState(0);
+
+  useEffect(() => {
+    if (passwordWait <= 0) return;
+    const timer = window.setTimeout(
+      () => setPasswordWait((seconds) => seconds - 1),
+      1000,
+    );
+    return () => window.clearTimeout(timer);
+  }, [passwordWait]);
 
   // The list of cultural groups is optional. If it can't load, the
   // dropdown is simply left out.
@@ -128,14 +140,35 @@ function Settings() {
     setChanging(true);
 
     try {
-      await changePassword(currentPassword, newPassword);
+      const response = await changePassword(currentPassword, newPassword);
+      if (response.code !== "PASSWORD_CHANGED") {
+        showToast("We couldn't change your password. Please try again.", "error");
+        return;
+      }
 
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      showToast("Your password has been changed.");
+      setPasswordUpdated(true);
     } catch (error) {
-      showToast(errorMessage(error), "error");
+      if (error instanceof ApiError && error.code === "CURRENT_PASSWORD_INCORRECT") {
+        setPasswordErrors({ current: "This password doesn't match your current password." });
+      } else if (error instanceof ApiError && error.code === "RATE_LIMITED") {
+        showToast("Password changes are temporarily limited. Please try again shortly.", "error");
+        setPasswordWait(error.retryAfterSeconds ?? 0);
+      } else if (
+        error instanceof ApiError &&
+        error.code === "RATE_LIMIT_STORE_UNAVAILABLE"
+      ) {
+        showToast("Password changes are temporarily unavailable. Please try again shortly.", "error");
+      } else {
+        showToast(
+          error instanceof ApiError && error.status === 0
+            ? "Can't reach the server. Check your connection and try again."
+            : "We couldn't change your password. Please try again.",
+          "error",
+        );
+      }
     } finally {
       setChanging(false);
     }
@@ -218,6 +251,21 @@ function Settings() {
         title="Password"
         intro="Choose a new password. You'll stay signed in on this device."
       >
+        {passwordUpdated && (
+          <div role="status" className="border-l-2 border-success bg-success/5 px-5 py-4">
+            <p className="font-medium text-success">Password updated successfully.</p>
+            <p className="mt-1 text-body-s text-muted">
+              Your new password is active. You can continue using REKÒ.
+            </p>
+            <button
+              type="button"
+              onClick={() => setPasswordUpdated(false)}
+              className="mt-3 text-body-s font-medium text-ink underline underline-offset-4"
+            >
+              Change it again
+            </button>
+          </div>
+        )}
         <form onSubmit={handlePasswordSubmit} className="space-y-6" noValidate>
           <Input
             label="Current password"
@@ -247,8 +295,12 @@ function Settings() {
             autoComplete="new-password"
           />
 
-          <Button type="submit" disabled={changing}>
-            {changing ? "Changing…" : "Change password"}
+          <Button type="submit" disabled={changing || passwordWait > 0}>
+            {changing
+              ? "Changing…"
+              : passwordWait > 0
+                ? `Please wait ${passwordWait}s`
+                : "Change password"}
           </Button>
         </form>
       </Block>

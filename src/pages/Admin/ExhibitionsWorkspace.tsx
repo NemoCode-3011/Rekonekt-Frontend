@@ -36,6 +36,7 @@ import type {
 } from "../../features/admin/types/dashboard";
 import { useAuth } from "../../features/auth/auth-context";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
+import { AdminPicturesToggle } from "../../features/admin/components/AdminPictures";
 
 // ---------- The fields each form asks for ----------
 
@@ -158,33 +159,38 @@ function Row({
   meta,
   status,
   onToggle,
+  children,
 }: {
   title: string;
   meta?: string | null;
   status?: string;
   onToggle?: () => void;
+  children?: ReactNode;
 }) {
   return (
-    <li className="flex items-center justify-between gap-4 py-3">
-      <div className="min-w-0">
-        <p className="truncate font-sans text-body-s text-ink">{title}</p>
-        {meta && (
-          <p className="truncate font-sans text-meta text-muted">{meta}</p>
-        )}
-      </div>
+    <li className="py-3">
+      <div className="flex items-center justify-between gap-4">
+        <div className="min-w-0">
+          <p className="truncate font-sans text-body-s text-ink">{title}</p>
+          {meta && (
+            <p className="truncate font-sans text-meta text-muted">{meta}</p>
+          )}
+        </div>
 
-      <div className="flex shrink-0 items-center gap-3">
-        {status && <StatusChip status={status} />}
-        {onToggle && (
-          <button
-            type="button"
-            onClick={onToggle}
-            className={`${textButton} text-meta`}
-          >
-            {status === "published" ? "Unpublish" : "Publish"}
-          </button>
-        )}
+        <div className="flex shrink-0 items-center gap-3">
+          {status && <StatusChip status={status} />}
+          {onToggle && (
+            <button
+              type="button"
+              onClick={onToggle}
+              className={`${textButton} text-meta`}
+            >
+              {status === "published" ? "Unpublish" : "Publish"}
+            </button>
+          )}
+        </div>
       </div>
+      {children}
     </li>
   );
 }
@@ -420,7 +426,13 @@ function ChapterPanel({
               meta={item.artifact_type}
               status={item.status}
               onToggle={() => toggle("artifacts", item.id, item.status)}
-            />
+            >
+              <AdminPicturesToggle
+                owner="artifact"
+                id={item.id}
+                name={item.title}
+              />
+            </Row>
           ))}
         </ul>
         {mode === "artifact" ? (

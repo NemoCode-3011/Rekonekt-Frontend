@@ -1,9 +1,16 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getCurrentUser, logout as logoutRequest } from "./api";
 import type { User } from "./types";
 import { AuthContext, type Toast } from "./auth-context";
-import { setSessionExpiredHandler } from "../../services/api/client";
+import { ApiError, setSessionExpiredHandler } from "../../services/api/client";
+import { clearUserDataCaches } from "./userDataCache";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
@@ -11,12 +18,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authUnavailable, setAuthUnavailable] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
   // The session-expired handler runs outside React's rendering, so it reads
   // the latest user and page from refs.
   const userRef = useRef<User | null>(null);
   const pathRef = useRef("/");
+  const authRequestId = useRef(0);
+
+  const setAuthUser = useCallback((nextUser: User | null) => {
+    if (userRef.current?.id !== nextUser?.id) clearUserDataCaches();
+    userRef.current = nextUser;
+    setUser(nextUser);
+  }, []);
+
+  const clearLocalSession = useCallback(() => {
+    authRequestId.current += 1;
+    clearUserDataCaches();
+    userRef.current = null;
+    setUser(null);
+    setLoading(false);
+    setAuthUnavailable(false);
+    setSessionExpired(false);
+  }, []);
+
+  const refreshUser = useCallback(async () => {
+    const requestId = ++authRequestId.current;
+    clearUserDataCaches();
+    userRef.current = null;
+    setUser(null);
+    setLoading(true);
+    setAuthUnavailable(false);
+    try {
+      const currentUser = await getCurrentUser();
+      if (requestId !== authRequestId.current) {
+        throw new Error("Authentication state changed while loading.");
+      }
+      setAuthUser(currentUser);
+      setAuthUnavailable(false);
+      return currentUser;
+    } catch (error) {
+      if (requestId === authRequestId.current) {
+        setAuthUser(null);
+        setAuthUnavailable(
+          !(error instanceof ApiError && error.status === 401),
+        );
+      }
+      throw error;
+    } finally {
+      if (requestId === authRequestId.current) setLoading(false);
+    }
+  }, [setAuthUser]);
 
   useEffect(() => {
     userRef.current = user;
@@ -32,11 +85,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Ask the backend who is signed in (reads the sessionId cookie)
   useEffect(() => {
+    try {
+      window.localStorage.removeItem("reko:last-user");
+    } catch {
+      // Storage may be unavailable in restricted browser contexts.
+    }
+
+    let active = true;
     getCurrentUser()
-      .then(setUser)
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
-  }, []);
+      .then((currentUser) => {
+        if (active) {
+          setAuthUser(currentUser);
+          setAuthUnavailable(false);
+        }
+      })
+      .catch((error: unknown) => {
+        if (active) {
+          setAuthUser(null);
+          setAuthUnavailable(
+            !(error instanceof ApiError && error.status === 401),
+          );
+        }
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [setAuthUser]);
 
   // If a signed-in visitor's session ends, send them to sign in again.
   useEffect(() => {
@@ -49,8 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      userRef.current = null; // several requests can fail at once: react once
-      setUser(null);
+      clearLocalSession();
       navigate("/auth/login", {
         replace: true,
         state: { expired: true, from: pathRef.current },
@@ -58,17 +134,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => setSessionExpiredHandler(null);
-  }, [navigate]);
+  }, [clearLocalSession, navigate]);
 
   async function logout() {
+    clearLocalSession();
     await logoutRequest();
-    setUser(null);
   }
 
   // "Continue" button: ask the backend if there is a session again.
   async function recheckSession() {
     try {
-      setUser(await getCurrentUser());
+      await refreshUser();
       setSessionExpired(false);
       return true;
     } catch {
@@ -78,9 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // "Leave this page" button: give up and go to the sign-in page.
   function leaveExpiredSession() {
-    userRef.current = null;
-    setUser(null);
-    setSessionExpired(false);
+    clearLocalSession();
     navigate("/admin/login", { replace: true, state: { expired: true } });
   }
 
@@ -89,7 +163,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         loading,
-        setUser,
+        authUnavailable,
+        setUser: setAuthUser,
+        refreshUser,
+        clearLocalSession,
         logout,
         sessionExpired,
         recheckSession,

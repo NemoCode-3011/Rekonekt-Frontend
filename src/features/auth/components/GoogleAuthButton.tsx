@@ -8,7 +8,7 @@ const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
 
 export default function GoogleAuthButton({ mode }: { mode: "signin" | "signup" }) {
   const navigate = useNavigate();
-  const { setUser, showToast } = useAuth();
+  const { refreshUser, showToast } = useAuth();
   const from = (useLocation().state as { from?: string } | null)?.from;
 
   // No client ID set up yet: show nothing instead of a broken button.
@@ -22,9 +22,8 @@ export default function GoogleAuthButton({ mode }: { mode: "signin" | "signup" }
     if (!credential) return failed();
 
     try {
-      const user = await googleSignIn(credential, mode);
-
-      setUser(user);
+      await googleSignIn(credential, mode);
+      await refreshUser();
       showToast("You're signed in.");
       navigate(from ?? "/", { replace: true });
     } catch (err) {
@@ -34,10 +33,13 @@ export default function GoogleAuthButton({ mode }: { mode: "signin" | "signup" }
 
   return (
     <GoogleOAuthProvider clientId={clientId}>
-      <GoogleLogin
-        onSuccess={(response) => handleSuccess(response.credential)}
-        onError={failed}
-      />
+      <div className="flex justify-center">
+        <GoogleLogin
+          size="large"
+          onSuccess={(response) => handleSuccess(response.credential)}
+          onError={failed}
+        />
+      </div>
     </GoogleOAuthProvider>
   );
 }

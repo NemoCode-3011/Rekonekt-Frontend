@@ -14,12 +14,12 @@ import { useChapterDate } from "../../features/experience/useChapterDate";
 import { useProgressSaver } from "../../features/progress/useProgressSaver";
 import NotesWidget from "../../features/notes/noteWidget";
 // Only used when a chapter and its exhibition bith have no image.
-import fallbackImage from "../../assets/hero.png";
 import ExamineObjectCard from "../../features/experience/components/ExamineObjectCard";
 import UrnMark from "../../features/experience/components/UrnMark";
 import { getObjectsFor } from "../../features/object-viewer/objects";
 import PageLoader from "../../components/ui/PageLoader";
 import PageError from "../../components/ui/PageError";
+import ChapterBackdrop from "../../features/experience/components/ChapterBackdrop";
 
 function ExperienceDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -110,10 +110,6 @@ function ExperienceDetail() {
   // 3D objects that belong to this chapter, if any.
   const objects = slug ? getObjectsFor(slug, section.slug) : [];
 
-  // The chapter's own image, then the exhibition's cover, then a plain default.
-  const image =
-    section.hero_image_url || experience.cover_image_url || fallbackImage;
-
   const goToChapter = (index: number) => {
     setSearchParams({ chapter: sections[index].slug }, { replace: true });
   };
@@ -122,12 +118,17 @@ function ExperienceDetail() {
     const target = document.getElementById(`examine-${key}`);
     if (!target) return;
 
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     if (lenis) {
       // 80 matches the card's scroll margin (scroll-mt-20)
       lenis.scrollTo(target, { offset: -80, immediate: reduce });
     } else {
-      target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+      target.scrollIntoView({
+        behavior: reduce ? "auto" : "smooth",
+        block: "start",
+      });
     }
   };
 
@@ -153,11 +154,15 @@ function ExperienceDetail() {
           transition={{ duration: 0.7, ease: "easeInOut" }}
         >
           <section className="relative flex min-h-screen items-end overflow-hidden">
-            <CinematicImage
-              src={image}
-              alt={`${experience.title} — ${section.title}`}
-              focus="50% 30%"
-            />
+            {section.hero_image_url ? (
+              <CinematicImage
+                src={section.hero_image_url}
+                alt={`${experience.title} — ${section.title}`}
+                focus="50% 30%"
+              />
+            ) : (
+              <ChapterBackdrop number={chapterIndex + 1} />
+            )}
 
             <div className="relative z-10 w-full px-5 pb-20 pt-32 md:px-10 md:pb-24">
               <motion.div

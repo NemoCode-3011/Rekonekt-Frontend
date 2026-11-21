@@ -1,10 +1,22 @@
 import { Link, Outlet, Navigate } from "react-router-dom";
 import { useAuth } from "../features/auth/auth-context";
+import PageError from "../components/ui/PageError";
 
 export default function AuthLayout() {
-  const { user, loading } = useAuth();
+  const { user, loading, authUnavailable, refreshUser } = useAuth();
 
   if (loading) return null;
+  if (authUnavailable) {
+    return (
+      <PageError
+        title="We couldn't check your session"
+        message="The sign-in service is temporarily unavailable. Try again before continuing."
+        onRetry={() => {
+          void refreshUser().catch(() => undefined);
+        }}
+      />
+    );
+  }
   if (user) {
     const isAdmin = user.role === "admin" || user.role === "super admin";
     return <Navigate to={isAdmin ? "/admin/dashboard" : "/"} replace />;

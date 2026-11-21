@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
@@ -10,6 +10,14 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState<string>(useLocation().state?.email ?? "");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [wait, setWait] = useState(0);
+
+  useEffect(() => {
+    if (wait <= 0) return;
+    const timer = window.setTimeout(() => setWait((seconds) => seconds - 1), 1000);
+    return () => window.clearTimeout(timer);
+  }, [wait]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -17,13 +25,62 @@ export default function ForgotPassword() {
     setLoading(true);
 
     try {
-      await forgotPassword(email);
-      navigate("/auth/reset-password", { state: { email } });
+      const response = await forgotPassword(email);
+      if (response.code !== "PASSWORD_RESET_REQUEST_ACCEPTED") {
+        setError("We couldn't process the request. Please try again later.");
+        return;
+      }
+      setSent(true);
     } catch (err) {
-      setError((err as ApiError).message);
+      const apiError = err as ApiError;
+      if (apiError.code === "RATE_LIMITED") {
+        setError("Requests are temporarily limited. Please wait before trying again.");
+        setWait(apiError.retryAfterSeconds ?? 0);
+      } else if (apiError.code === "RATE_LIMIT_STORE_UNAVAILABLE") {
+        setError("Password recovery is temporarily unavailable. Please try again shortly.");
+      } else {
+        setError(
+          apiError.status === 0
+            ? "Can't reach the server. Check your connection and try again."
+            : "We couldn't process the request. Please try again later.",
+        );
+      }
     } finally {
       setLoading(false);
     }
+  }
+
+  if (sent) {
+    return (
+      <div className="text-center">
+        <p className="font-sans text-label uppercase tracking-[0.2em] text-success">
+          Password recovery
+        </p>
+        <h1 className="mt-3 font-display text-heading-l leading-tight">
+          Check your email.
+        </h1>
+        <p className="mt-5 text-body-m text-muted">
+          If an account can receive a password reset for this address, instructions will arrive shortly.
+        </p>
+        <Button
+          type="button"
+          onClick={() =>
+            navigate("/auth/reset-password", { state: { email } })
+          }
+          className="mt-8 w-full"
+        >
+          Continue to reset password
+        </Button>
+        <p className="mt-6 text-body-s text-muted">
+          <Link
+            to="/auth/login"
+            className="font-medium text-ink underline underline-offset-4"
+          >
+            Back to sign in
+          </Link>
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -52,8 +109,12 @@ export default function ForgotPassword() {
           </p>
         )}
 
-        <Button type="submit" disabled={loading} className="w-full">
-          {loading ? "Sending code…" : "Send code"}
+        <Button type="submit" disabled={loading || wait > 0} className="w-full">
+          {loading
+            ? "Sending code…"
+            : wait > 0
+              ? `Please wait ${wait}s`
+              : "Send code"}
         </Button>
       </form>
 

@@ -77,7 +77,7 @@ function PersonStory({ person }: { person: ExperiencePerson }) {
                 <img
                   src={image.file_url}
                   alt={person.name}
-                  className="aspect-[4/5] w-full max-w-sm object-cover object-top lg:max-w-none"
+                  className="aspect-4/5 w-full max-w-sm object-cover object-top lg:max-w-none"
                 />
                 {image.source_credit && (
                   <figcaption className="mt-2 font-sans text-label text-muted">
@@ -88,7 +88,7 @@ function PersonStory({ person }: { person: ExperiencePerson }) {
             ) : (
               <div
                 aria-hidden="true"
-                className="flex aspect-[4/5] w-full max-w-sm items-center justify-center border-t-2 border-ochre bg-sand/40 font-display text-heading-l text-ink/30 lg:max-w-none"
+                className="flex aspect-4/5 w-full max-w-sm items-center justify-center border-t-2 border-ochre bg-sand/40 font-display text-heading-l text-ink/30 lg:max-w-none"
               >
                 {initials(person.name)}
               </div>

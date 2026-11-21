@@ -43,7 +43,7 @@ export default function Input({
         {Icon && (
           <Icon
             aria-hidden="true"
-            className="pointer-events-none absolute left-4 top-1/2 size-4.5ranslate-y-1/2 text-muted"
+            className="pointer-events-none absolute left-4 top-1/2 size-4.5 -translate-y-1/2 text-muted"
           />
         )}
 

@@ -35,6 +35,7 @@ import AdminStoryEditor from "./pages/Admin/StoryEditor";
 import ExhibitionWorkspace from "./pages/Admin/ExhibitionsWorkspace";
 import Team from "./pages/Admin/Team";
 import AdminSettings from "./pages/Admin/AdminSettings";
+import AdminContentLibrary from "./pages/Admin/AdminContentLibrary";
 import RequireSuperAdmin from "./features/admin/components/RequireSuperAdmin";
 import AdminSetupPassword from "./pages/Admin/AdminSetupPassword";
 import Scrolltotop from "./components/navigation/ScrollToTop";
@@ -118,6 +119,30 @@ function App() {
                 />
                 <Route path="stories" element={<AdminStories />} />
                 <Route path="stories/:id" element={<AdminStoryEditor />} />
+                <Route
+                  path="events"
+                  element={<AdminContentLibrary kind="events" />}
+                />
+                <Route
+                  path="events/:id"
+                  element={<AdminContentLibrary kind="events" />}
+                />
+                <Route
+                  path="people"
+                  element={<AdminContentLibrary kind="people" />}
+                />
+                <Route
+                  path="people/:id"
+                  element={<AdminContentLibrary kind="people" />}
+                />
+                <Route
+                  path="places"
+                  element={<AdminContentLibrary kind="places" />}
+                />
+                <Route
+                  path="places/:id"
+                  element={<AdminContentLibrary kind="places" />}
+                />
                 <Route path="settings" element={<AdminSettings />} />
                 <Route element={<RequireSuperAdmin />}>
                   <Route path="team" element={<Team />} />

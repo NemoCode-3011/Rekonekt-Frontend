@@ -1,4 +1,4 @@
-import { http } from "../../services/api/client";
+import { ApiError, http } from "../../services/api/client";
 import type { User } from "./types";
 
 export interface CulturalGroup {
@@ -8,54 +8,91 @@ export interface CulturalGroup {
   region: string | null;
 }
 
+export interface AuthResponse<T> {
+  code: string;
+  message: string;
+  data: T | null;
+}
+
+export interface SignupData {
+  expiresInSeconds: number;
+  resendAfterSeconds: number;
+  nextStep: string;
+}
+
 const cleanEmail = (email: string) => email.trim().toLowerCase();
 
-export function signUp(input: {
+export async function signUp(input: {
   name: string;
   email: string;
   password: string;
+  preferredLanguage?: string;
 }) {
-  return http.post("/auth/signup", {
+  const res = await http.post<AuthResponse<SignupData>>("/auth/signup", {
     ...input,
     email: cleanEmail(input.email),
   });
+  return res.data;
 }
 
-export function verifyOtp(email: string, otp: string) {
-  return http.post("/auth/verify-otp", { email: cleanEmail(email), otp });
+export async function verifyOtp(email: string, otp: string) {
+  const res = await http.post<AuthResponse<null>>("/auth/verify-otp", {
+    email: cleanEmail(email),
+    otp,
+  });
+  return res.data;
 }
 
-export function resendOtp(email: string) {
-  return http.post("/auth/resend-otp", { email: cleanEmail(email) });
+export async function resendOtp(email: string) {
+  const res = await http.post<AuthResponse<null>>("/auth/resend-otp", {
+    email: cleanEmail(email),
+  });
+  return res.data;
 }
 
 export async function signIn(email: string, password: string) {
-  const res = await http.post<{ message: string; data: User }>("/auth/signin", {
+  const res = await http.post<AuthResponse<User>>("/auth/signin", {
     email: cleanEmail(email),
     password,
   });
-  return res.data.data;
+  return res.data;
 }
 
-export function forgotPassword(email: string) {
-  return http.post("/auth/forgot-password", { email: cleanEmail(email) });
+export async function forgotPassword(email: string) {
+  const res = await http.post<AuthResponse<null>>("/auth/forgot-password", {
+    email: cleanEmail(email),
+  });
+  return res.data;
 }
 
-export function resetPassword(email: string, otp: string, newPassword: string) {
-  return http.post("/auth/reset-password", {
+export async function resetPassword(
+  email: string,
+  otp: string,
+  newPassword: string,
+) {
+  const res = await http.post<AuthResponse<null>>("/auth/reset-password", {
     email: cleanEmail(email),
     otp,
     newPassword,
   });
+  return res.data;
 }
 
 export async function getCurrentUser() {
-  const res = await http.get<{ message: string; data: User }>("/auth/me");
+  const res = await http.get<AuthResponse<User>>("/auth/me");
+  if (!res.data.data) {
+    throw new ApiError(
+      502,
+      "We couldn't confirm the signed-in account. Please try again.",
+      "INVALID_AUTH_RESPONSE",
+    );
+  }
   return res.data.data;
 }
 
-export function logout() {
-  return http.post("/auth/logout");
+export async function logout() {
+  const res = await http.post<AuthResponse<null>>("/auth/logout");
+  return res.data;
 }
 
 // ---------- Settings ----------
@@ -72,8 +109,12 @@ export async function updateProfile(input: {
   return res.data.data;
 }
 
-export function changePassword(currentPassword: string, newPassword: string) {
-  return http.post("/auth/change-password", { currentPassword, newPassword });
+export async function changePassword(currentPassword: string, newPassword: string) {
+  const res = await http.post<AuthResponse<null>>("/auth/change-password", {
+    currentPassword,
+    newPassword,
+  });
+  return res.data;
 }
 
 export async function getCulturalGroups() {
