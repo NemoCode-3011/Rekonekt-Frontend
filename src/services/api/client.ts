@@ -70,7 +70,7 @@ http.interceptors.response.use(
         status === 429
           ? "Too many requests. Please wait before trying again."
           : status >= 500
-            ? "The service is temporarily unavailable. Please try again shortly."
+            ? "We’re having trouble connecting. Try again shortly."
             : serverMessage ?? "Something went wrong. Please try again.";
 
       if (status === 401 && !EXPECTED_401.includes(error.config?.url ?? "")) {
@@ -84,7 +84,7 @@ http.interceptors.response.use(
     return Promise.reject(
       new ApiError(
         0,
-        "Can't reach the server. Check your connection and try again.",
+        "We’re having trouble connecting. Try again shortly.",
       ),
     );
   },

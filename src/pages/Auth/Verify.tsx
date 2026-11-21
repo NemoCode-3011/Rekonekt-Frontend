@@ -79,12 +79,12 @@ export default function Verify() {
           setError("Verification is temporarily limited. Please wait before trying again.");
           break;
         case "RATE_LIMIT_STORE_UNAVAILABLE":
-          setError("Verification is temporarily unavailable. Please try again shortly.");
+          setError("We’re having trouble connecting. Try again shortly.");
           break;
         default:
           setError(
-            apiError.status === 0
-              ? "Can't reach the server. Check your connection and try again."
+            apiError.status === 0 || apiError.status >= 500
+              ? "We’re having trouble connecting. Try again shortly."
               : "We couldn't verify the code. Please try again.",
           );
       }
@@ -128,12 +128,12 @@ export default function Verify() {
           setError("Requests are temporarily limited. Please wait before trying again.");
           break;
         case "RATE_LIMIT_STORE_UNAVAILABLE":
-          setError("Verification is temporarily unavailable. Please try again shortly.");
+          setError("We’re having trouble connecting. Try again shortly.");
           break;
         default:
           setError(
-            apiError.status === 0
-              ? "Can't reach the server. Check your connection and try again."
+            apiError.status === 0 || apiError.status >= 500
+              ? "We’re having trouble connecting. Try again shortly."
               : "We couldn't process that request. Please try again later.",
           );
       }
@@ -179,7 +179,7 @@ export default function Verify() {
   return (
     <>
       <h1 className="font-display text-heading-l leading-tight">
-        Check your email.
+        Check your email for a verification code.
       </h1>
       <p className="mt-4 text-body-m text-muted">
         {stateEmail

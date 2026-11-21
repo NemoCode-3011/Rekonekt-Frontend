@@ -74,12 +74,12 @@ export default function ResetPassword() {
           }
           break;
         case "RATE_LIMIT_STORE_UNAVAILABLE":
-          setError("Password reset is temporarily unavailable. Please try again shortly.");
+          setError("We’re having trouble connecting. Try again shortly.");
           break;
         default:
           setError(
-            apiError.status === 0
-              ? "Can't reach the server. Check your connection and try again."
+            apiError.status === 0 || apiError.status >= 500
+              ? "We’re having trouble connecting. Try again shortly."
               : "We couldn't update your password. Please try again.",
           );
       }
@@ -97,7 +97,7 @@ export default function ResetPassword() {
     try {
       const response = await forgotPassword(email);
       if (response.code === "PASSWORD_RESET_REQUEST_ACCEPTED") {
-        setNotice("If a reset is needed, check your email for next steps.");
+        setNotice("If there’s an account for this email, a reset code is on the way.");
       } else {
         setError("We couldn't process that request. Please try again later.");
       }
@@ -109,11 +109,11 @@ export default function ResetPassword() {
           setResendWait(apiError.retryAfterSeconds);
         }
       } else if (apiError.code === "RATE_LIMIT_STORE_UNAVAILABLE") {
-        setError("Password recovery is temporarily unavailable. Please try again shortly.");
+        setError("We’re having trouble connecting. Try again shortly.");
       } else {
         setError(
-          apiError.status === 0
-            ? "Can't reach the server. Check your connection and try again."
+          apiError.status === 0 || apiError.status >= 500
+            ? "We’re having trouble connecting. Try again shortly."
             : "We couldn't process that request. Please try again later.",
         );
       }

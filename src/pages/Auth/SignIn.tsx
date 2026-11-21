@@ -99,19 +99,21 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
           state: { email, resume: true },
         });
       } else if (apiError.code === "INVALID_CREDENTIALS") {
-        setError("Email or password is incorrect.");
+        setError("Email or password is incorrect. Try again.");
       } else if (
         apiError.code === "RATE_LIMITED" ||
         apiError.code === "RATE_LIMIT_STORE_UNAVAILABLE"
       ) {
-        setError("Sign in is temporarily unavailable. Please try again shortly.");
+        setError("We’re having trouble connecting. Try again shortly.");
         if (apiError.code === "RATE_LIMITED") {
           setWait(apiError.retryAfterSeconds ?? 0);
         }
       } else if (apiError.status === 0) {
-        setError("Can't reach the server. Check your connection and try again.");
+        setError("We’re having trouble connecting. Try again shortly.");
+      } else if (apiError.status >= 500) {
+        setError("We’re having trouble connecting. Try again shortly.");
       } else {
-        setError("We couldn't sign you in. Please try again.");
+        setError("Email or password is incorrect. Try again.");
       }
     } finally {
       setLoading(false);

@@ -62,15 +62,13 @@ export default function SignUp() {
           setNextAction("verify");
           break;
         case "OTP_DELIVERY_FAILED":
-          setError("Your account was created, but the code couldn't be delivered. You can request another code.");
+          setError("Check your email for a verification code.");
           setNextAction("verify");
           break;
         case "OTP_COOLDOWN":
           setRetryAfterSeconds(apiError.retryAfterSeconds);
           setWait(apiError.retryAfterSeconds ?? 0);
-          setError(
-            "Your account is ready for verification. Check your email for a code, or continue and request one when the cooldown ends.",
-          );
+          setError("Check your email for a verification code.");
           setNextAction("verify");
           break;
         case "RATE_LIMITED":
@@ -84,8 +82,8 @@ export default function SignUp() {
           break;
         default:
           setError(
-            apiError.status === 0
-              ? "Can't reach the server. Check your connection and try again."
+            apiError.status === 0 || apiError.status >= 500
+              ? "We’re having trouble connecting. Try again shortly."
               : "We couldn't create your account. Please try again.",
           );
       }

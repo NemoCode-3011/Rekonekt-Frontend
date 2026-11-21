@@ -117,6 +117,24 @@ describe("session authentication flows", () => {
     vi.clearAllMocks();
   });
 
+  it("uses the same sign-in error for invalid credentials", async () => {
+    authApi.signIn.mockRejectedValue(
+      new ApiError(401, "ignored backend message", "INVALID_CREDENTIALS"),
+    );
+    renderAuthRoute("/auth/login", <SignIn />);
+    fireEvent.change(screen.getByLabelText("Email"), {
+      target: { value: "unknown@example.com" },
+    });
+    fireEvent.change(screen.getByLabelText("Password"), {
+      target: { value: "wrong-password" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Sign in/ }));
+
+    expect(
+      await screen.findByText("Email or password is incorrect. Try again."),
+    ).toBeInTheDocument();
+  });
+
   it("keeps duplicate signup on the existing-account sign-in path", async () => {
     authApi.signUp.mockRejectedValue(
       new ApiError(409, "ignored backend message", "EMAIL_ALREADY_EXISTS"),
@@ -146,12 +164,14 @@ describe("session authentication flows", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create account" }));
 
     expect(
-      await screen.findByText(/Your account is ready for verification/),
+      await screen.findByText("Check your email for a verification code."),
     ).toBeInTheDocument();
     fireEvent.click(
       screen.getByRole("button", { name: "Continue to verification" }),
     );
-    expect(screen.getByText("Check your email.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Check your email for a verification code."),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Resend code in 42s" }),
     ).toBeDisabled();
@@ -213,7 +233,9 @@ describe("session authentication flows", () => {
     fireEvent.click(screen.getByRole("button", { name: "Send code" }));
 
     expect(
-      await screen.findByText(/If an account can receive a password reset/),
+      await screen.findByText(
+        "If there’s an account for this email, a reset code is on the way.",
+      ),
     ).toBeInTheDocument();
     expect(screen.queryByText(/unknown@example\.com/)).not.toBeInTheDocument();
     expect(screen.queryByText(/We sent a/)).not.toBeInTheDocument();

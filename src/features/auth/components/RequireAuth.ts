@@ -22,7 +22,7 @@ function RequireAuth() {
   if (authUnavailable) {
     return React.createElement(PageError, {
       title: "We couldn't check your session",
-      message: "The sign-in service is temporarily unavailable. Try again before continuing.",
+      message: "We’re having trouble connecting. Try again shortly.",
       onRetry: () => {
         void refreshUser().catch(() => undefined);
       },

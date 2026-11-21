@@ -37,11 +37,11 @@ export default function ForgotPassword() {
         setError("Requests are temporarily limited. Please wait before trying again.");
         setWait(apiError.retryAfterSeconds ?? 0);
       } else if (apiError.code === "RATE_LIMIT_STORE_UNAVAILABLE") {
-        setError("Password recovery is temporarily unavailable. Please try again shortly.");
+        setError("We’re having trouble connecting. Try again shortly.");
       } else {
         setError(
-          apiError.status === 0
-            ? "Can't reach the server. Check your connection and try again."
+          apiError.status === 0 || apiError.status >= 500
+            ? "We’re having trouble connecting. Try again shortly."
             : "We couldn't process the request. Please try again later.",
         );
       }
@@ -57,10 +57,10 @@ export default function ForgotPassword() {
           Password recovery
         </p>
         <h1 className="mt-3 font-display text-heading-l leading-tight">
-          Check your email.
+          Password recovery
         </h1>
         <p className="mt-5 text-body-m text-muted">
-          If an account can receive a password reset for this address, instructions will arrive shortly.
+          If there’s an account for this email, a reset code is on the way.
         </p>
         <Button
           type="button"
