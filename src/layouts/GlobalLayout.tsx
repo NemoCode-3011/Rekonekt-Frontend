@@ -7,7 +7,7 @@ export default function GlobalLayout() {
   return (
     <>
       <GlobalNav />
-      <main>
+      <main id="main-content">
         <Outlet />
       </main>
       <Footer />

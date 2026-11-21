@@ -62,7 +62,10 @@ export default function Footer() {
               EXPLORE
             </p>
 
-            <nav className="mt-6 flex flex-col items-start gap-3">
+            <nav
+              aria-label="Explore"
+              className="mt-6 flex flex-col items-start gap-3"
+            >
               {exploreLinks.map((link) => (
                 <Link
                   key={link.to}
@@ -87,7 +90,10 @@ export default function Footer() {
               REKÒ
             </p>
 
-            <nav className="mt-6 flex flex-col items-start gap-3">
+            <nav
+              aria-label="REKÒ information"
+              className="mt-6 flex flex-col items-start gap-3"
+            >
               {rekoLinks.map((link) => (
                 <Link
                   key={link.to}
@@ -123,7 +129,7 @@ export default function Footer() {
             duration: 1.2,
             ease: [0.76, 0, 0.24, 1],
           }}
-          className="text-center font-display text-[clamp(8rem,25vw,24rem)] leading-[0.7] tracking-[-0.07em] text-ivory/10"
+          className="text-center font-display text-[clamp(8rem,25vw,24rem)] leading-[0.7] tracking-[-0.07em] text-ivory/50"
         >
           REKÒ
         </motion.div>

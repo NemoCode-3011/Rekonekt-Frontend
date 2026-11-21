@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../features/auth/auth-context";
+import SkipLink from "./SkipLink";
 import { useScrollLock } from "./useScrollLock";
 
 const links = [
@@ -132,6 +133,7 @@ export default function GlobalNav() {
           : "relative border-b border-line text-ink"
       }
     >
+      <SkipLink />
       <div className="container grid h-20 grid-cols-2 items-center md:grid-cols-[1fr_auto_1fr]">
         <Link to="/" className="font-display text-heading-s tracking-wide">
           REKÒ

@@ -11,6 +11,7 @@ REKÒ helps people explore Nigerian history, culture, and the stories shaping th
 - Explore selected objects through interactive 3D experiences.
 - Search and navigate the museum across responsive layouts.
 
+
 ## Tech stack
 
 - React 19, TypeScript, and Vite
@@ -69,6 +70,7 @@ npm run preview  # Preview the production build locally
 npm run lint     # Run ESLint
 npm test         # Run the Vitest test suite
 ```
+
 
 ## Project structure
 

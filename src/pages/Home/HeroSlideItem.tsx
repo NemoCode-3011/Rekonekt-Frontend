@@ -83,7 +83,6 @@ function HeroSlideItem({
           loop
           playsInline
           preload="metadata"
-          role={isDuplicate ? undefined : "img"}
           aria-label={isDuplicate ? undefined : slide.alt}
           onLoadedData={isFirst ? onFirstImageReady : undefined}
           onError={() => {

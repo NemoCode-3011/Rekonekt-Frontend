@@ -4,7 +4,7 @@ import type { MouseEvent } from "react";
 // page's content. It stays out of sight until it receives focus.
 export default function SkipLink() {
   const goToContent = (event: MouseEvent<HTMLAnchorElement>) => {
-    const main = document.querySelector("main");
+    const main = document.getElementById("main-content");
     if (!main) return;
     event.preventDefault();
     main.setAttribute("tabindex", "-1");

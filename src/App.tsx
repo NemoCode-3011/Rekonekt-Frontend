@@ -40,7 +40,6 @@ import RequireSuperAdmin from "./features/admin/components/RequireSuperAdmin";
 import AdminSetupPassword from "./pages/Admin/AdminSetupPassword";
 import Scrolltotop from "./components/navigation/ScrollToTop";
 import PageChange from "./components/navigation/PageChange";
-import SkipLink from "./components/navigation/SkipLink";
 import { lazy, Suspense } from "react";
 import { SplashProvider } from "./components/splash/SplashProvider";
 import { SplashLayer } from "./components/splash/SplashScreen";
@@ -51,7 +50,6 @@ const ObjectViewer = lazy(() => import("./pages/Experiences/ObjectViewer"));
 function App() {
   return (
     <SplashProvider>
-      <SkipLink />
       <SplashLayer />
       <DiscoveryProvider>
         <Scrolltotop />

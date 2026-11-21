@@ -72,6 +72,8 @@ export default function ComingSoon() {
 
       <ul
         ref={railRef}
+        tabIndex={0}
+        aria-label="Coming soon experiences"
         className="
         mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto
         pb-2 motion-safe:scroll-smooth

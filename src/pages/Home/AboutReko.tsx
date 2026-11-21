@@ -25,7 +25,7 @@ const dot: Variants = {
 };
 
 const word: Variants = {
-  hidden: { opacity: 0.25 },
+  hidden: { opacity: 0.55 },
   show: (i: number) => ({
     opacity: 1,
     transition: { duration: 0.6, delay: (i / 4) * DRAW },
