@@ -20,7 +20,10 @@ export default function AdminSidebar() {
         </p>
       </div>
 
-      <nav className="mt-12 flex-1 px-4" aria-label="Admin">
+      <nav
+        className="admin-sidebar-scroll mt-12 min-h-0 flex-1 overflow-y-auto px-4"
+        aria-label="Admin"
+      >
         <ul className="space-y-1">
           {links.map((link) => (
             <li key={link.to}>
@@ -41,7 +44,7 @@ export default function AdminSidebar() {
         </ul>
       </nav>
 
-      <div className="border-t border-ivory/15 px-7 py-6">
+      <div className="shrink-0 border-t border-ivory/15 px-7 py-6">
         <p className="truncate font-sans text-body-s text-ivory">{user?.name}</p>
         <p className="font-sans text-meta capitalize text-ivory/60">{user?.role}</p>
 
