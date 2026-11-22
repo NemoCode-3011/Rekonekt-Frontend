@@ -35,8 +35,9 @@ async function waitForFonts() {
 // Decode every picture ahead of time, so a cut never stalls. Only the first one
 // is waited for, and only for a moment.
 function preloadPictures() {
-  return milestones.map((milestone) => {
+  return milestones.map((milestone, index) => {
     const picture = new Image();
+    picture.fetchPriority = index < 2 ? "high" : "low";
     picture.src = milestone.image;
     return picture.decode().catch(() => undefined);
   });

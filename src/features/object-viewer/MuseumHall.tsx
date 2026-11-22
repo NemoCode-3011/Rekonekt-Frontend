@@ -72,7 +72,11 @@ const ORISHA = [
     name: "Èṣù",
     title: "Òrìṣà of Crossroads & Messenger",
   },
-  { image: "/orisha/ogun3.png", name: "Ògún", title: "Òrìṣà of Iron & Craft" },
+  {
+    image: "/orisha/optimized/ogun3-compressed.jpg",
+    name: "Ògún",
+    title: "Òrìṣà of Iron & Craft",
+  },
   {
     image: "/orisha/sango3.jpg",
     name: "Ṣàngó",
@@ -85,7 +89,7 @@ const ORISHA = [
     title: "Mother of the Waters",
   },
   {
-    image: "/orisha/obatala.png",
+    image: "/orisha/optimized/obatala-compressed.jpg",
     name: "Ọbàtálá",
     title: "Òrìṣà of Purity & Creation",
   },

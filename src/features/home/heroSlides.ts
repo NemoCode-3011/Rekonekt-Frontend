@@ -1,6 +1,6 @@
 
-import image1 from "../../assets/images/hero/civilwar-optimized.jpg";
-import image2 from "../../assets/images/hero/about1-optimized.jpg";
+import image1 from "../../assets/images/hero/optimized/civilwar-optimized-compressed.jpg";
+import image2 from "../../assets/images/hero/optimized/about1-optimized-compressed.jpg";
 import video1 from "../../assets/images/hero/herovideo2.mp4";
 import image3 from "../../assets/images/hero/heroimage1.jpg";
 import image4 from "../../assets/images/hero/heroimage3.jpg";
