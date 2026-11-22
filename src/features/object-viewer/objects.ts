@@ -72,7 +72,8 @@ export const objects: ObjectConfig[] = [
     modelUrl: "/models/bronze-head.glb",
 
     credit: {
-      model: "Benin Bronze Head (https://skfb.ly/ptKrO) by yugengen is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/)"
+      model:
+        "Benin Bronze Head (https://skfb.ly/ptKrO) by yugengen is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/)",
     },
 
     stories: [
