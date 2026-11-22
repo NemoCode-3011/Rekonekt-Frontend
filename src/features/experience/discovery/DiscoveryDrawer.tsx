@@ -54,7 +54,7 @@ function DiscoveryDrawer({ subject, onClose }: DiscoveryDrawerProps) {
         </div>
 
         <div className="px-6 pb-16 md:px-10">
-          <SubjectDetails subject={subject} />
+          <SubjectDetails subject={subject} onClose={onClose} />
         </div>
       </motion.div>
     </dialog>

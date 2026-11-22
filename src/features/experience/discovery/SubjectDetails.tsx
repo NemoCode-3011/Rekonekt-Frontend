@@ -133,7 +133,13 @@ function SourcesBlock({
 
 // ---------- One layout per kind of subject ----------
 
-function PersonDetails({ person }: { person: ExperiencePerson }) {
+function PersonDetails({
+  person,
+  onClose,
+}: {
+  person: ExperiencePerson;
+  onClose: () => void;
+}) {
   const { items: media } = usePersonMedia(person.id);
   const { items: sources, status } = usePersonSources(person.id);
   const years = lifeSpan(person);
@@ -152,6 +158,7 @@ function PersonDetails({ person }: { person: ExperiencePerson }) {
       {paragraphs.length > 1 && (
         <Link
           to={`/people/${person.slug}`}
+          onClick={onClose}
           className="mt-8 inline-flex items-center gap-2 border-b border-ink font-sans text-body-m font-medium transition-colors hover:text-heritage-green"
         >
           Read their full story <span aria-hidden>→</span>
@@ -292,10 +299,16 @@ function StoryDetails({ story }: { story: ExperienceStory }) {
 }
 
 // What the drawer shows, depending on what was selected.
-function SubjectDetails({ subject }: { subject: DiscoverySubject }) {
+function SubjectDetails({
+  subject,
+  onClose,
+}: {
+  subject: DiscoverySubject;
+  onClose: () => void;
+}) {
   switch (subject.kind) {
     case "person":
-      return <PersonDetails person={subject.person} />;
+      return <PersonDetails person={subject.person} onClose={onClose} />;
     case "place":
       return <PlaceDetails place={subject.place} />;
     case "event":
