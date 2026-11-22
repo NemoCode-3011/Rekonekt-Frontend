@@ -41,6 +41,8 @@ Create a `.env.local` file in the project root and configure the backend API URL
 VITE_API_URL=https://your-backend-origin
 ```
 
+For Vercel, set `VITE_API_URL` under **Project Settings → Environment Variables** to the deployed backend's HTTPS origin (without an API path), then redeploy. Vite embeds this value at build time; if it is missing, API requests use the frontend's origin.
+
 Google sign-in is optional. To enable its button, also set the Google OAuth client ID:
 
 ```dotenv
