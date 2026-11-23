@@ -131,7 +131,7 @@ describe("session authentication flows", () => {
     fireEvent.click(screen.getByRole("button", { name: /Sign in/ }));
 
     expect(
-      await screen.findByText("Email or password is incorrect. Try again."),
+      await screen.findByText("Incorrect email or password. Please try again."),
     ).toBeInTheDocument();
   });
 

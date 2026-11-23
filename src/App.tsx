@@ -14,6 +14,7 @@ import { lazy, Suspense } from "react";
 import { SplashProvider } from "./components/splash/SplashProvider";
 import { SplashLayer } from "./components/splash/SplashScreen";
 import PageLoader from "./components/ui/PageLoader";
+import { Analytics } from "@vercel/analytics/next";
 
 const Home = lazy(() => import("./pages/Home/Home"));
 const SignUp = lazy(() => import("./pages/Auth/SignUp"));
@@ -23,8 +24,12 @@ const ForgotPassword = lazy(() => import("./pages/Auth/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/Auth/ResetPassword"));
 const Explore = lazy(() => import("./pages/Explore/Explore"));
 const Exhibitions = lazy(() => import("./pages/Explore/Exhibitions"));
-const ExhibitionDetail = lazy(() => import("./pages/Exhibitions/ExhibitionsDetail"));
-const ExperienceDetail = lazy(() => import("./pages/Experiences/ExperienceDetail"));
+const ExhibitionDetail = lazy(
+  () => import("./pages/Exhibitions/ExhibitionsDetail"),
+);
+const ExperienceDetail = lazy(
+  () => import("./pages/Experiences/ExperienceDetail"),
+);
 const Search = lazy(() => import("./pages/Search/Search"));
 const Profile = lazy(() => import("./pages/Account/Profile"));
 const Progress = lazy(() => import("./pages/Account/Progress"));
@@ -40,11 +45,17 @@ const Settings = lazy(() => import("./pages/Account/Settings"));
 const AdminExhibitions = lazy(() => import("./pages/Admin/Exhibitions"));
 const AdminStories = lazy(() => import("./pages/Admin/Stories"));
 const AdminStoryEditor = lazy(() => import("./pages/Admin/StoryEditor"));
-const ExhibitionWorkspace = lazy(() => import("./pages/Admin/ExhibitionsWorkspace"));
+const ExhibitionWorkspace = lazy(
+  () => import("./pages/Admin/ExhibitionsWorkspace"),
+);
 const Team = lazy(() => import("./pages/Admin/Team"));
 const AdminSettings = lazy(() => import("./pages/Admin/AdminSettings"));
-const AdminContentLibrary = lazy(() => import("./pages/Admin/AdminContentLibrary"));
-const AdminSetupPassword = lazy(() => import("./pages/Admin/AdminSetupPassword"));
+const AdminContentLibrary = lazy(
+  () => import("./pages/Admin/AdminContentLibrary"),
+);
+const AdminSetupPassword = lazy(
+  () => import("./pages/Admin/AdminSetupPassword"),
+);
 const PersonPage = lazy(() => import("./pages/People/PersonPage"));
 const ObjectViewer = lazy(() => import("./pages/Experiences/ObjectViewer"));
 
@@ -79,7 +90,10 @@ function App() {
                   path="/explore/artifacts"
                   element={<CollectionPage kind="artifacts" />}
                 />
-                <Route path="/exhibitions/:slug" element={<ExhibitionDetail />} />
+                <Route
+                  path="/exhibitions/:slug"
+                  element={<ExhibitionDetail />}
+                />
                 <Route path="/search" element={<Search />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/stories" element={<Stories />} />
@@ -170,6 +184,7 @@ function App() {
                 <Route path="reset-password" element={<ResetPassword />} />
               </Route>
             </Routes>
+            <Analytics />
           </Suspense>
         </BookmarksProvider>
       </DiscoveryProvider>

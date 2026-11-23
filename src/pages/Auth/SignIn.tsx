@@ -111,7 +111,7 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
           state: { email, resume: true },
         });
       } else if (apiError.code === "INVALID_CREDENTIALS") {
-        setError("Email or password is incorrect. Try again.");
+        setError("Incorrect email or password. Please try again.");
       } else if (
         apiError.code === "RATE_LIMITED" ||
         apiError.code === "RATE_LIMIT_STORE_UNAVAILABLE"
@@ -128,7 +128,7 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
         setError(
           getApiErrorMessage(
             apiError,
-            "Email or password is incorrect. Try again.",
+            "Incorrect email or password. Please try again.",
           ),
         );
       }
