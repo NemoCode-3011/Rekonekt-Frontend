@@ -14,7 +14,7 @@ import { lazy, Suspense } from "react";
 import { SplashProvider } from "./components/splash/SplashProvider";
 import { SplashLayer } from "./components/splash/SplashScreen";
 import PageLoader from "./components/ui/PageLoader";
-import { Analytics } from "@vercel/analytics/next";
+import { Analytics } from "@vercel/analytics/react";
 
 const Home = lazy(() => import("./pages/Home/Home"));
 const SignUp = lazy(() => import("./pages/Auth/SignUp"));
