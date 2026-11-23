@@ -61,7 +61,7 @@ npm run dev
 
 The frontend uses the companion [REKÒ Backend](https://github.com/NemoCode-3011/Rekonekt-Backend). Sign-in is based on a server session and an HttpOnly cookie; browser API requests include credentials, and the app checks `/auth/me` to resolve the current user. The frontend does not store a JWT for authentication.
 
-Follow the backend README for its environment variables, database setup, and API documentation. Configure the backend's allowed client origin to match the frontend's exact origin. Cross-site session cookies require HTTPS and the appropriate backend cookie settings.
+Follow the backend README for its environment variables, database setup, and API documentation. Configure the backend's allowed client origin to match the frontend's exact origin. Cross-site session cookies require HTTPS and the appropriate backend cookie settings. Safari may still block cookies when the frontend and API are on separate sites; custom frontend and API domains under the same site are the most reliable deployment. After deployment, verify login and a page refresh on iPhone Safari and Android browsers, since desktop browser checks do not confirm mobile third-party-cookie behavior.
 
 ## Development scripts
 

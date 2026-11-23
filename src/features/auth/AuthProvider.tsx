@@ -83,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.clearTimeout(timer);
   }, [toast]);
 
-  // Ask the backend who is signed in (reads the sessionId cookie)
+  // Ask the backend to validate the HttpOnly session cookie.
   useEffect(() => {
     try {
       window.localStorage.removeItem("reko:last-user");

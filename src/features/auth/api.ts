@@ -79,7 +79,9 @@ export async function resetPassword(
 }
 
 export async function getCurrentUser() {
-  const res = await http.get<AuthResponse<User>>("/auth/me");
+  const res = await http.get<AuthResponse<User>>("/auth/me", {
+    timeout: 15_000,
+  });
   if (!res.data.data) {
     throw new ApiError(
       502,

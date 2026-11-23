@@ -84,6 +84,8 @@ describe("session auth API contract", () => {
       currentPassword: "old-password",
       newPassword: "new-password",
     });
-    expect(httpMock.get).toHaveBeenCalledWith("/auth/me");
+    expect(httpMock.get).toHaveBeenCalledWith("/auth/me", {
+      timeout: 15_000,
+    });
   });
 });
