@@ -3,13 +3,13 @@ import SourceList from "./SourceList";
 
 // The sources behind one chapter. Shows nothing if none are linked yet.
 function ChapterSources({ sectionId }: { sectionId: number }) {
-  const { items: sources, status } = useSectionSources(sectionId);
+  const { items: sources, status, error } = useSectionSources(sectionId);
 
   if (status === "error") {
     return (
       <section className="border-t border-line bg-ivory text-ink">
         <p className="mx-auto max-w-7xl px-5 py-12 font-sans text-body-s text-muted md:px-10">
-          We couldn't load this chapter's sources. Refresh to try again.
+          {error ?? "We couldn't load this chapter's sources. Refresh to try again."}
         </p>
       </section>
     );

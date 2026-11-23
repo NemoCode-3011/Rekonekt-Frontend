@@ -3,6 +3,7 @@ import Button from "../../../components/ui/Button";
 import { useAuth } from "../../auth/auth-context";
 import { uploadAdminImage, type UploadedMedia } from "../api/media";
 import RichTextEditor from "./RichTextEditor";
+import { getApiFieldErrors } from "../../../services/api/client";
 export interface FormField {
   name: string;
   label: string;
@@ -159,6 +160,15 @@ export default function InlineForm({
         setUploadProgress({});
       }
     } catch (error) {
+      const apiFieldErrors = getApiFieldErrors(error);
+      const formFieldErrors = Object.fromEntries(
+        Object.entries(apiFieldErrors).filter(([field]) =>
+          fields.some((candidate) => candidate.name === field),
+        ),
+      );
+      if (Object.keys(formFieldErrors).length > 0) {
+        setErrors((current) => ({ ...current, ...formFieldErrors }));
+      }
       showToast(
         error instanceof Error
           ? error.message
@@ -185,8 +195,10 @@ export default function InlineForm({
           "aria-invalid": !!errors[field.name],
           className: `${controlClass} ${errors[field.name] ? "border-error" : ""}`,
         };
-        const change = (value: string) =>
+        const change = (value: string) => {
           setValues((current) => ({ ...current, [field.name]: value }));
+          setErrors((current) => ({ ...current, [field.name]: "" }));
+        };
 
         return (
           <div key={field.name}>

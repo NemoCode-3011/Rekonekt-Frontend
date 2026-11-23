@@ -96,7 +96,9 @@ function ChapterConnections({ sectionId }: { sectionId: number }) {
 
         {failed && (
           <p className="mt-12 font-sans text-body-s text-muted">
-            Some people or places couldn't be loaded. Refresh to try again.
+            {people.error ??
+              places.error ??
+              "Some people or places couldn't be loaded. Refresh to try again."}
           </p>
         )}
       </div>

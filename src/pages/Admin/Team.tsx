@@ -11,6 +11,7 @@ import { useAuth } from "../../features/auth/auth-context";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import PageLoader from "../../components/ui/PageLoader";
 import PageError from "../../components/ui/PageError";
+import { getApiErrorMessage } from "../../services/api/client";
 function errorMessage(error: unknown) {
   return error instanceof Error
     ? error.message
@@ -23,6 +24,7 @@ export default function Team() {
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading",
   );
+  const [loadError, setLoadError] = useState("We couldn't load the team.");
   const [toRemove, setToRemove] = useState<TeamMember | null>(null);
   const [removing, setRemoving] = useState(false);
 
@@ -30,7 +32,8 @@ export default function Team() {
     try {
       setTeam(await getTeam());
       setStatus("ready");
-    } catch {
+    } catch (error) {
+      setLoadError(getApiErrorMessage(error, "We couldn't load the team."));
       setStatus("error");
     }
   }, []);
@@ -44,8 +47,11 @@ export default function Team() {
         setTeam(members);
         setStatus("ready");
       })
-      .catch(() => {
-        if (!cancelled) setStatus("error");
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setLoadError(getApiErrorMessage(error, "We couldn't load the team."));
+          setStatus("error");
+        }
       });
 
     return () => {
@@ -81,7 +87,7 @@ export default function Team() {
 
           {status === "error" && (
             <PageError
-              message="We couldn't load the team."
+              message={loadError}
               backTo="/admin"
               backLabel="Back to dashboard"
             />

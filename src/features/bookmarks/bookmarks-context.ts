@@ -4,6 +4,7 @@ import type { Bookmark } from "./types";
 
 export interface BookmarksContextValue {
   bookmarks: Bookmark[];
+  error: string | null;
   status: LoadStatus;
   // Has the signed-in visitor saved this artifact?
   isSaved: (artifactId: number) => boolean;

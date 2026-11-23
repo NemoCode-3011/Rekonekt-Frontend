@@ -3,7 +3,11 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import { forgotPassword, resetPassword } from "../../features/auth/api";
-import type { ApiError } from "../../services/api/client";
+import {
+  ApiError,
+  getApiErrorMessage,
+  getApiFieldErrors,
+} from "../../services/api/client";
 import { CheckCircle2, ArrowRight } from "lucide-react";
 import { useAuth } from "../../features/auth/auth-context";
 
@@ -16,6 +20,7 @@ export default function ResetPassword() {
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
@@ -44,6 +49,7 @@ export default function ResetPassword() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
+    setFieldErrors({});
     setNotice("");
     setLoading(true);
 
@@ -56,7 +62,11 @@ export default function ResetPassword() {
       clearLocalSession();
       setResetComplete(true);
     } catch (err) {
-      const apiError = err as ApiError;
+      const apiError =
+        err instanceof ApiError
+          ? err
+          : new ApiError(0, "We’re having trouble connecting. Try again shortly.");
+      setFieldErrors(getApiFieldErrors(err));
       switch (apiError.code) {
         case "INVALID_OTP":
           setError("That reset code isn't correct. Check it and try again.");
@@ -78,9 +88,10 @@ export default function ResetPassword() {
           break;
         default:
           setError(
-            apiError.status === 0 || apiError.status >= 500
-              ? "We’re having trouble connecting. Try again shortly."
-              : "We couldn't update your password. Please try again.",
+            getApiErrorMessage(
+              apiError,
+              "We couldn't update your password. Please try again.",
+            ),
           );
       }
     } finally {
@@ -91,6 +102,7 @@ export default function ResetPassword() {
   async function handleResend() {
     if (resendWait > 0 || resending) return;
     setError("");
+    setFieldErrors({});
     setNotice("");
     setResending(true);
 
@@ -102,7 +114,11 @@ export default function ResetPassword() {
         setError("We couldn't process that request. Please try again later.");
       }
     } catch (err) {
-      const apiError = err as ApiError;
+      const apiError =
+        err instanceof ApiError
+          ? err
+          : new ApiError(0, "We’re having trouble connecting. Try again shortly.");
+      setFieldErrors(getApiFieldErrors(err));
       if (apiError.code === "RATE_LIMITED") {
         setError("Requests are temporarily limited. Please wait before trying again.");
         if (apiError.retryAfterSeconds) {
@@ -112,9 +128,10 @@ export default function ResetPassword() {
         setError("We’re having trouble connecting. Try again shortly.");
       } else {
         setError(
-          apiError.status === 0 || apiError.status >= 500
-            ? "We’re having trouble connecting. Try again shortly."
-            : "We couldn't process that request. Please try again later.",
+          getApiErrorMessage(
+            apiError,
+            "We couldn't process that request. Please try again later.",
+          ),
         );
       }
     } finally {
@@ -174,7 +191,12 @@ export default function ResetPassword() {
             autoComplete="email"
             required
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setFieldErrors((current) => ({ ...current, email: "" }));
+              setError("");
+            }}
+            error={fieldErrors.email}
           />
         )}
 
@@ -188,7 +210,12 @@ export default function ResetPassword() {
           title="Enter the six-digit code"
           required
           value={otp}
-          onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+          onChange={(e) => {
+            setOtp(e.target.value.replace(/\D/g, ""));
+            setFieldErrors((current) => ({ ...current, otp: "" }));
+            setError("");
+          }}
+          error={fieldErrors.otp ?? fieldErrors.code}
         />
 
         <Input
@@ -199,7 +226,12 @@ export default function ResetPassword() {
           minLength={8}
           required
           value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
+          onChange={(e) => {
+            setNewPassword(e.target.value);
+            setFieldErrors((current) => ({ ...current, newPassword: "" }));
+            setError("");
+          }}
+          error={fieldErrors.newPassword ?? fieldErrors.password}
         />
 
         {error && (

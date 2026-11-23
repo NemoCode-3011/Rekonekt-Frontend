@@ -25,6 +25,7 @@ import type {
   DashboardSection,
 } from "../types/dashboard";
 import type { DashboardExhibitionResponseItem } from "../types/dashboard";
+import { getApiErrorMessage } from "../../../services/api/client";
 
 type Mode = "person" | "place" | "new-person" | "new-place" | null;
 
@@ -118,7 +119,7 @@ export default function AdminEventRelationships({
   );
   const [mode, setMode] = useState<Mode>(null);
   const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [savingSection, setSavingSection] = useState(false);
 
   const refresh = useCallback(async () => {
@@ -131,9 +132,11 @@ export default function AdminEventRelationships({
       setAllPlaces(data.allPlaces);
       setExhibitions(data.exhibitions);
       setSections(data.sections);
-      setLoadError(false);
-    } catch {
-      setLoadError(true);
+      setLoadError(null);
+    } catch (error) {
+      setLoadError(
+        getApiErrorMessage(error, "Couldn’t load the event connections."),
+      );
     } finally {
       setLoading(false);
     }
@@ -150,10 +153,14 @@ export default function AdminEventRelationships({
         setAllPlaces(data.allPlaces);
         setExhibitions(data.exhibitions);
         setSections(data.sections);
-        setLoadError(false);
+        setLoadError(null);
       })
-      .catch(() => {
-        if (!cancelled) setLoadError(true);
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setLoadError(
+            getApiErrorMessage(error, "Couldn’t load the event connections."),
+          );
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -274,7 +281,7 @@ export default function AdminEventRelationships({
       {loadError && (
         <div role="alert" className="mt-5">
           <p className="font-sans text-body-s text-error">
-            Couldn’t load the event connections.
+            {loadError}
           </p>
           <button type="button" onClick={() => void refresh()} className={linkButton}>
             Try again
@@ -379,7 +386,7 @@ export default function AdminEventRelationships({
             }
             onLinkExisting={() => setMode("person")}
             onCreateNew={() => setMode("new-person")}
-            disabled={loading || loadError || mode !== null}
+            disabled={loading || loadError !== null || mode !== null}
             canLinkExisting={freePeople.length > 0}
           />
 
@@ -430,7 +437,7 @@ export default function AdminEventRelationships({
             }
             onLinkExisting={() => setMode("place")}
             onCreateNew={() => setMode("new-place")}
-            disabled={loading || loadError || mode !== null}
+            disabled={loading || loadError !== null || mode !== null}
             canLinkExisting={freePlaces.length > 0}
           />
         </div>

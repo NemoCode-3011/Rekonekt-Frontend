@@ -9,7 +9,7 @@ function Search() {
   const [params, setParams] = useSearchParams();
   const query = params.get("q") ?? "";
 
-  const { status, results, searching } = useSearch(query);
+  const { status, results, searching, error } = useSearch(query);
 
   return (
     <div className="bg-ivory text-ink">
@@ -29,6 +29,7 @@ function Search() {
             status={status}
             searching={searching}
             results={results}
+            error={error}
           />
         </div>
       </div>

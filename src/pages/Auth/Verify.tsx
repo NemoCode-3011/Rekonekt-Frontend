@@ -3,7 +3,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import { resendOtp, verifyOtp } from "../../features/auth/api";
-import type { ApiError } from "../../services/api/client";
+import {
+  ApiError,
+  getApiErrorMessage,
+  getApiFieldErrors,
+} from "../../services/api/client";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 
 export default function Verify() {
@@ -21,6 +25,7 @@ export default function Verify() {
   const [email, setEmail] = useState(stateEmail ?? "");
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
@@ -53,6 +58,7 @@ export default function Verify() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
+    setFieldErrors({});
     setNotice("");
     setLoading(true);
 
@@ -64,7 +70,11 @@ export default function Verify() {
       }
       setVerifiedSuccess(true);
     } catch (err) {
-      const apiError = err as ApiError;
+      const apiError =
+        err instanceof ApiError
+          ? err
+          : new ApiError(0, "We’re having trouble connecting. Try again shortly.");
+      setFieldErrors(getApiFieldErrors(err));
       switch (apiError.code) {
         case "INVALID_OTP":
           setError("That code isn't correct. Check it and try again.");
@@ -83,9 +93,10 @@ export default function Verify() {
           break;
         default:
           setError(
-            apiError.status === 0 || apiError.status >= 500
-              ? "We’re having trouble connecting. Try again shortly."
-              : "We couldn't verify the code. Please try again.",
+            getApiErrorMessage(
+              apiError,
+              "We couldn't verify the code. Please try again.",
+            ),
           );
       }
       if (
@@ -103,6 +114,7 @@ export default function Verify() {
   async function handleResend() {
     if (resendWait > 0 || resending) return;
     setError("");
+    setFieldErrors({});
     setNotice("");
     setResending(true);
 
@@ -114,7 +126,11 @@ export default function Verify() {
         setError("We couldn't process that request. Please try again later.");
       }
     } catch (err) {
-      const apiError = err as ApiError;
+      const apiError =
+        err instanceof ApiError
+          ? err
+          : new ApiError(0, "We’re having trouble connecting. Try again shortly.");
+      setFieldErrors(getApiFieldErrors(err));
       switch (apiError.code) {
         case "OTP_COOLDOWN":
           setResendWait(apiError.retryAfterSeconds ?? 0);
@@ -132,9 +148,10 @@ export default function Verify() {
           break;
         default:
           setError(
-            apiError.status === 0 || apiError.status >= 500
-              ? "We’re having trouble connecting. Try again shortly."
-              : "We couldn't process that request. Please try again later.",
+            getApiErrorMessage(
+              apiError,
+              "We couldn't process that request. Please try again later.",
+            ),
           );
       }
     } finally {
@@ -196,7 +213,12 @@ export default function Verify() {
             autoComplete="email"
             required
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setFieldErrors((current) => ({ ...current, email: "" }));
+              setError("");
+            }}
+            error={fieldErrors.email}
           />
         )}
 
@@ -210,7 +232,12 @@ export default function Verify() {
           title="Enter the six-digit code"
           required
           value={otp}
-          onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+          onChange={(e) => {
+            setOtp(e.target.value.replace(/\D/g, ""));
+            setFieldErrors((current) => ({ ...current, otp: "" }));
+            setError("");
+          }}
+          error={fieldErrors.otp ?? fieldErrors.code}
         />
 
         {error && (

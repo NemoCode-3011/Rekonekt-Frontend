@@ -4,6 +4,7 @@ import { loadSubject } from "./api";
 import { DiscoveryContext } from "./discovery-context";
 import DiscoveryDrawer from "./DiscoveryDrawer";
 import type { DiscoveryRef, DiscoverySubject } from "./types";
+import { getApiErrorMessage } from "../../../services/api/client";
 
 // Wraps the whole app. Any component can ask for the side drawer to open,
 // and this is the one place that shows it.
@@ -16,8 +17,11 @@ export function DiscoveryProvider({ children }: { children: ReactNode }) {
   async function openRef(ref: DiscoveryRef) {
     try {
       setSubject(await loadSubject(ref));
-    } catch {
-      showToast("We couldn't open that. Please try again.", "error");
+    } catch (error) {
+      showToast(
+        getApiErrorMessage(error, "We couldn't open that. Please try again."),
+        "error",
+      );
     }
   }
 

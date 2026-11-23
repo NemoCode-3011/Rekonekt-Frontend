@@ -107,14 +107,16 @@ function Description({ text }: { text: string | null }) {
 function SourcesBlock({
   sources,
   status,
+  error,
 }: {
   sources: ExperienceSource[];
   status: LoadStatus;
+  error?: string | null;
 }) {
   if (status === "error") {
     return (
       <p className="mt-12 font-sans text-body-s text-muted">
-        We couldn't load the sources. Close this panel and try again.
+        {error ?? "We couldn't load the sources. Close this panel and try again."}
       </p>
     );
   }
@@ -141,7 +143,7 @@ function PersonDetails({
   onClose: () => void;
 }) {
   const { items: media } = usePersonMedia(person.id);
-  const { items: sources, status } = usePersonSources(person.id);
+  const { items: sources, status, error } = usePersonSources(person.id);
   const years = lifeSpan(person);
   const paragraphs = toParagraphs(person.description);
 
@@ -165,14 +167,14 @@ function PersonDetails({
         </Link>
       )}
 
-      <SourcesBlock sources={sources} status={status} />
+      <SourcesBlock sources={sources} status={status} error={error} />
     </article>
   );
 }
 
 function PlaceDetails({ place }: { place: ExperiencePlace }) {
   const { items: media } = usePlaceMedia(place.id);
-  const { items: sources, status } = usePlaceSources(place.id);
+  const { items: sources, status, error } = usePlaceSources(place.id);
 
   const mapUrl =
     place.latitude && place.longitude
@@ -197,13 +199,13 @@ function PlaceDetails({ place }: { place: ExperiencePlace }) {
         </a>
       )}
 
-      <SourcesBlock sources={sources} status={status} />
+      <SourcesBlock sources={sources} status={status} error={error} />
     </article>
   );
 }
 
 function EventDetails({ event }: { event: ExperienceEvent }) {
-  const { items: sources, status } = useEventSources(event.id);
+  const { items: sources, status, error } = useEventSources(event.id);
 
   return (
     <article>
@@ -219,14 +221,14 @@ function EventDetails({ event }: { event: ExperienceEvent }) {
       )}
 
       <Description text={event.description} />
-      <SourcesBlock sources={sources} status={status} />
+      <SourcesBlock sources={sources} status={status} error={error} />
     </article>
   );
 }
 
 function ArtifactDetails({ artifact }: { artifact: ExperienceArtifact }) {
   const { items: media } = useArtifactMedia(artifact.id);
-  const { items: sources, status } = useArtifactSources(artifact.id);
+  const { items: sources, status, error } = useArtifactSources(artifact.id);
   const context = toParagraphs(artifact.historical_context);
 
   return (
@@ -268,7 +270,7 @@ function ArtifactDetails({ artifact }: { artifact: ExperienceArtifact }) {
       )}
 
       <OtherFiles media={media} />
-      <SourcesBlock sources={sources} status={status} />
+      <SourcesBlock sources={sources} status={status} error={error} />
     </article>
   );
 }

@@ -22,6 +22,7 @@ import {
   type AdminContentKind,
   type AdminContentRecord,
 } from "../../features/admin/api/content";
+import { getApiErrorMessage } from "../../services/api/client";
 import type {
   DashboardEvent,
   DashboardPerson,
@@ -196,6 +197,7 @@ export default function AdminContentLibrary({
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading",
   );
+  const [loadError, setLoadError] = useState("We couldn't load this content.");
   const [loadedKey, setLoadedKey] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -210,7 +212,8 @@ export default function AdminContentLibrary({
       }
       setLoadedKey(id ? `${kind}:${id}` : kind);
       setStatus("ready");
-    } catch {
+    } catch (error) {
+      setLoadError(getApiErrorMessage(error, "We couldn't load this content."));
       setStatus("error");
     }
   }, [id, kind]);
@@ -231,8 +234,13 @@ export default function AdminContentLibrary({
         }
         setLoadedKey(id ? `${kind}:${id}` : kind);
         setStatus("ready");
-      } catch {
-        if (!cancelled) setStatus("error");
+      } catch (error) {
+        if (!cancelled) {
+          setLoadError(
+            getApiErrorMessage(error, "We couldn't load this content."),
+          );
+          setStatus("error");
+        }
       }
     }
 
@@ -316,7 +324,7 @@ export default function AdminContentLibrary({
     return (
       <div className="mx-auto w-full max-w-5xl px-5 py-8 md:px-8 md:py-12">
         <PageError
-          message={`We couldn't load this ${info.singular}.`}
+          message={loadError}
           backTo={`/admin/${kind}`}
           backLabel={`Back to ${kind}`}
         />

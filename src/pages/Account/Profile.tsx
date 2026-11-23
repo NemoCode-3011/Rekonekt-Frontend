@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../features/auth/auth-context";
 import type { Role } from "../../features/auth/types";
+import { getApiErrorMessage } from "../../services/api/client";
 
 const roleLabels: Record<Role, string> = {
   visitor: "Visitor",
@@ -32,8 +33,11 @@ function Profile() {
       await logout();
       showToast("You're signed out.");
       navigate("/");
-    } catch {
-      showToast("We couldn't sign you out. Please try again.", "error");
+    } catch (error) {
+      showToast(
+        getApiErrorMessage(error, "We couldn't sign you out. Please try again."),
+        "error",
+      );
       setSigningOut(false);
     }
   }

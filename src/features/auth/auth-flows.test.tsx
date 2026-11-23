@@ -155,6 +155,43 @@ describe("session authentication flows", () => {
     expect(screen.queryByText("Check your email.")).not.toBeInTheDocument();
   });
 
+  it("shows backend signup validation beside its field and preserves entered values", async () => {
+    authApi.signUp.mockRejectedValue(
+      new ApiError(
+        422,
+        "Please correct the highlighted fields.",
+        "VALIDATION_ERROR",
+        undefined,
+        { password: "Use at least 8 characters." },
+      ),
+    );
+    renderAuthRoute("/auth/signup", <p>Sign in destination</p>);
+    fillSignupForm();
+    fireEvent.click(screen.getByRole("button", { name: "Create account" }));
+
+    expect(
+      await screen.findByText("Use at least 8 characters."),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Please correct the highlighted fields.",
+    );
+    expect(screen.getByLabelText("Full name")).toHaveValue("New Visitor");
+    expect(screen.getByLabelText("Email")).toHaveValue("new@example.com");
+    expect(screen.getByLabelText("Password")).toHaveValue("secure-password");
+  });
+
+  it("checks the signup password length before sending the request", () => {
+    renderAuthRoute("/auth/signup", <p>Sign in destination</p>);
+    fillSignupForm();
+    fireEvent.change(screen.getByLabelText("Password"), {
+      target: { value: "short" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Create account" }));
+
+    expect(screen.getByText("Use at least 8 characters.")).toBeInTheDocument();
+    expect(authApi.signUp).not.toHaveBeenCalled();
+  });
+
   it("offers continue verification when signup created the account but hit OTP cooldown", async () => {
     authApi.signUp.mockRejectedValue(
       new ApiError(429, "ignored backend message", "OTP_COOLDOWN", 42),

@@ -4,6 +4,7 @@ import { registerUserDataCache } from "../auth/userDataCache";
 import type { LoadStatus } from "../experience/useCachedList";
 import { getProgress } from "./api";
 import type { ProgressEntry } from "./types";
+import { getApiErrorMessage } from "../../services/api/client";
 
 // Loads the signed-in visitor's progress for the Account page.
 export function useProgress() {
@@ -13,12 +14,18 @@ export function useProgress() {
     userId: number | null;
     status: LoadStatus;
     entries: ProgressEntry[];
-  }>({ userId: null, status: "loading", entries: [] });
+    error: string | null;
+  }>({ userId: null, status: "loading", entries: [], error: null });
 
   useEffect(
     () =>
       registerUserDataCache(() => {
-        setState({ userId: null, status: "loading", entries: [] });
+        setState({
+          userId: null,
+          status: "loading",
+          entries: [],
+          error: null,
+        });
       }),
     [],
   );
@@ -29,10 +36,19 @@ export function useProgress() {
 
     getProgress()
       .then((entries) => {
-        if (!cancelled) setState({ userId, status: "ready", entries });
+        if (!cancelled) {
+          setState({ userId, status: "ready", entries, error: null });
+        }
       })
-      .catch(() => {
-        if (!cancelled) setState({ userId, status: "error", entries: [] });
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setState({
+            userId,
+            status: "error",
+            entries: [],
+            error: getApiErrorMessage(error, "We couldn't load your progress."),
+          });
+        }
       });
 
     return () => {
@@ -42,11 +58,12 @@ export function useProgress() {
 
   return state.userId === userId
     ? userId === null && !authLoading
-      ? { userId: null, status: "ready", entries: [] }
+      ? { userId: null, status: "ready", entries: [], error: null }
       : state
     : {
         userId,
         status: "loading",
         entries: [],
+        error: null,
       };
 }

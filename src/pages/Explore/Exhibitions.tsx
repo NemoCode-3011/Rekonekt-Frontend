@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { getExhibitions } from "../../features/exhibitions/api/exhibitions";
 import PageLoader from "../../components/ui/PageLoader";
 import PageError from "../../components/ui/PageError";
+import { getApiErrorMessage } from "../../services/api/client";
 
 export default function Exhibitions() {
   const reduce = useReducedMotion();
@@ -19,8 +20,10 @@ export default function Exhibitions() {
       try {
         const data = await getExhibitions();
         setExhibitions(data);
-      } catch {
-        setError("We couldn't load the exhibitions.");
+      } catch (error) {
+        setError(
+          getApiErrorMessage(error, "We couldn't load the exhibitions."),
+        );
       } finally {
         setLoading(false);
       }

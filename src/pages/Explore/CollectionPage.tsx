@@ -9,6 +9,7 @@ import {
 import { useDiscovery } from "../../features/experience/discovery/discovery-context";
 import PageLoader from "../../components/ui/PageLoader";
 import PageError from "../../components/ui/PageError";
+import { getApiErrorMessage } from "../../services/api/client";
 // The words that change between the four pages.
 const copy: Record<
   CollectionKind,
@@ -131,6 +132,7 @@ export default function CollectionPage({ kind }: { kind: CollectionKind }) {
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading",
   );
+  const [loadError, setLoadError] = useState("We couldn't load this collection.");
   const [query, setQuery] = useState("");
 
   // Runs again when the visitor moves between People, Events, Places and
@@ -147,9 +149,12 @@ export default function CollectionPage({ kind }: { kind: CollectionKind }) {
         setLoadedKind(kind);
         setStatus("ready");
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         if (!cancelled) {
           setLoadedKind(kind);
+          setLoadError(
+            getApiErrorMessage(error, "We couldn't load this collection."),
+          );
           setStatus("error");
         }
       });
@@ -202,7 +207,7 @@ export default function CollectionPage({ kind }: { kind: CollectionKind }) {
         <div className="container">
           {currentStatus === "loading" && <PageLoader />}
           {currentStatus === "error" && (
-            <PageError message="We couldn't load this collection." />
+            <PageError message={loadError} />
           )}
 
           {currentStatus === "ready" && currentItems.length === 0 && (

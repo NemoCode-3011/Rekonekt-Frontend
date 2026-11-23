@@ -10,6 +10,7 @@ import {
 import type { StorySummary } from "../../features/stories/types";
 import PageLoader from "../../components/ui/PageLoader";
 import PageError from "../../components/ui/PageError";
+import { getApiErrorMessage } from "../../services/api/client";
 // The words on this page. Change them here.
 const copy = {
   label: "STORIES",
@@ -117,6 +118,7 @@ export default function Stories() {
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading",
   );
+  const [loadError, setLoadError] = useState(copy.error);
   const [params, setParams] = useSearchParams();
 
   useEffect(() => {
@@ -128,8 +130,11 @@ export default function Stories() {
         setStories(result);
         setStatus("ready");
       })
-      .catch(() => {
-        if (!cancelled) setStatus("error");
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setLoadError(getApiErrorMessage(error, copy.error));
+          setStatus("error");
+        }
       });
 
     return () => {
@@ -212,7 +217,7 @@ export default function Stories() {
       <section>
         <div className="container py-14 md:py-20">
           {status === "loading" && <PageLoader label="Loading stories…" />}
-          {status === "error" && <PageError message={copy.error} />}
+          {status === "error" && <PageError message={loadError} />}
 
           {status === "ready" && shown.length === 0 && (
             <p className="text-body-m text-muted">

@@ -7,12 +7,16 @@ import { createExhibitionFromForm } from "../../features/admin/api/workspace";
 import type { DashboardExhibitionResponseItem } from "../../features/admin/types/dashboard";
 import PageLoader from "../../components/ui/PageLoader";
 import PageError from "../../components/ui/PageError";
+import { getApiErrorMessage } from "../../services/api/client";
 
 export default function Exhibitions() {
   const navigate = useNavigate();
   const [items, setItems] = useState<DashboardExhibitionResponseItem[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading",
+  );
+  const [loadError, setLoadError] = useState(
+    "We couldn't load the exhibitions.",
   );
   const [creating, setCreating] = useState(false);
 
@@ -25,8 +29,13 @@ export default function Exhibitions() {
         setItems(exhibitions);
         setStatus("ready");
       })
-      .catch(() => {
-        if (!cancelled) setStatus("error");
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setLoadError(
+            getApiErrorMessage(error, "We couldn't load the exhibitions."),
+          );
+          setStatus("error");
+        }
       });
 
     return () => {
@@ -92,7 +101,7 @@ export default function Exhibitions() {
 
         {status === "error" && (
           <PageError
-            message="We couldn't load the exhibitions."
+            message={loadError}
             backTo="/admin"
             backLabel="Back to dashboard"
           />

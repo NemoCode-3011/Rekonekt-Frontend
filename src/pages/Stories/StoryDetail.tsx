@@ -6,7 +6,7 @@ import { getStory, getStorySources } from "../../features/stories/api";
 import { categoryLabel } from "../../features/stories/Category";
 import type { Story } from "../../features/stories/types";
 import RichText from "../../components/ui/RichText";
-import { ApiError } from "../../services/api/client";
+import { ApiError, getApiErrorMessage } from "../../services/api/client";
 import { splitStoryHtml } from "../../lib/richText";
 import PageLoader from "../../components/ui/PageLoader";
 import PageError from "../../components/ui/PageError";
@@ -16,7 +16,7 @@ const BODY_IMAGE_AFTER = 57;
 type State =
   | { status: "loading" }
   | { status: "not-found" }
-  | { status: "error" }
+  | { status: "error"; message: string }
   | { status: "ready"; story: Story; slug: string };
 
 export default function StoryDetail() {
@@ -47,7 +47,13 @@ export default function StoryDetail() {
         setState(
           error instanceof ApiError && error.status === 404
             ? { status: "not-found" }
-            : { status: "error" },
+            : {
+                status: "error",
+                message: getApiErrorMessage(
+                  error,
+                  "We couldn't load this story.",
+                ),
+              },
         );
       });
 
@@ -91,7 +97,7 @@ export default function StoryDetail() {
           )}
 
           {currentState.status === "error" && (
-            <PageError message="We couldn't load this story." />
+            <PageError message={currentState.message} />
           )}
 
           {currentState.status === "not-found" && (

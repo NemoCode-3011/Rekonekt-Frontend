@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { ApiError } from "../../../services/api/client";
+import {
+  ApiError,
+  getApiErrorMessage,
+} from "../../../services/api/client";
 import { getExhibitionBySlug } from "../api/exhibitions";
 import { getSectionsByExhibition } from "../api/sections";
 import type { Exhibition } from "../types/exhibitions";
@@ -7,7 +10,7 @@ import type { Section } from "../types/sections";
 
 type Settled =
   | { status: "not-found" }
-  | { status: "error" }
+  | { status: "error"; message: string }
   | {
       status: "ready";
       exhibition: Exhibition;
@@ -23,7 +26,13 @@ async function load(slug: string): Promise<Settled> {
   } catch (error) {
     return error instanceof ApiError && error.status === 404
       ? { status: "not-found" }
-      : { status: "error" };
+      : {
+          status: "error",
+          message: getApiErrorMessage(
+            error,
+            "We couldn't load this exhibition.",
+          ),
+        };
   }
 
   try {
@@ -33,8 +42,11 @@ async function load(slug: string): Promise<Settled> {
       exhibition,
       sections: [...sections].sort((a, b) => a.section_order - b.section_order),
     };
-  } catch {
-    return { status: "error" };
+  } catch (error) {
+    return {
+      status: "error",
+      message: getApiErrorMessage(error, "We couldn't load this exhibition."),
+    };
   }
 }
 

@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import ConfirmDialog from "../../../components/ui/ConfirmDialog";
-import { http } from "../../../services/api/client";
+import {
+  getApiErrorMessage,
+  http,
+} from "../../../services/api/client";
 import { useAuth } from "../../auth/auth-context";
 import { attachImage } from "../api/workspace";
 import InlineForm, { type FormField } from "./InlineForm";
@@ -89,6 +92,9 @@ export default function AdminPictures({ owner, id, name }: AdminPicturesProps) {
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading",
   );
+  const [loadError, setLoadError] = useState(
+    "We couldn’t load the pictures. You can still add one below.",
+  );
   const [reload, setReload] = useState(0);
   const [removing, setRemoving] = useState<Picture | null>(null);
   const [busy, setBusy] = useState(false);
@@ -102,8 +108,16 @@ export default function AdminPictures({ owner, id, name }: AdminPicturesProps) {
         setPictures(result);
         setStatus("ready");
       })
-      .catch(() => {
-        if (!cancelled) setStatus("error");
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setLoadError(
+            getApiErrorMessage(
+              error,
+              "We couldn’t load the pictures. You can still add one below.",
+            ),
+          );
+          setStatus("error");
+        }
       });
 
     return () => {
@@ -150,7 +164,7 @@ export default function AdminPictures({ owner, id, name }: AdminPicturesProps) {
 
       {status === "error" && (
         <p role="alert" className="mt-3 font-sans text-body-s text-error">
-          We couldn&rsquo;t load the pictures. You can still add one below.
+          {loadError}
         </p>
       )}
 

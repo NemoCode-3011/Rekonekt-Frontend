@@ -11,6 +11,7 @@ import { storyFields } from "../../features/admin/components/StoryFields";
 import { categoryLabel } from "../../features/stories/Category";
 import PageLoader from "../../components/ui/PageLoader";
 import PageError from "../../components/ui/PageError";
+import { getApiErrorMessage } from "../../services/api/client";
 
 export default function AdminStories() {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ export default function AdminStories() {
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading",
   );
+  const [loadError, setLoadError] = useState("We couldn't load the stories.");
 
   const creating = params.get("new") === "1";
 
@@ -31,8 +33,11 @@ export default function AdminStories() {
         setItems(stories);
         setStatus("ready");
       })
-      .catch(() => {
-        if (!cancelled) setStatus("error");
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setLoadError(getApiErrorMessage(error, "We couldn't load the stories."));
+          setStatus("error");
+        }
       });
 
     return () => {
@@ -85,7 +90,7 @@ export default function AdminStories() {
 
         {status === "error" && (
           <PageError
-            message="We couldn't load the stories."
+            message={loadError}
             backTo="/admin"
             backLabel="Back to dashboard"
           />

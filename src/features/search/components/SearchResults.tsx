@@ -17,6 +17,7 @@ interface SearchResultsProps {
   status: SearchStatus;
   searching: boolean;
   results: SearchResult[];
+  error: string | null;
 }
 
 function SearchResults({
@@ -24,6 +25,7 @@ function SearchResults({
   status,
   searching,
   results,
+  error,
 }: SearchResultsProps) {
   // aria-live makes screen readers announce changes as results arrive.
   return (
@@ -36,7 +38,8 @@ function SearchResults({
 
       {status === "error" && (
         <p role="alert" className="font-sans text-body-m text-muted">
-          Search isn't working right now. Please try again in a moment.
+          {error ??
+            "Search isn't working right now. Please try again in a moment."}
         </p>
       )}
 

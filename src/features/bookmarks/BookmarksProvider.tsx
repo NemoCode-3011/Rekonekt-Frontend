@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ApiError } from "../../services/api/client";
+import {
+  ApiError,
+  getApiErrorMessage,
+} from "../../services/api/client";
 import { useAuth } from "../auth/auth-context";
 import { registerUserDataCache } from "../auth/userDataCache";
 import type { LoadStatus } from "../experience/useCachedList";
@@ -11,6 +14,7 @@ interface State {
   userId: number | null; // whose bookmarks these are
   status: LoadStatus;
   bookmarks: Bookmark[];
+  error: string | null;
 }
 
 // Keeps the signed-in visitor's bookmarks in one place, so the bookmark
@@ -27,12 +31,13 @@ export function BookmarksProvider({ children }: { children: ReactNode }) {
     userId: null,
     status: "loading",
     bookmarks: [],
+    error: null,
   });
 
   useEffect(
     () =>
       registerUserDataCache(() => {
-        setState({ userId: null, status: "ready", bookmarks: [] });
+        setState({ userId: null, status: "ready", bookmarks: [], error: null });
       }),
     [],
   );
@@ -44,10 +49,22 @@ export function BookmarksProvider({ children }: { children: ReactNode }) {
 
     getBookmarks()
       .then((bookmarks) => {
-        if (!cancelled) setState({ userId, status: "ready", bookmarks });
+        if (!cancelled) {
+          setState({ userId, status: "ready", bookmarks, error: null });
+        }
       })
-      .catch(() => {
-        if (!cancelled) setState({ userId, status: "error", bookmarks: [] });
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setState({
+            userId,
+            status: "error",
+            bookmarks: [],
+            error: getApiErrorMessage(
+              error,
+              "We couldn't load your bookmarks.",
+            ),
+          });
+        }
       });
 
     return () => {
@@ -63,13 +80,14 @@ export function BookmarksProvider({ children }: { children: ReactNode }) {
           userId,
           status: userId === null ? "ready" : "loading",
           bookmarks: [],
+          error: null,
         };
 
   async function reload() {
     if (userId === null) return;
     const bookmarks = await getBookmarks();
     if (userIdRef.current === userId) {
-      setState({ userId, status: "ready", bookmarks });
+      setState({ userId, status: "ready", bookmarks, error: null });
     }
   }
 
@@ -91,7 +109,10 @@ export function BookmarksProvider({ children }: { children: ReactNode }) {
           showToast("This object is already bookmarked.");
         } catch {
           showToast(
-            "We couldn't confirm this bookmark. Please try again.",
+            getApiErrorMessage(
+              error,
+              "We couldn't confirm this bookmark. Please try again.",
+            ),
             "error",
           );
         }
@@ -99,9 +120,12 @@ export function BookmarksProvider({ children }: { children: ReactNode }) {
       }
 
       showToast(
-        existing
-          ? "We couldn't remove this bookmark. Please try again."
-          : "We couldn't add this bookmark. Please try again.",
+        getApiErrorMessage(
+          error,
+          existing
+            ? "We couldn't remove this bookmark. Please try again."
+            : "We couldn't add this bookmark. Please try again.",
+        ),
         "error",
       );
       return;
@@ -111,9 +135,12 @@ export function BookmarksProvider({ children }: { children: ReactNode }) {
 
     try {
       await reload();
-    } catch {
+    } catch (error) {
       showToast(
-        "Bookmark updated, but your list couldn't refresh. Please refresh the page.",
+        `Bookmark updated, but your list couldn't refresh. ${getApiErrorMessage(
+          error,
+          "Please refresh the page.",
+        )}`,
         "error",
       );
     }
@@ -124,6 +151,7 @@ export function BookmarksProvider({ children }: { children: ReactNode }) {
       value={{
         bookmarks: current.bookmarks,
         status: current.status,
+        error: current.error,
         isSaved: (artifactId) =>
           current.bookmarks.some((bookmark) => bookmark.artifact_id === artifactId),
         toggle,

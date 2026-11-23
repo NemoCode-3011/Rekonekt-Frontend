@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { searchContent } from "../api";
 import type { SearchResult } from "../types";
+import { getApiErrorMessage } from "../../../services/api/client";
 
 // The backend refuses searches shorter than this.
 export const MIN_QUERY_LENGTH = 2;
@@ -14,6 +15,7 @@ interface Answer {
   query: string;
   failed: boolean;
   results: SearchResult[];
+  error: string | null;
 }
 
 export function useSearch(rawQuery: string) {
@@ -33,12 +35,20 @@ export function useSearch(rawQuery: string) {
       searchContent(query)
         .then((results) => {
           if (!cancelled) {
-            setAnswer({ query, failed: false, results });
+            setAnswer({ query, failed: false, results, error: null });
           }
         })
-        .catch(() => {
+        .catch((error: unknown) => {
           if (!cancelled) {
-            setAnswer({ query, failed: true, results: [] });
+            setAnswer({
+              query,
+              failed: true,
+              results: [],
+              error: getApiErrorMessage(
+                error,
+                "Search isn't working right now. Please try again in a moment.",
+              ),
+            });
           }
         });
     }, TYPING_PAUSE_MS);
@@ -54,6 +64,7 @@ export function useSearch(rawQuery: string) {
       status: "idle" as SearchStatus,
       results: [],
       searching: false,
+      error: null,
     };
   }
 
@@ -64,5 +75,6 @@ export function useSearch(rawQuery: string) {
     // While a new search is on its way, the previous results stay visible.
     results: answer?.results ?? [],
     searching: answer?.query !== query,
+    error: answer?.error ?? null,
   };
 }

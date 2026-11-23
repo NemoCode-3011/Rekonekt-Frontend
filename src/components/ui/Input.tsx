@@ -34,6 +34,7 @@ export default function Input({
           id={inputId}
           type={isPassword && show ? "text" : type}
           aria-invalid={!!error}
+          aria-describedby={error ? `${inputId}-error` : undefined}
           className={`h-12 w-full border bg-transparent px-4 text-body-m transition-colors focus:border-heritage-green ${
             error ? "border-error" : "border-line"
           } ${Icon ? "pl-11" : ""} ${isPassword ? "pr-12" : ""}`}
@@ -64,7 +65,11 @@ export default function Input({
         )}
       </div>
 
-      {error && <p className="mt-2 text-body-s text-error">{error}</p>}
+      {error && (
+        <p id={`${inputId}-error`} className="mt-2 text-body-s text-error">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

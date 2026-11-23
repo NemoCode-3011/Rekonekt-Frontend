@@ -22,13 +22,13 @@ function statusLine(entry: ProgressEntry) {
 }
 
 function Progress() {
-  const { entries, status } = useProgress();
+  const { entries, status, error } = useProgress();
 
   if (status === "loading")
     return <PageLoader label="Loading your progress…" />;
 
   if (status === "error") {
-    return <PageError message="We couldn't load your progress." />;
+    return <PageError message={error ?? "We couldn't load your progress."} />;
   }
 
   if (entries.length === 0) {

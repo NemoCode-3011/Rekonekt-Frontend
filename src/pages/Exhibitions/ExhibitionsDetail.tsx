@@ -50,7 +50,7 @@ function ExhibitionDetail() {
     return (
       <MessageState
         title="Something went wrong"
-        body="We couldn't load this exhibition. Refresh the page to try again."
+        body={state.message}
       />
     );
   }

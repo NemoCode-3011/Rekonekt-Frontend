@@ -20,6 +20,7 @@ import { getObjectsFor } from "../../features/object-viewer/objects";
 import PageLoader from "../../components/ui/PageLoader";
 import PageError from "../../components/ui/PageError";
 import ChapterBackdrop from "../../features/experience/components/ChapterBackdrop";
+import { getApiErrorMessage } from "../../services/api/client";
 
 function ExperienceDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -48,8 +49,8 @@ function ExperienceDetail() {
             (a, b) => a.section_order - b.section_order,
           ),
         });
-      } catch {
-        setError("Unable to load this experience.");
+      } catch (error) {
+        setError(getApiErrorMessage(error, "Unable to load this experience."));
       } finally {
         setLoading(false);
       }

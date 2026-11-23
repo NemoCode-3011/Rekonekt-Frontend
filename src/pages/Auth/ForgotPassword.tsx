@@ -3,12 +3,17 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import { forgotPassword } from "../../features/auth/api";
-import type { ApiError } from "../../services/api/client";
+import {
+  ApiError,
+  getApiErrorMessage,
+  getApiFieldErrors,
+} from "../../services/api/client";
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
   const [email, setEmail] = useState<string>(useLocation().state?.email ?? "");
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [wait, setWait] = useState(0);
@@ -22,6 +27,7 @@ export default function ForgotPassword() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
+    setFieldErrors({});
     setLoading(true);
 
     try {
@@ -32,7 +38,11 @@ export default function ForgotPassword() {
       }
       setSent(true);
     } catch (err) {
-      const apiError = err as ApiError;
+      const apiError =
+        err instanceof ApiError
+          ? err
+          : new ApiError(0, "We’re having trouble connecting. Try again shortly.");
+      setFieldErrors(getApiFieldErrors(err));
       if (apiError.code === "RATE_LIMITED") {
         setError("Requests are temporarily limited. Please wait before trying again.");
         setWait(apiError.retryAfterSeconds ?? 0);
@@ -40,9 +50,10 @@ export default function ForgotPassword() {
         setError("We’re having trouble connecting. Try again shortly.");
       } else {
         setError(
-          apiError.status === 0 || apiError.status >= 500
-            ? "We’re having trouble connecting. Try again shortly."
-            : "We couldn't process the request. Please try again later.",
+          getApiErrorMessage(
+            apiError,
+            "We couldn't process the request. Please try again later.",
+          ),
         );
       }
     } finally {
@@ -100,7 +111,12 @@ export default function ForgotPassword() {
           autoComplete="email"
           required
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setFieldErrors((current) => ({ ...current, email: "" }));
+            setError("");
+          }}
+          error={fieldErrors.email}
         />
 
         {error && (

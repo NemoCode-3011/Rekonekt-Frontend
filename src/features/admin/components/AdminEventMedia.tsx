@@ -11,6 +11,7 @@ import {
 } from "../api/media";
 import { useAuth } from "../../auth/auth-context";
 import { useUnsavedChanges } from "../unsaved/unsaved-context";
+import { getApiFieldErrors } from "../../../services/api/client";
 
 type VideoMode = "upload" | "youtube" | null;
 type MetadataValues = Omit<AdminMediaMetadata, "title"> & { title: string };
@@ -92,6 +93,9 @@ export default function AdminEventMedia({ eventId }: { eventId: number }) {
     null,
   );
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [metadataErrors, setMetadataErrors] = useState<Record<string, string>>(
+    {},
+  );
   const [saving, setSaving] = useState(false);
   useUnsavedChanges(
     pendingMedia !== null ||
@@ -136,6 +140,12 @@ export default function AdminEventMedia({ eventId }: { eventId: number }) {
 
   function updateMetadata(field: keyof MetadataValues, value: string) {
     setMetadata((current) => ({ ...current, [field]: value }));
+    setMetadataErrors((current) => ({ ...current, [field]: "" }));
+  }
+
+  function recordSubmitError(error: unknown) {
+    setMetadataErrors(getApiFieldErrors(error));
+    setSubmitError(messageOf(error));
   }
 
   function resetForm() {
@@ -146,12 +156,14 @@ export default function AdminEventMedia({ eventId }: { eventId: number }) {
     setFileError(null);
     setUploadProgress(null);
     setSubmitError(null);
+    setMetadataErrors({});
   }
 
   async function attachCreatedMedia(created: AdminMediaRecord) {
     setPendingMedia(created);
     setSaving(true);
     setSubmitError(null);
+    setMetadataErrors({});
     try {
       await attachAdminMediaToEvent(created.id, eventId, media.length);
       setPendingMedia(null);
@@ -175,6 +187,7 @@ export default function AdminEventMedia({ eventId }: { eventId: number }) {
     }
     setSaving(true);
     setSubmitError(null);
+    setMetadataErrors({});
     try {
       const created = await createAdminYouTubeMedia({
         ...normalizedMetadata(metadata),
@@ -182,7 +195,7 @@ export default function AdminEventMedia({ eventId }: { eventId: number }) {
       });
       await attachCreatedMedia(created);
     } catch (error) {
-      setSubmitError(messageOf(error));
+      recordSubmitError(error);
     } finally {
       setSaving(false);
     }
@@ -201,6 +214,7 @@ export default function AdminEventMedia({ eventId }: { eventId: number }) {
 
     setSaving(true);
     setSubmitError(null);
+    setMetadataErrors({});
     setUploadProgress(0);
     try {
       const created = await uploadAdminVideo(
@@ -210,7 +224,7 @@ export default function AdminEventMedia({ eventId }: { eventId: number }) {
       );
       await attachCreatedMedia(created);
     } catch (error) {
-      setSubmitError(messageOf(error));
+      recordSubmitError(error);
     } finally {
       setSaving(false);
     }
@@ -261,8 +275,20 @@ export default function AdminEventMedia({ eventId }: { eventId: number }) {
             maxLength={255}
             value={metadata.title}
             onChange={(event) => updateMetadata("title", event.target.value)}
+            aria-invalid={Boolean(metadataErrors.title)}
+            aria-describedby={
+              metadataErrors.title ? "video-title-error" : undefined
+            }
             className={fieldClass}
           />
+          {metadataErrors.title && (
+            <span
+              id="video-title-error"
+              className="mt-1.5 block font-sans text-body-s text-error"
+            >
+              {metadataErrors.title}
+            </span>
+          )}
         </label>
         <div className="grid gap-4 sm:grid-cols-2">
           {metadataFields.map((field) => (
@@ -275,6 +301,7 @@ export default function AdminEventMedia({ eventId }: { eventId: number }) {
                   onChange={(event) =>
                     updateMetadata(field.name, event.target.value)
                   }
+                  aria-invalid={Boolean(metadataErrors[field.name])}
                   className={fieldClass}
                 />
               ) : (
@@ -284,8 +311,14 @@ export default function AdminEventMedia({ eventId }: { eventId: number }) {
                   onChange={(event) =>
                     updateMetadata(field.name, event.target.value)
                   }
+                  aria-invalid={Boolean(metadataErrors[field.name])}
                   className={fieldClass}
                 />
+              )}
+              {metadataErrors[field.name] && (
+                <span className="mt-1.5 block font-sans text-body-s text-error">
+                  {metadataErrors[field.name]}
+                </span>
               )}
             </label>
           ))}

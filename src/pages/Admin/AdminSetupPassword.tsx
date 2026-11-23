@@ -3,21 +3,27 @@ import { Link, useSearchParams } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import { setupAdminPassword } from "../../features/admin/api/team";
-import type { ApiError } from "../../services/api/client";
+import {
+  ApiError,
+  getApiErrorMessage,
+  getApiFieldErrors,
+} from "../../services/api/client";
 
 export default function AdminSetupPassword() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token") ?? "";
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [saving, setSaving] = useState(false);
   const [complete, setComplete] = useState(false);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setError("");
+    setPasswordError("");
     if (password.length < 8) {
-      setError("Your password must be at least 8 characters.");
+      setPasswordError("Your password must be at least 8 characters.");
       return;
     }
     if (!token) {
@@ -30,7 +36,26 @@ export default function AdminSetupPassword() {
       await setupAdminPassword(token, password);
       setComplete(true);
     } catch (caught) {
-      setError((caught as ApiError).message);
+      const apiError =
+        caught instanceof ApiError
+          ? caught
+          : new ApiError(0, "We’re having trouble connecting. Try again shortly.");
+      const fieldErrors = getApiFieldErrors(caught);
+      setPasswordError(
+        fieldErrors.password ??
+          fieldErrors.newPassword ??
+          (apiError.code === "PASSWORD_TOO_SHORT"
+            ? apiError.message
+            : ""),
+      );
+      if (!fieldErrors.password && !fieldErrors.newPassword) {
+        setError(
+          getApiErrorMessage(
+            apiError,
+            "We couldn't set your password. Please try again.",
+          ),
+        );
+      }
     } finally {
       setSaving(false);
     }
@@ -74,7 +99,11 @@ export default function AdminSetupPassword() {
                 minLength={8}
                 required
                 value={password}
-                onChange={(event) => setPassword(event.target.value)}
+                onChange={(event) => {
+                  setPassword(event.target.value);
+                  setPasswordError("");
+                }}
+                error={passwordError}
               />
               {error && (
                 <p role="alert" className="text-body-s text-error">

@@ -4,14 +4,14 @@ import { useDiscovery } from "../../features/experience/discovery/discovery-cont
 import PageLoader from "../../components/ui/PageLoader";
 import PageError from "../../components/ui/PageError";
 function Bookmarks() {
-  const { bookmarks, status, toggle } = useBookmarks();
+  const { bookmarks, status, error, toggle } = useBookmarks();
   const { openRef } = useDiscovery();
 
   if (status === "loading")
     return <PageLoader label="Loading your bookmarks…" />;
 
   if (status === "error") {
-    return <PageError message="We couldn't load your bookmarks." />;
+    return <PageError message={error ?? "We couldn't load your bookmarks."} />;
   }
 
   if (bookmarks.length === 0) {

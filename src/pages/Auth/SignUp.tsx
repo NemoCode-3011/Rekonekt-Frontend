@@ -3,7 +3,11 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import { signUp } from "../../features/auth/api";
-import type { ApiError } from "../../services/api/client";
+import {
+  ApiError,
+  getApiErrorMessage,
+  getApiFieldErrors,
+} from "../../services/api/client";
 import GoogleAuthButton from "../../features/auth/components/GoogleAuthButton";
 
 export default function SignUp() {
@@ -11,6 +15,7 @@ export default function SignUp() {
   const from = (useLocation().state as { from?: string } | null)?.from;
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [nextAction, setNextAction] = useState<"signin" | "verify" | "retry" | null>(
     null,
@@ -26,10 +31,13 @@ export default function SignUp() {
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setFieldErrors((current) => ({ ...current, [e.target.name]: "" }));
+    setError("");
   }
 
   async function submitSignup() {
     setError("");
+    setFieldErrors({});
     setNextAction(null);
     setRetryAfterSeconds(undefined);
     setWait(0);
@@ -51,7 +59,12 @@ export default function SignUp() {
         },
       });
     } catch (err) {
-      const apiError = err as ApiError;
+      const apiError =
+        err instanceof ApiError
+          ? err
+          : new ApiError(0, "We’re having trouble connecting. Try again shortly.");
+      const serverFieldErrors = getApiFieldErrors(err);
+      setFieldErrors(serverFieldErrors);
       switch (apiError.code) {
         case "EMAIL_ALREADY_EXISTS":
           setError("An account with this email already exists. Sign in to continue.");
@@ -80,11 +93,20 @@ export default function SignUp() {
           setError("Account creation is temporarily unavailable. You can try again shortly.");
           setNextAction("retry");
           break;
+        case "PASSWORD_TOO_SHORT":
+          setFieldErrors((current) => ({
+            ...current,
+            password:
+              serverFieldErrors.password ??
+              getApiErrorMessage(apiError, "Use at least 8 characters."),
+          }));
+          break;
         default:
           setError(
-            apiError.status === 0 || apiError.status >= 500
-              ? "We’re having trouble connecting. Try again shortly."
-              : "We couldn't create your account. Please try again.",
+            getApiErrorMessage(
+              apiError,
+              "We couldn't create your account. Please try again.",
+            ),
           );
       }
     } finally {
@@ -94,6 +116,21 @@ export default function SignUp() {
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    const errors: Record<string, string> = {};
+    if (!form.name.trim()) errors.name = "Enter your name.";
+    if (!form.email.trim()) {
+      errors.email = "Enter your email.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      errors.email = "Enter a valid email address.";
+    }
+    if (form.password.length < 8) {
+      errors.password = "Use at least 8 characters.";
+    }
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setError("");
+      return;
+    }
     void submitSignup();
   }
 
@@ -119,7 +156,7 @@ export default function SignUp() {
         path through REKÒ.
       </p>
 
-      <form onSubmit={handleSubmit} className="mt-10 space-y-5">
+      <form onSubmit={handleSubmit} noValidate className="mt-10 space-y-5">
         <Input
           label="Full name"
           name="name"
@@ -127,6 +164,7 @@ export default function SignUp() {
           required
           value={form.name}
           onChange={handleChange}
+          error={fieldErrors.name}
         />
         <Input
           label="Email"
@@ -136,15 +174,18 @@ export default function SignUp() {
           required
           value={form.email}
           onChange={handleChange}
+          error={fieldErrors.email}
         />
         <Input
           label="Password"
           name="password"
           type="password"
           autoComplete="new-password"
+          minLength={8}
           required
           value={form.password}
           onChange={handleChange}
+          error={fieldErrors.password}
         />
 
         {error && (

@@ -10,14 +10,14 @@ import {
 } from "../../features/experience/useConnections";
 import { formatYear } from "../../lib/dates";
 import { toParagraphs } from "../../lib/text";
-import { ApiError } from "../../services/api/client";
+import { ApiError, getApiErrorMessage } from "../../services/api/client";
 import { getData } from "../../services/api/request";
 
 type PersonState =
   | { status: "loading" }
   | { status: "ready"; person: ExperiencePerson }
   | { status: "not-found" }
-  | { status: "error" };
+  | { status: "error"; message: string };
 
 // "1933–1999", "Born 1933", "Died 1999", or nothing if no dates are known.
 function lifeSpan(person: ExperiencePerson) {
@@ -44,7 +44,8 @@ function initials(name: string) {
 
 function PersonStory({ person }: { person: ExperiencePerson }) {
   const { items: media } = usePersonMedia(person.id);
-  const { items: sources, status } = usePersonSources(person.id);
+  const { items: sources, status, error: sourcesError } =
+    usePersonSources(person.id);
 
   const [lead, ...rest] = toParagraphs(person.description);
   const image = media.find((item) => item.media_type === "image");
@@ -127,7 +128,8 @@ function PersonStory({ person }: { person: ExperiencePerson }) {
 
           {status === "error" && (
             <p className="mt-4 font-sans text-body-s text-muted">
-              We couldn't load the sources. Please refresh to try again.
+              {sourcesError ??
+                "We couldn't load the sources. Please refresh to try again."}
             </p>
           )}
 
@@ -163,7 +165,15 @@ export default function PersonPage() {
         const notFound = error instanceof ApiError && error.status === 404;
         setLoaded({
           slug,
-          state: notFound ? { status: "not-found" } : { status: "error" },
+          state: notFound
+            ? { status: "not-found" }
+            : {
+                status: "error",
+                message: getApiErrorMessage(
+                  error,
+                  "We couldn't load this person.",
+                ),
+              },
         });
       });
 
@@ -186,7 +196,7 @@ export default function PersonPage() {
         )}
 
         {state.status === "error" && (
-          <PageError message="We couldn't load this person." />
+          <PageError message={state.message} />
         )}
 
         {state.status === "not-found" && (

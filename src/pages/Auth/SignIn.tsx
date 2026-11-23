@@ -13,7 +13,11 @@ import {
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import { signIn } from "../../features/auth/api";
-import type { ApiError } from "../../services/api/client";
+import {
+  ApiError,
+  getApiErrorMessage,
+  getApiFieldErrors,
+} from "../../services/api/client";
 import { useAuth } from "../../features/auth/auth-context";
 import GoogleAuthButton from "../../features/auth/components/GoogleAuthButton";
 
@@ -43,6 +47,7 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
   });
 
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [wait, setWait] = useState(0);
 
@@ -59,12 +64,15 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
       ...form,
       [e.target.name]: e.target.value,
     });
+    setFieldErrors((current) => ({ ...current, [e.target.name]: "" }));
+    setError("");
   }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
     setError("");
+    setFieldErrors({});
     setLoading(true);
 
     try {
@@ -92,7 +100,11 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
         navigate(state?.from ?? "/", { replace: true });
       }
     } catch (err) {
-      const apiError = err as ApiError;
+      const apiError =
+        err instanceof ApiError
+          ? err
+          : new ApiError(0, "We’re having trouble connecting. Try again shortly.");
+      setFieldErrors(getApiFieldErrors(err));
 
       if (apiError.code === "EMAIL_NOT_VERIFIED") {
         navigate("/auth/verify", {
@@ -109,11 +121,16 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
           setWait(apiError.retryAfterSeconds ?? 0);
         }
       } else if (apiError.status === 0) {
-        setError("We’re having trouble connecting. Try again shortly.");
+        setError(getApiErrorMessage(apiError, "Sign in failed."));
       } else if (apiError.status >= 500) {
-        setError("We’re having trouble connecting. Try again shortly.");
+        setError(getApiErrorMessage(apiError, "Sign in failed."));
       } else {
-        setError("Email or password is incorrect. Try again.");
+        setError(
+          getApiErrorMessage(
+            apiError,
+            "Email or password is incorrect. Try again.",
+          ),
+        );
       }
     } finally {
       setLoading(false);
@@ -183,6 +200,7 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
             required
             value={form.email}
             onChange={handleChange}
+            error={fieldErrors.email}
           />
         )}
 
@@ -195,6 +213,7 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
           required
           value={form.password}
           onChange={handleChange}
+          error={fieldErrors.password}
         />
 
         <div className="text-right">

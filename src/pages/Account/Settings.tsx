@@ -8,7 +8,11 @@ import {
   updateProfile,
   type CulturalGroup,
 } from "../../features/auth/api";
-import { ApiError } from "../../services/api/client";
+import {
+  ApiError,
+  getApiErrorMessage,
+  getApiFieldErrors,
+} from "../../services/api/client";
 
 const languages = [
   { code: "en", label: "English" },
@@ -118,7 +122,11 @@ function Settings() {
       setUser(updated);
       showToast("Your settings are saved.");
     } catch (error) {
-      showToast(errorMessage(error), "error");
+      const fieldErrors = getApiFieldErrors(error);
+      setNameError(fieldErrors.name ?? fieldErrors.fullName ?? "");
+      if (!fieldErrors.name && !fieldErrors.fullName) {
+        showToast(errorMessage(error), "error");
+      }
     } finally {
       setSaving(false);
     }
@@ -151,6 +159,24 @@ function Settings() {
       setConfirmPassword("");
       setPasswordUpdated(true);
     } catch (error) {
+      const fieldErrors = getApiFieldErrors(error);
+      setPasswordErrors((current) => ({
+        ...current,
+        ...fieldErrors,
+        current:
+          fieldErrors.current ??
+          fieldErrors.currentPassword ??
+          current.current,
+        next:
+          fieldErrors.next ??
+          fieldErrors.newPassword ??
+          fieldErrors.password ??
+          current.next,
+        confirm:
+          fieldErrors.confirm ??
+          fieldErrors.confirmPassword ??
+          current.confirm,
+      }));
       if (error instanceof ApiError && error.code === "CURRENT_PASSWORD_INCORRECT") {
         setPasswordErrors({ current: "This password doesn't match your current password." });
       } else if (error instanceof ApiError && error.code === "RATE_LIMITED") {
@@ -163,9 +189,10 @@ function Settings() {
         showToast("Password changes are temporarily unavailable. Please try again shortly.", "error");
       } else {
         showToast(
-          error instanceof ApiError && error.status === 0
-            ? "Can't reach the server. Check your connection and try again."
-            : "We couldn't change your password. Please try again.",
+          getApiErrorMessage(
+            error,
+            "We couldn't change your password. Please try again.",
+          ),
           "error",
         );
       }
@@ -185,7 +212,10 @@ function Settings() {
             label="Name"
             name="name"
             value={name}
-            onChange={(event) => setName(event.target.value)}
+            onChange={(event) => {
+              setName(event.target.value);
+              setNameError("");
+            }}
             error={nameError}
             autoComplete="name"
           />
@@ -272,7 +302,10 @@ function Settings() {
             name="current-password"
             type="password"
             value={currentPassword}
-            onChange={(event) => setCurrentPassword(event.target.value)}
+            onChange={(event) => {
+              setCurrentPassword(event.target.value);
+              setPasswordErrors((current) => ({ ...current, current: "" }));
+            }}
             error={passwordErrors.current}
             autoComplete="current-password"
           />
@@ -281,7 +314,10 @@ function Settings() {
             name="new-password"
             type="password"
             value={newPassword}
-            onChange={(event) => setNewPassword(event.target.value)}
+            onChange={(event) => {
+              setNewPassword(event.target.value);
+              setPasswordErrors((current) => ({ ...current, next: "" }));
+            }}
             error={passwordErrors.next}
             autoComplete="new-password"
           />
@@ -290,7 +326,10 @@ function Settings() {
             name="confirm-password"
             type="password"
             value={confirmPassword}
-            onChange={(event) => setConfirmPassword(event.target.value)}
+            onChange={(event) => {
+              setConfirmPassword(event.target.value);
+              setPasswordErrors((current) => ({ ...current, confirm: "" }));
+            }}
             error={passwordErrors.confirm}
             autoComplete="new-password"
           />

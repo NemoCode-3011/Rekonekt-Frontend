@@ -12,7 +12,10 @@ import InlineForm from "../../features/admin/components/InlineForm";
 import StoryConnection from "../../features/admin/components/StoryConnection";
 import { storyFields } from "../../features/admin/components/StoryFields";
 import { useAuth } from "../../features/auth/auth-context";
-import { ApiError } from "../../services/api/client";
+import {
+  ApiError,
+  getApiErrorMessage,
+} from "../../services/api/client";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import PageLoader from "../../components/ui/PageLoader";
 import PageError from "../../components/ui/PageError";
@@ -29,6 +32,7 @@ export default function AdminStoryEditor() {
   const [status, setStatus] = useState<
     "loading" | "ready" | "missing" | "error"
   >("loading");
+  const [loadError, setLoadError] = useState("We couldn't load this story.");
   const [busy, setBusy] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
@@ -37,9 +41,12 @@ export default function AdminStoryEditor() {
       setStory(await getAdminStory(storyId));
       setStatus("ready");
     } catch (error) {
-      setStatus(
-        error instanceof ApiError && error.status === 404 ? "missing" : "error",
-      );
+      if (error instanceof ApiError && error.status === 404) {
+        setStatus("missing");
+      } else {
+        setLoadError(getApiErrorMessage(error, "We couldn't load this story."));
+        setStatus("error");
+      }
     }
   }, [storyId]);
 
@@ -54,11 +61,14 @@ export default function AdminStoryEditor() {
       })
       .catch((error) => {
         if (cancelled) return;
-        setStatus(
-          error instanceof ApiError && error.status === 404
-            ? "missing"
-            : "error",
-        );
+        if (error instanceof ApiError && error.status === 404) {
+          setStatus("missing");
+        } else {
+          setLoadError(
+            getApiErrorMessage(error, "We couldn't load this story."),
+          );
+          setStatus("error");
+        }
       });
 
     return () => {
@@ -84,7 +94,7 @@ export default function AdminStoryEditor() {
 
         {status === "error" && (
           <PageError
-            message="We couldn't load this story."
+            message={loadError}
             backTo="/admin/stories"
             backLabel="Back to stories"
           />
