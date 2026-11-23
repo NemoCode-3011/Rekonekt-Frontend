@@ -138,7 +138,7 @@ function Settings() {
     const errors: Record<string, string> = {};
 
     if (!currentPassword) errors.current = "Enter your current password.";
-    if (newPassword.length < 8) errors.next = "Use at least 8 characters.";
+    if (newPassword.length < 8) errors.next = "Password should be at least 8 characters.";
     if (confirmPassword !== newPassword)
       errors.confirm = "The passwords don't match.";
 

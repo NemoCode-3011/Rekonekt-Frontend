@@ -162,7 +162,7 @@ describe("session authentication flows", () => {
         "Please correct the highlighted fields.",
         "VALIDATION_ERROR",
         undefined,
-        { password: "Use at least 8 characters." },
+        { password: "Password should be at least 8 characters." },
       ),
     );
     renderAuthRoute("/auth/signup", <p>Sign in destination</p>);
@@ -188,7 +188,7 @@ describe("session authentication flows", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Create account" }));
 
-    expect(screen.getByText("Use at least 8 characters.")).toBeInTheDocument();
+    expect(screen.getByText("Password should be at least 8 characters.")).toBeInTheDocument();
     expect(authApi.signUp).not.toHaveBeenCalled();
   });
 

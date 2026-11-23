@@ -13,7 +13,7 @@ describe("API error normalization", () => {
           data: {
             errors: {
               email: ["Enter a valid email address."],
-              password: "Use at least 8 characters.",
+              password: "Password should be at least 8 characters.",
             },
           },
         },
@@ -25,7 +25,7 @@ describe("API error normalization", () => {
     expect(error.message).toBe("Please correct the highlighted fields.");
     expect(error.fieldErrors).toEqual({
       email: "Enter a valid email address.",
-      password: "Use at least 8 characters.",
+      password: "Password should be at least 8 characters.",
     });
   });
 

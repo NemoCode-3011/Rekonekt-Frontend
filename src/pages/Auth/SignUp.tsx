@@ -98,7 +98,7 @@ export default function SignUp() {
             ...current,
             password:
               serverFieldErrors.password ??
-              getApiErrorMessage(apiError, "Use at least 8 characters."),
+              getApiErrorMessage(apiError, "Password should be at least 8 characters."),
           }));
           break;
         default:
@@ -124,7 +124,7 @@ export default function SignUp() {
       errors.email = "Enter a valid email address.";
     }
     if (form.password.length < 8) {
-      errors.password = "Use at least 8 characters.";
+      errors.password = "Password should be at least 8 characters.";
     }
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
