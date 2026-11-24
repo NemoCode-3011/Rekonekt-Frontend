@@ -4,7 +4,7 @@
   --color-heritage-green: #0B5D3B;
   --color-deep-forest: #163F32;
   --color-ochre: #A66A3F;
-  --color-ochre-deep: #744626;
+  --color-ochre-deep: #744626; 
   --color-ochre-light: #D4955F;
   --color-sand: #D8C7A9;
   --color-ivory: #F5F0E6;
@@ -21,7 +21,6 @@
 
   --font-sans: "Instrument Sans", Arial, sans-serif;
   --font-display: "Newsreader", Georgia, serif;
-  --font-hero: "Gloock", Georgia, serif;
 
   /* Widths → max-w-page, max-w-reading */
   --container-page: 1440px;
@@ -77,7 +76,6 @@
   0% {
     box-shadow: 0 0 0 0 rgba(216, 199, 169, 0.6);
   }
-
   70%,
   100% {
     box-shadow: 0 0 0 14px rgba(216, 199, 169, 0);
@@ -248,7 +246,6 @@ html[data-hall-focus] .hide-in-hall {
 
 /* Visitors who ask for less motion get none: no looping, no long transitions */
 @media (prefers-reduced-motion: reduce) {
-
   *,
   ::before,
   ::after {

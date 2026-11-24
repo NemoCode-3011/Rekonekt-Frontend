@@ -83,7 +83,7 @@ export default function Explore() {
               EXPLORE REKÒ
             </p>
 
-            <h1 className="mt-6 max-w-4xl font-hero text-display-l leading-[0.9]">
+            <h1 className="mt-6 max-w-4xl font-display text-display-l leading-[0.9]">
               There is more than one way into the story.
             </h1>
 
