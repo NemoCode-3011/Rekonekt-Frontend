@@ -1,4 +1,3 @@
-
 import image1 from "../../assets/images/hero/optimized/civilwar-optimized-compressed.jpg";
 import image2 from "../../assets/images/hero/optimized/about1-optimized-compressed.jpg";
 import video1 from "../../assets/images/hero/herovideo2.mp4";
@@ -30,8 +29,8 @@ export const heroSlides: HeroSlide[] = [
     id: "slide-2",
     image: image5,
     tint: ["#7A5C3E", "#3E3A2E", "#A68057"],
-    alt: "Chief Obafemi Awolowo",
-    caption: "Ibadan / Lagos, Nigeria, Circa 1960s",
+    alt: "Portrait of Dr. Nnamdi Azikiwe in traditional attire and glasses",
+    caption: "Lagos / London, Circa 1950s",
   },
   {
     id: "slide-4",
@@ -43,18 +42,19 @@ export const heroSlides: HeroSlide[] = [
   },
   {
     id: "slide-3",
-    image:image3,
+    image: image3,
     tint: ["#845D54", "#394D59", "#A66A3F"],
-    alt: "Moremi Statue of Liberty",
-    caption: "Palace of the Ooni of Ife, Ile-Ife, 2016",
+    alt: "Aerial night view of traffic on the illuminated Lekki-Ikoyi Link Bridge",
+    caption: "Lagos, Nigeria, Contemporary",
   },
   {
     id: "slide-5",
     image: image4,
     tint: ["#7799B5", "#7D2D2C", "#472525"],
-    alt: "Bronze Head of Queen Idia (Iyoba)",
-    caption: "Ancient Kingdom of Benin, Early 16th Century",
+    alt: "Farooq Oreagba on horseback in traditional Yoruba regalia at Ojude Oba",
+    caption: "Ijebu-Ode, Ogun State, Nigeria, 2024",
   },
+
   {
     id: "slide-6",
     image: image2,
