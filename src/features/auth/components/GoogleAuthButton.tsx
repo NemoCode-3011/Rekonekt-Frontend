@@ -6,6 +6,10 @@ import { ApiError } from "../../../services/api/client";
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
 
+if (!clientId) {
+  console.warn("VITE_GOOGLE_CLIENT_ID is not set, so Google sign-in is hidden.");
+}
+
 export default function GoogleAuthButton({ mode }: { mode: "signin" | "signup" }) {
   const navigate = useNavigate();
   const { refreshUser, showToast } = useAuth();

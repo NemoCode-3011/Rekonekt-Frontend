@@ -1,12 +1,12 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
-import ArrowLink from "../../components/ui/ArrowLink";
+import { ArrowRight } from "lucide-react";
 
 export default function AccountCTA() {
   const reduce = useReducedMotion();
 
   return (
-    <section className="bg-heritage-green text-ivory">
+    <section className="bg-sand/50 text-ink">
       <div className="container py-24 md:py-32 lg:py-40">
         <div className="max-w-5xl">
           <motion.p
@@ -14,7 +14,7 @@ export default function AccountCTA() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 0.6 }}
-            className="text-label font-medium tracking-[0.2em] text-ivory/70"
+            className="text-label font-medium tracking-[0.2em] text-heritage-green"
           >
             MAKE IT YOURS
           </motion.p>
@@ -42,10 +42,10 @@ export default function AccountCTA() {
               duration: 0.7,
               delay: 0.15,
             }}
-            className="mt-8 max-w-2xl text-body-l text-ivory/80"
+            className="mt-8 max-w-2xl text-body-l text-ink/75"
           >
-            Save the stories that stay with you. Track your progress.
-            Build your own path through REKÒ.
+            Save the stories that stay with you. Track your progress. Build your
+            own path through REKÒ.
           </motion.p>
 
           <motion.div
@@ -58,13 +58,19 @@ export default function AccountCTA() {
             }}
             className="mt-10 flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:gap-8"
           >
-            <ArrowLink to="/auth/signup" className="text-ivory">
+            <Link
+              to="/auth/signup"
+              className="group inline-flex h-12 items-center gap-4 rounded-full bg-heritage-green pl-7 pr-1.5 text-body-s font-medium text-ivory transition-colors hover:bg-deep-forest"
+            >
               Create your account
-            </ArrowLink>
+              <span className="grid size-9 place-items-center rounded-full bg-ochre-light text-deep-forest transition-transform duration-300 group-hover:translate-x-0.5">
+                <ArrowRight size={16} aria-hidden="true" />
+              </span>
+            </Link>
 
             <Link
               to="/auth/login"
-              className="text-body-m text-ivory/70 transition-colors hover:text-ivory"
+              className="text-body-m text-ink/75 transition-colors hover:text-ink"
             >
               Already have an account? Sign in
             </Link>

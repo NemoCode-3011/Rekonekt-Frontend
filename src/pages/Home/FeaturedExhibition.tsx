@@ -63,12 +63,12 @@ export default function FeaturedExhibition() {
             />
           </div>
 
-          <h2 className="mt-8 font-display text-display-l lg:text-[clamp(3rem,5vw,5.5rem)] uppercase leading-[0.95] tracking-normal text-ink lg:absolute lg:bottom-0 lg:left-[56%] lg:mt-0 lg:text-ivory lg:mix-blend-difference">
+          <h2 className="mt-8 font-display text-display-l uppercase leading-[0.95] tracking-normal text-ink lg:absolute lg:bottom-0 lg:left-[70%] lg:mt-0 lg:text-[clamp(2.5rem,4vw,4.25rem)]">
             {title}
           </h2>
         </Link>
 
-        <div className="mt-8 lg:ml-[56%] lg:mt-10 lg:max-w-md">
+        <div className="mt-8 lg:ml-[70%] lg:mt-10 lg:max-w-md">
           <p className="text-body-l text-muted">{teaser}</p>
 
           <ArrowLink to={href} className="mt-8">

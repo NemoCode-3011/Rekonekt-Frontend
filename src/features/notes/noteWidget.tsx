@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../auth/auth-context";
 import { registerUserDataCache } from "../auth/userDataCache";
-import SignInPrompt from "../auth/components/Signinprompt";
+import SignInPrompt from "../auth/components/SignInPrompt";
 import { formatLongDate } from "../../lib/dates";
 import { createNote, deleteNote, getNotes, updateNote, type Note } from "./api";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
@@ -251,7 +251,9 @@ export default function NotesWidget() {
 
                 <div className="flex-1 overflow-y-auto px-6 py-2">
                   {(status === "loading" ||
-                    (Boolean(userId) && loadedFor !== userId && status !== "error")) && (
+                    (Boolean(userId) &&
+                      loadedFor !== userId &&
+                      status !== "error")) && (
                     <p className="py-6 font-sans text-body-s text-muted">
                       Loading your notes…
                     </p>

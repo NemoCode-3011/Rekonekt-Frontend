@@ -21,10 +21,11 @@ export default function CinematicInterlude() {
 
       <div className="absolute inset-0 bg-ink/10" />
       <div className="absolute inset-x-0 bottom-0 h-4/5 bg-linear-to-t from-ink/95 via-ink/65 to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-1/4 bg-linear-to-b from-ink/60 to-transparent" />
 
       <div className="container relative z-10 flex h-full flex-col justify-between py-8 sm:py-10 lg:py-14">
-        <p className="flex items-center gap-3 text-label font-medium tracking-[0.2em] text-ink">
-          <span aria-hidden className="h-px w-8 bg-heritage-green" />
+        <p className="flex items-center gap-3 text-label font-medium tracking-[0.2em] text-ivory">
+          <span aria-hidden className="h-px w-8 bg-ivory/70" />
           CROSS RIVER · NIGERIA
         </p>
 

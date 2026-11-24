@@ -106,7 +106,7 @@ export default function ComingSoon() {
               />
 
               {/* Consistent overlay for the upcoming state */}
-              <div className="absolute inset-0 bg-ink/45 transition-colors duration-500 group-hover:bg-ink/35" />
+              <div className="absolute inset-0 bg-ink/60 transition-colors duration-500 group-hover:bg-ink/50" />
 
               {/* Editorial overlay */}
               <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">

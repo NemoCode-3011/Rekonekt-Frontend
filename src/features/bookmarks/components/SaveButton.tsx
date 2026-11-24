@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../../auth/auth-context";
-import SignInPrompt from "../../auth/components/Signinprompt";
+import SignInPrompt from "../../auth/components/SignInPrompt";
 import { useBookmarks } from "../bookmarks-context";
 
 interface SaveButtonProps {
@@ -84,9 +84,7 @@ function SaveButton({ artifactId, tone }: SaveButtonProps) {
       disabled={busy || status === "loading"}
       onClick={handleClick}
       className={`${style} disabled:opacity-50`}
-      aria-label={
-        saved ? "Remove bookmark" : "Bookmark this object"
-      }
+      aria-label={saved ? "Remove bookmark" : "Bookmark this object"}
       title={saved ? "Remove bookmark" : "Bookmark this object"}
     >
       <BookmarkIcon saved={saved} />
