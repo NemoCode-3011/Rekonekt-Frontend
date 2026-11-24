@@ -1,32 +1,38 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   AnimatePresence,
+  animate,
   motion,
+  useMotionValue,
+  usePresence,
   useReducedMotion,
   useTransform,
-  useVelocity,
 } from "framer-motion";
 import { useSplash } from "./splash-context";
-import { milestones } from "./splashMilestones";
 import { useSplashSequence } from "./useSplashSequence";
+import SplashMark from "./SplashMark";
+import { RING, VIEWBOX } from "./splashArt";
+import { IRIS_SECONDS, T } from "./splashTimeline";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-const LAST = milestones.length - 1;
+const IRIS_EASE = [0.6, 0, 0.25, 1] as const;
 
-// Old film: a little colour, a little warmth, and darker than life.
-const PHOTO_FILTER = "grayscale(0.5) sepia(0.4) contrast(1.05) brightness(0.72)";
+const WORD = ["R", "E", "K", "Ò"];
+// Letterpress: no two letters sit quite level.
+const LETTER_TILT = [-0.9, 0.6, -0.4, 0.8];
 
+// Paper grain, so the page has a surface rather than a flat colour.
 function Grain() {
   return (
     <svg
       aria-hidden
-      className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.09]"
+      className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.13] mix-blend-multiply"
     >
       <filter id="splash-grain">
         <feTurbulence
           type="fractalNoise"
-          baseFrequency="0.75"
+          baseFrequency="0.8"
           numOctaves="2"
           stitchTiles="stitch"
         />
@@ -38,79 +44,66 @@ function Grain() {
   );
 }
 
-// The picture behind the numbers. Each one fades in over the last as the count
-// sets off, and drifts slowly the whole time it is on screen, like a camera move.
-function Photographs({ scene, show }: { scene: number; show: boolean }) {
-  const milestone = milestones[scene];
-  // The drift goes one way, then the other, so no two cuts feel the same.
-  const drift = scene % 2 === 0 ? "2.5%" : "-2.5%";
-
-  return (
-    <AnimatePresence>
-      {show && milestone && (
-        <motion.div
-          key={milestone.id}
-          aria-hidden
-          className="absolute inset-0"
-          style={{ filter: PHOTO_FILTER }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1, transition: { duration: 0.8, ease: EASE } }}
-          exit={{ opacity: 0, transition: { duration: 0.7, ease: EASE } }}
-        >
-          <motion.img
-            src={milestone.image}
-            alt=""
-            draggable={false}
-            className="h-full w-full object-cover"
-            style={{ objectPosition: milestone.focus ?? "center" }}
-            initial={{ scale: 1.16, x: drift }}
-            animate={{
-              scale: 1.04,
-              x: drift.startsWith("-") ? "2.5%" : "-2.5%",
-              transition: { duration: 7, ease: "linear" },
-            }}
-          />
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-}
-
 export default function SplashScreen() {
   const { finishIntro, homeReady } = useSplash();
   const reduced = useReducedMotion() ?? false;
   const [showSkip, setShowSkip] = useState(false);
+  const [isPresent, safeToRemove] = usePresence();
 
-  const { year, reached, scene, resting, showIdentity, skip } = useSplashSequence({
+  const { started, skip } = useSplashSequence({
     reduced,
     homeReady,
     onFinish: finishIntro,
   });
 
-  // The number on screen. There is no year 0, so 0 shows as 1.
-  const number = useTransform(year, (v) => {
-    const n = Math.round(v);
-    return String(n === 0 ? 1 : Math.abs(n));
-  });
-  const era = useTransform(year, (v): string => (Math.round(v) < 0 ? "BCE" : "CE"));
-
-  // Blur the number while it is moving fast. It goes sharp when it stops.
-  const speed = useVelocity(year);
-  const blur = useTransform(
-    speed,
-    (v) => `blur(${Math.min(Math.abs(v) / 400, 4)}px)`,
-  );
-
-  // How far along the line we are (0 to 1). The stops are spaced evenly,
-  // even though the years between them are not.
-  const progress = useTransform(
-    year,
-    milestones.map((m) => m.year),
-    milestones.map((_, i) => i / LAST),
+  // The exit: the hollow of the O opens and grows until the home page fills the screen.
+  const markRef = useRef<SVGSVGElement>(null);
+  const holeCentre = useRef({ x: 0, y: 0 });
+  const holeRadius = useMotionValue(0);
+  const push = useMotionValue(1);
+  const fade = useMotionValue(1);
+  const mask = useTransform(
+    holeRadius,
+    (r) =>
+      `radial-gradient(circle at ${holeCentre.current.x}px ${holeCentre.current.y}px, transparent ${r}px, #000 ${r + 1.5}px)`,
   );
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowSkip(true), 1400);
+    if (isPresent) return;
+    const done = () => safeToRemove?.();
+
+    if (reduced) {
+      const fadeOut = animate(fade, 0, {
+        duration: 0.4,
+        ease: "easeOut",
+        onComplete: done,
+      });
+      return () => fadeOut.stop();
+    }
+
+    // Start the opening exactly at the middle of the ring.
+    const box = markRef.current?.getBoundingClientRect();
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const x = box ? box.left + (box.width * RING.cx) / VIEWBOX : width / 2;
+    const y = box ? box.top + (box.height * RING.cy) / VIEWBOX : height / 2;
+    holeCentre.current = { x, y };
+
+    const reach =
+      Math.hypot(Math.max(x, width - x), Math.max(y, height - y)) + 40;
+    const options = { duration: IRIS_SECONDS, ease: IRIS_EASE };
+
+    const opening = animate(holeRadius, reach, { ...options, onComplete: done });
+    const closeIn = animate(push, 1.1, options);
+
+    return () => {
+      opening.stop();
+      closeIn.stop();
+    };
+  }, [isPresent, safeToRemove, reduced, fade, holeRadius, push]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSkip(true), 900);
     return () => clearTimeout(timer);
   }, []);
 
@@ -123,189 +116,80 @@ export default function SplashScreen() {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [skip]);
 
+  const go = started || reduced;
+
   return createPortal(
     <motion.div
       role="region"
       aria-label="REKÒ introduction"
-      className="fixed inset-0 z-100 flex items-center justify-center overflow-hidden bg-ink text-ivory"
+      className="fixed inset-0 z-100 flex items-center justify-center overflow-hidden bg-ivory text-ink"
       style={{
         backgroundImage:
-          "radial-gradient(ellipse at 50% 46%, #0D1A13 0%, #070B08 72%)",
+          "radial-gradient(ellipse at 50% 42%, #F7F2E8 0%, #EBE2CF 100%)",
         paddingTop: "env(safe-area-inset-top)",
         paddingBottom: "env(safe-area-inset-bottom)",
+        opacity: fade,
+        ...(isPresent ? {} : { maskImage: mask, WebkitMaskImage: mask }),
       }}
-      exit={{ opacity: 0, transition: { duration: 0.55, ease: EASE } }}
     >
-      {/* The film: a picture for each stop, darkened so the numbers stay clear */}
-      <Photographs scene={scene} show={!reduced && !showIdentity} />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_48%,rgba(7,11,8,0.35)_0%,rgba(7,11,8,0.88)_100%)]"
-      />
-
-      {/* A faint flash at every cut, like a projector catching */}
-      {!reduced && scene > 0 && !showIdentity && (
-        <motion.div
-          key={scene}
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-ivory"
-          initial={{ opacity: 0.14 }}
-          animate={{ opacity: 0, transition: { duration: 0.6, ease: "easeOut" } }}
-        />
-      )}
-
       <Grain />
 
-      <div className="relative flex w-full flex-col items-center px-6">
-        {/* Stage: the number and REKÒ take turns in this same box.
-            The big font lives here so that "em" means the big size. */}
-        <div className="relative h-[1.15em] w-full overflow-hidden whitespace-nowrap text-center [text-shadow:0_4px_60px_rgba(0,0,0,0.6)] font-display text-splash-year-sm leading-none tracking-tight text-ivory lining-nums tabular-nums md:text-splash-year">
-          <AnimatePresence initial={false}>
-            {!showIdentity && (
-              <motion.div
-                key="counter"
-                className="absolute inset-0 flex items-center justify-center"
-                style={{ filter: blur }}
-                exit={
-                  reduced
-                    ? { opacity: 0 }
-                    : { y: "-100%", transition: { duration: 0.5, ease: EASE } }
-                }
-              >
-                <span>
-                  <motion.span>{number}</motion.span>
-                  <motion.span className="ml-[0.12em] align-top font-sans text-[0.14em] font-medium tracking-[0.2em] text-sand">
-                    {era}
-                  </motion.span>
-                </span>
-              </motion.div>
-            )}
+      <motion.div
+        className="relative flex flex-col items-center px-6"
+        style={{ scale: push }}
+      >
+        <SplashMark
+          ref={markRef}
+          started={started}
+          reduced={reduced}
+          className="aspect-square h-[min(42svh,20rem)] w-auto"
+        />
 
-            {showIdentity && (
-              <motion.div
-                key="reko"
-                className="absolute inset-0 flex items-center justify-center tracking-[-0.03em]"
-                initial={reduced ? { opacity: 0 } : { y: "100%" }}
-                animate={{
-                  y: 0,
-                  opacity: 1,
-                  transition: {
-                    duration: reduced ? 0.3 : 0.7,
-                    ease: EASE,
-                    delay: reduced ? 0 : 0.1,
-                  },
-                }}
-              >
-                REKÒ
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* Caption: the name of the stop, then the museum descriptor */}
-        <div className="mt-7 flex h-10 items-center justify-center md:mt-9">
-          <AnimatePresence mode="wait">
-            {resting && !showIdentity && (
-              <motion.div
-                key={milestones[reached].id}
-                className="flex flex-col items-center"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                  transition: { duration: 0.28, ease: EASE, delay: 0.1 },
-                }}
-                exit={{
-                  opacity: 0,
-                  y: -8,
-                  transition: { duration: 0.15, ease: EASE },
-                }}
-              >
-                <p className="font-sans text-label font-medium uppercase tracking-[0.26em] text-sand">
-                  {milestones[reached].label}
-                </p>
-
-                <motion.span
-                  aria-hidden
-                  className="mt-4 block h-px w-16 bg-ochre md:w-24"
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: 0.5, ease: EASE, delay: 0.15 }}
-                />
-              </motion.div>
-            )}
-
-            {showIdentity && (
-              <motion.p
-                key="descriptor"
-                className="max-w-[22ch] text-balance text-center font-sans text-label font-medium uppercase tracking-[0.24em] text-sand"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                  transition: {
-                    duration: 0.45,
-                    ease: EASE,
-                    delay: reduced ? 0 : 0.35,
-                  },
-                }}
-              >
-                Digital Museum of Nigerian History
-              </motion.p>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* The line of stops: it fills as the years pass, one dot per stop */}
-        <div
-          aria-hidden
-          className="relative mt-10 h-px w-[min(70vw,28rem)] bg-ivory/15 md:mt-14"
+        <p
+          className="mt-3 flex font-display text-[clamp(2.75rem,11vw,5.25rem)] leading-none tracking-wider text-ink md:mt-5"
+          aria-label="REKÒ"
         >
-          <motion.div
-            className="absolute inset-0 origin-left bg-ochre"
-            style={{ scaleX: progress }}
-          />
-
-          {milestones.map((m, i) => (
+          {WORD.map((letter, i) => (
             <span
-              key={m.id}
-              className={`absolute top-1/2 size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full transition-colors duration-300 ${
-                i <= reached ? "bg-ochre" : "bg-ivory/25"
-              }`}
-              style={{ left: `${(i / LAST) * 100}%` }}
-            />
+              key={letter}
+              aria-hidden
+              className="mb-[-0.1em] mt-[-0.3em] inline-block overflow-hidden pb-[0.1em] pt-[0.3em]"
+            >
+              <motion.span
+                className="block"
+                style={{ rotate: LETTER_TILT[i] }}
+                initial={reduced ? false : { y: "118%" }}
+                animate={go ? { y: "0%" } : undefined}
+                transition={{
+                  duration: 0.7,
+                  ease: EASE,
+                  delay: T.wordmark + i * T.letterGap,
+                }}
+              >
+                {letter}
+              </motion.span>
+            </span>
           ))}
-        </div>
-      </div>
+        </p>
 
-      {/* Cinema bars: they close in at the start and open as the intro ends */}
-      {!reduced && (
-        <>
-          <motion.div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 z-20 h-[7svh] bg-black"
-            initial={{ y: "-100%" }}
-            animate={{ y: 0, transition: { duration: 0.9, ease: EASE } }}
-            exit={{ y: "-100%", transition: { duration: 0.55, ease: EASE } }}
-          />
-          <motion.div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[7svh] bg-black"
-            initial={{ y: "100%" }}
-            animate={{ y: 0, transition: { duration: 0.9, ease: EASE } }}
-            exit={{ y: "100%", transition: { duration: 0.55, ease: EASE } }}
-          />
-        </>
-      )}
+        <motion.p
+          className="mt-4 max-w-[26ch] text-balance text-center font-sans text-label font-medium uppercase tracking-[0.24em] text-ink/70 md:mt-5"
+          initial={reduced ? false : { opacity: 0, y: 8 }}
+          animate={go ? { opacity: 1, y: 0 } : undefined}
+          transition={{ duration: 0.5, ease: EASE, delay: T.descriptor }}
+        >
+          Digital Museum of Nigerian History
+        </motion.p>
+      </motion.div>
 
-      {/* Skip: sits in the corner of the screen, quiet and late */}
+      {/* Skip: sits in the corner of the screen, quiet and early enough to find. */}
       <AnimatePresence>
-        {showSkip && (
+        {showSkip && isPresent && (
           <motion.button
             type="button"
             onClick={skip}
             aria-label="Skip introduction"
-            className="absolute bottom-6 right-6 z-30 inline-flex min-h-11 min-w-11 items-center justify-center border border-ivory/25 px-4 font-sans text-xs font-medium uppercase tracking-[0.18em] text-ivory/80 transition-colors hover:border-ochre hover:text-ivory focus-visible:outline-ivory"
+            className="absolute bottom-6 right-6 z-30 inline-flex min-h-11 min-w-11 items-center justify-center border border-ink/25 px-4 font-sans text-xs font-medium uppercase tracking-[0.18em] text-ink/75 transition-colors hover:border-ochre hover:text-ink focus-visible:outline-ink"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -320,8 +204,12 @@ export default function SplashScreen() {
   );
 }
 
-/** Mounts the splash only while the intro is pending; AnimatePresence plays its exit. */
+/** Mounts the splash only while the intro is pending; the splash plays its own exit. */
 export function SplashLayer() {
   const { introDone } = useSplash();
-  return <AnimatePresence>{!introDone && <SplashScreen key="splash" />}</AnimatePresence>;
+  return (
+    <AnimatePresence>
+      {!introDone && <SplashScreen key="splash" />}
+    </AnimatePresence>
+  );
 }

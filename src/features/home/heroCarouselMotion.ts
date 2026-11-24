@@ -81,7 +81,13 @@ export const BACKDROP_BLUR_PX = 5;
 /** How dark the layer over the background photo is (0 = none, 1 = black). */
 export const BACKDROP_DARKNESS = 0.6;
 
-// ---------------------------------------------------------------------------
+
+export type BackdropStyle = "original" | "ink" | "atmosphere" | "cinematic" | "arch";
+
+/** Which hero background to show. Change the word, save, and look. */
+export const BACKDROP_STYLE: BackdropStyle = "cinematic";
+
+
 
 /** Keeps `value` between `min` and `max`. */
 function clamp(value: number, min: number, max: number) {
