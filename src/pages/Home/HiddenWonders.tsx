@@ -6,8 +6,8 @@ import {
   useReducedMotion,
 } from "framer-motion";
 import ArrowLink from "../../components/ui/ArrowLink";
-import awhum from "../../assets/images/hero/Awhuhm-optimized.jpg";
-import idanre from "../../assets/images/hero/Idanre-Hill.jpg";
+import awhum from "../../assets/images/hero/awhum-waterfall-and-cave1.png";
+import obudu from "../../assets/images/hero/obudu5.jpg";
 import agbokim from "../../assets/images/hero/Agbokim.jpg";
 
 type Wonder = {
@@ -25,10 +25,10 @@ const wonders: Wonder[] = [
     href: "/places/awhum-waterfall",
   },
   {
-    name: "Idanre Hills",
-    location: "Ondo State",
-    image: idanre,
-    href: "/places/idanre-hills",
+    name: "Obudu Cattle Ranch",
+    location: "Cross-River",
+    image: obudu,
+    href: "/places/obudu",
   },
   {
     name: "Agbokim Waterfalls",

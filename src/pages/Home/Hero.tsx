@@ -59,7 +59,7 @@ export default function Hero() {
         {/* The headline rises out of a mask once the intro has finished */}
         <div className="overflow-hidden pb-[0.08em]">
           <motion.h1
-            className="font-display text-[clamp(2.25rem,min(5vw,7.2svh),5rem)] leading-[1.02] tracking-tight"
+            className="font-hero text-[clamp(2.25rem,min(5vw,7.2svh),5rem)] leading-[1.02] tracking-tight"
             initial={reduce ? false : { y: "105%" }}
             animate={{ y: open ? 0 : "105%" }}
             transition={{ duration: 1, ease, delay: 0.5 }}
