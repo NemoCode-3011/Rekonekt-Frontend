@@ -65,10 +65,10 @@ function App() {
   return (
     <SplashProvider>
       <SplashLayer />
-      <DiscoveryProvider>
-        <Scrolltotop />
-        <PageChange />
-        <BookmarksProvider>
+      <BookmarksProvider>
+        <DiscoveryProvider>
+          <Scrolltotop />
+          <PageChange />
           <Suspense fallback={<PageLoader fullScreen />}>
             <Routes>
               {/* Public / visitor experience */}
@@ -190,8 +190,8 @@ function App() {
             </Routes>
             <Analytics />
           </Suspense>
-        </BookmarksProvider>
-      </DiscoveryProvider>
+        </DiscoveryProvider>
+      </BookmarksProvider>
     </SplashProvider>
   );
 }
