@@ -2,10 +2,10 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 
-import exhibitionsImage from "../../assets/images/hero/exhibit3.jpg";
+import exhibitionsImage from "../../assets/images/hero/ex-2.webp";
 import peopleImage from "../../assets/images/hero/people4.jpg";
 import eventsImage from "../../assets/images/hero/events1.jpg";
-import placesImage from "../../assets/images/hero/Awhuhm.png";
+import placesImage from  "../../assets/images/hero/ex-6.webp";
 import artifactsImage from "../../assets/images/hero/artifact1.jpg";
 
 const discoveryRoutes = [
