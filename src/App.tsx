@@ -45,6 +45,8 @@ const Settings = lazy(() => import("./pages/Account/Settings"));
 const AdminExhibitions = lazy(() => import("./pages/Admin/Exhibitions"));
 const AdminStories = lazy(() => import("./pages/Admin/Stories"));
 const AdminStoryEditor = lazy(() => import("./pages/Admin/StoryEditor"));
+const AdminWonders = lazy(() => import("./pages/Admin/Wonders"));
+const AdminWonderEditor = lazy(() => import("./pages/Admin/WonderEditor"));
 const ExhibitionWorkspace = lazy(
   () => import("./pages/Admin/ExhibitionsWorkspace"),
 );
@@ -63,10 +65,10 @@ function App() {
   return (
     <SplashProvider>
       <SplashLayer />
-      <BookmarksProvider>
-        <DiscoveryProvider>
-          <Scrolltotop />
-          <PageChange />
+      <DiscoveryProvider>
+        <Scrolltotop />
+        <PageChange />
+        <BookmarksProvider>
           <Suspense fallback={<PageLoader fullScreen />}>
             <Routes>
               {/* Public / visitor experience */}
@@ -133,6 +135,8 @@ function App() {
                   />
                   <Route path="stories" element={<AdminStories />} />
                   <Route path="stories/:id" element={<AdminStoryEditor />} />
+                  <Route path="wonders" element={<AdminWonders />} />
+                  <Route path="wonders/:id" element={<AdminWonderEditor />} />
                   <Route
                     path="events"
                     element={<AdminContentLibrary kind="events" />}
@@ -186,8 +190,8 @@ function App() {
             </Routes>
             <Analytics />
           </Suspense>
-        </DiscoveryProvider>
-      </BookmarksProvider>
+        </BookmarksProvider>
+      </DiscoveryProvider>
     </SplashProvider>
   );
 }

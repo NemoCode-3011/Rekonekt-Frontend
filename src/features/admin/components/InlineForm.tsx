@@ -3,6 +3,7 @@ import Button from "../../../components/ui/Button";
 import { useAuth } from "../../auth/auth-context";
 import { uploadAdminImage, type UploadedMedia } from "../api/media";
 import RichTextEditor from "./RichTextEditor";
+import LinksField from "./LinksField";
 import { getApiFieldErrors } from "../../../services/api/client";
 export interface FormField {
   name: string;
@@ -15,7 +16,8 @@ export interface FormField {
     | "select"
     | "email"
     | "password"
-    | "image";
+    | "image"
+    | "links"; // a short list of names and web addresses
   required?: boolean;
   placeholder?: string;
   hint?: string;
@@ -216,6 +218,14 @@ export default function InlineForm({
                 label={field.label}
                 value={values[field.name]}
                 placeholder={field.placeholder}
+                invalid={!!errors[field.name]}
+                onChange={change}
+              />
+            ) : field.kind === "links" ? (
+              <LinksField
+                id={id}
+                label={field.label}
+                value={values[field.name]}
                 invalid={!!errors[field.name]}
                 onChange={change}
               />
