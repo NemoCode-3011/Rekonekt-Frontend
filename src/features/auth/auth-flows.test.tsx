@@ -170,7 +170,7 @@ describe("session authentication flows", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create account" }));
 
     expect(
-      await screen.findByText("Use at least 8 characters."),
+      await screen.findByText("Password should be at least 8 characters."),
     ).toBeInTheDocument();
     expect(screen.getByRole("alert")).toHaveTextContent(
       "Please correct the highlighted fields.",
