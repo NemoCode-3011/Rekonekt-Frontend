@@ -19,7 +19,8 @@ export function createAdmin(input: {
   name: string;
   email: string;
 }) {
-  return http.post("/admin/admins", input);
+  // Gives up after 30 seconds, so the form shows an error instead of "Saving..." forever.
+  return http.post("/admin/admins", input, { timeout: 30_000 });
 }
 
 export function setupAdminPassword(token: string, password: string) {
