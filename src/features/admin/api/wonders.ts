@@ -72,16 +72,20 @@ export function parseLocation(value: string) {
 }
 
 /** Turns the "Learn more" rows into what the backend expects. Blank rows are skipped. */
-export function parseLinks(json: string | undefined) {
-  let rows: unknown = [];
-
+function readJson(json: string | undefined): unknown {
+  if (!json) return [];
   try {
-    rows = json ? JSON.parse(json) : [];
+    return JSON.parse(json);
   } catch {
-    rows = [];
+    return [];
   }
+}
+
+export function parseLinks(json: string | undefined) {
+  const rows = readJson(json);
 
   if (!Array.isArray(rows)) return [];
+  // ...rest unchanged
 
   const links: { label: string; url: string; note?: string }[] = [];
 
