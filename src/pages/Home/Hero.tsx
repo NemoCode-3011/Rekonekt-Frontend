@@ -44,7 +44,7 @@ export default function Hero() {
   });
 
   return (
-    <section className="relative isolate flex min-h-svh flex-col overflow-hidden pb-4 pt-24 text-ivory [@media(max-height:700px)]:pt-21">
+    <section className="relative isolate flex min-h-svh flex-col overflow-hidden pb-4 pt-28 text-ivory md:[@media(min-height:800px)]:pt-32 [@media(max-height:700px)]:pt-24">
       <HeroBackdrop slide={heroSlides[activeIndex]} />
 
       {/* The words: a label, the headline, one line and one button, centred */}

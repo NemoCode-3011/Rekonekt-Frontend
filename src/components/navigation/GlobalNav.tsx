@@ -83,6 +83,8 @@ export default function GlobalNav() {
   const location = useLocation();
   // These pages open with a full-screen picture, so the nav floats over it.
   const isHome = location.pathname === "/" || location.pathname === "/about";
+  // On the homepage the hero should be the star, so the links sit back a little.
+  const isLanding = location.pathname === "/";
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
@@ -142,10 +144,18 @@ export default function GlobalNav() {
 
         <nav
           aria-label="Main"
-          className="hidden items-center gap-10 text-body-s md:flex"
+          className="hidden items-center gap-6 text-body-s md:flex lg:gap-8"
         >
           {links.map((link) => (
-            <Link key={link.to} to={link.to} className="hover:opacity-70">
+            <Link
+              key={link.to}
+              to={link.to}
+              className={
+                isLanding
+                  ? "text-ivory/75 transition-colors hover:text-ivory"
+                  : "hover:opacity-70"
+              }
+            >
               {link.label}
             </Link>
           ))}

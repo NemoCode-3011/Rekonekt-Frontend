@@ -1,5 +1,6 @@
 import { http } from "../../services/api/client";
 import type {
+  PlaceBundle,
   PlaceCard,
   PlaceCategory,
   PlaceDetail,
@@ -35,4 +36,8 @@ export function getPlaceFacets() {
 
 export function getPlaceBySlug(slug: string) {
   return get<PlaceDetail>(`/places/slug/${encodeURIComponent(slug)}`);
+}
+
+export function getPlaceBundles() {
+  return get<PlaceBundle[]>("/places/bundles");
 }

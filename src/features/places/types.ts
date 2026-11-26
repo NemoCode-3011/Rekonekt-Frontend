@@ -125,3 +125,25 @@ export interface PlaceDetail extends PlaceCard {
   artifacts: PlaceArtifact[];
   nearby: NearbyPlace[];
 }
+
+/** One place inside an exhibition (GET /places/bundles). */
+export interface PlaceBundleMember {
+  id: number;
+  name: string;
+  slug: string;
+  region: PlaceRegion | null;
+  category: PlaceCategory | null;
+  cover_image_url: string | null;
+  cover_image_alt: string | null;
+}
+
+/** A published exhibition and the published places inside its chapters. */
+export interface PlaceBundle {
+  id: number;
+  title: string;
+  slug: string;
+  subtitle: string | null;
+  cover_image_url: string | null;
+  place_count: number;
+  places: PlaceBundleMember[];
+}

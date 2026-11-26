@@ -1,13 +1,26 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
+import ArrowLink from "../../components/ui/ArrowLink";
 import PageError from "../../components/ui/PageError";
 import PageLoader from "../../components/ui/PageLoader";
 import LazyMap from "../../features/map/LazyMap";
 import type { MapMarker } from "../../features/map/types";
-import { getPlaceFacets, listPlaces } from "../../features/places/api";
+import {
+  getPlaceBundles,
+  getPlaceFacets,
+  listPlaces,
+} from "../../features/places/api";
+import {
+  bundleCoverUrl,
+  placesInBundle,
+  standalonePlaces,
+  tilesOf,
+  type StandalonePlace,
+} from "../../features/places/bundles";
 import {
   PLACE_CATEGORIES,
+  type PlaceBundle,
   type PlaceCard,
   type PlaceCategory,
   type PlaceFacets,
@@ -41,7 +54,15 @@ function PlaceImage({ place, className = "" }: { place: PlaceCard; className?: s
   );
 }
 
-function PlaceCardView({ place, selected = false }: { place: PlaceCard; selected?: boolean }) {
+function PlaceCardView({
+  place,
+  partOf = null,
+  selected = false,
+}: {
+  place: PlaceCard;
+  partOf?: string | null;
+  selected?: boolean;
+}) {
   return (
     <article className={selected ? "-m-3 border border-heritage-green/40 bg-sand/20 p-3" : ""}>
       <Link to={`/places/${place.slug}`} className="group block">
@@ -59,6 +80,9 @@ function PlaceCardView({ place, selected = false }: { place: PlaceCard; selected
             {place.summary}
           </p>
         )}
+        {partOf && (
+          <p className="mt-3 font-sans text-meta text-muted">Part of {partOf}</p>
+        )}
         <span className="mt-4 inline-flex items-center gap-2 text-body-s font-medium text-heritage-green">
           Explore place <span aria-hidden>→</span>
         </span>
@@ -70,11 +94,82 @@ function PlaceCardView({ place, selected = false }: { place: PlaceCard; selected
   );
 }
 
+// One exhibition as a single picture tile. It opens that exhibition's places.
+function ExhibitionTile({ bundle }: { bundle: PlaceBundle }) {
+  const cover = bundleCoverUrl(bundle);
+
+  return (
+    <Link
+      to={`/explore/places?exhibition=${encodeURIComponent(bundle.slug)}`}
+      className="group relative block aspect-4/5 overflow-hidden bg-deep-forest text-ivory"
+    >
+      {cover ? (
+        <img
+          src={cover}
+          alt=""
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 motion-safe:group-hover:scale-[1.04]"
+        />
+      ) : (
+        <span
+          aria-hidden
+          className="absolute inset-0 grid place-items-center font-display text-display-m text-ivory/20"
+        >
+          {bundle.title.charAt(0)}
+        </span>
+      )}
+      <span
+        aria-hidden
+        className="absolute inset-0 bg-linear-to-t from-ink/85 via-ink/20 to-transparent"
+      />
+      <span className="absolute inset-x-0 bottom-0 p-5">
+        <span className="block font-display text-heading-s leading-tight">
+          {bundle.title}
+        </span>
+        <span className="mt-1 block text-meta text-ivory/80">
+          {bundle.places.length} places
+        </span>
+      </span>
+    </Link>
+  );
+}
+
+// The top of one exhibition's page of places.
+function ExhibitionHeader({ bundle, count }: { bundle: PlaceBundle; count: number }) {
+  return (
+    <div className="mt-10 border-t-2 border-ochre bg-sand/30 p-6 md:p-8">
+      <Link to="/explore/places" className="text-body-s text-muted hover:text-ink">
+        <span aria-hidden>←</span> All places
+      </Link>
+      <p className="mt-6 text-label font-medium uppercase tracking-[0.2em] text-ochre-deep">
+        From the exhibition
+      </p>
+      <h2 className="mt-2 font-display text-heading-l leading-tight">{bundle.title}</h2>
+      {bundle.subtitle && (
+        <p className="mt-3 max-w-2xl font-sans text-body-m text-muted">{bundle.subtitle}</p>
+      )}
+      <p className="mt-4 text-body-s text-muted">
+        {count === 1 ? "1 place" : `${count} places`}
+      </p>
+      <ArrowLink to={`/exhibitions/${bundle.slug}`} className="mt-6 text-heritage-green">
+        Open the exhibition
+      </ArrowLink>
+    </div>
+  );
+}
+
 type LoadState =
-  | { requestKey: string; status: "ready"; places: PlaceCard[]; facets: PlaceFacets }
+  | {
+      requestKey: string;
+      status: "ready";
+      places: PlaceCard[];
+      facets: PlaceFacets;
+      bundles: PlaceBundle[];
+    }
   | { requestKey: string; status: "error"; message: string };
 
 const EMPTY_PLACES: PlaceCard[] = [];
+const NO_BUNDLES: PlaceBundle[] = [];
 
 export default function Places() {
   const reduce = useReducedMotion();
@@ -85,11 +180,17 @@ export default function Places() {
   const region = params.get("region") ?? "";
   const category = params.get("category") ?? "";
   const searchQuery = params.get("q") ?? "";
+  const exhibitionSlug = params.get("exhibition") ?? "";
+  // The exhibition choice is read in the page, so it does not need a new request.
   const requestKey = `${region}\u0000${category}\u0000${searchQuery}`;
   const currentState = state?.requestKey === requestKey ? state : null;
 
   useEffect(() => {
     let cancelled = false;
+    // Exhibitions are only grouped on the plain page. With a search or a filter
+    // the visitor gets the ordinary list, so they are not asked for.
+    const plain = !region && !category && !searchQuery;
+
     Promise.all([
       listPlaces({
         region: (region || undefined) as PlaceRegion | undefined,
@@ -97,9 +198,13 @@ export default function Places() {
         q: searchQuery || undefined,
       }),
       getPlaceFacets(),
+      // If the exhibitions can't be loaded, the page simply shows the plain list.
+      plain ? getPlaceBundles().catch(() => NO_BUNDLES) : Promise.resolve(NO_BUNDLES),
     ])
-      .then(([places, facets]) => {
-        if (!cancelled) setState({ requestKey, status: "ready", places, facets });
+      .then(([places, facets, bundles]) => {
+        if (!cancelled) {
+          setState({ requestKey, status: "ready", places, facets, bundles });
+        }
       })
       .catch((error: unknown) => {
         if (!cancelled) {
@@ -112,14 +217,45 @@ export default function Places() {
   useEffect(() => {
     const timer = window.setTimeout(() => {
       const next = new URLSearchParams(params);
-      if (query.trim()) next.set("q", query.trim());
-      else next.delete("q");
+      if (query.trim()) {
+        next.set("q", query.trim());
+        // A search always shows the plain list, never one exhibition.
+        next.delete("exhibition");
+      } else {
+        next.delete("q");
+      }
       if (next.toString() !== params.toString()) setParams(next, { replace: true });
     }, 250);
     return () => window.clearTimeout(timer);
   }, [query, params, setParams]);
 
-  const places = currentState?.status === "ready" ? currentState.places : EMPTY_PLACES;
+  const allPlaces = currentState?.status === "ready" ? currentState.places : EMPTY_PLACES;
+  const bundles = currentState?.status === "ready" ? currentState.bundles : NO_BUNDLES;
+
+  const filtering = Boolean(region || category || searchQuery);
+  const activeBundle = exhibitionSlug
+    ? bundles.find((bundle) => bundle.slug === exhibitionSlug)
+    : undefined;
+  const missingExhibition = Boolean(exhibitionSlug) && !filtering && !activeBundle;
+
+  // The places the map and cards are about: one exhibition's, or all of them.
+  const places = useMemo(
+    () => (activeBundle ? placesInBundle(activeBundle, allPlaces) : allPlaces),
+    [activeBundle, allPlaces],
+  );
+  const tiles = useMemo(() => tilesOf(bundles), [bundles]);
+  const standalone = useMemo(
+    () => standalonePlaces(allPlaces, bundles),
+    [allPlaces, bundles],
+  );
+
+  const plainPage = !filtering && !activeBundle;
+  const showTiles = plainPage && tiles.length > 0;
+  // On the plain page, places already inside a tile are not repeated as cards.
+  const cards: StandalonePlace[] = plainPage
+    ? standalone
+    : places.map((place) => ({ place, partOf: null }));
+
   const markers = useMemo<MapMarker[]>(() => places.flatMap((place) => {
     const latitude = numberCoordinate(place.latitude);
     const longitude = numberCoordinate(place.longitude);
@@ -132,6 +268,7 @@ export default function Places() {
     const next = new URLSearchParams(params);
     if (value) next.set(key, value);
     else next.delete(key);
+    next.delete("exhibition");
     setParams(next);
   };
 
@@ -191,19 +328,49 @@ export default function Places() {
           {currentState?.status === "error" && <div className="py-12"><PageError message={currentState.message} /></div>}
           {currentState?.status === "ready" && (
             <>
-              <div className="mt-10 flex flex-wrap items-baseline justify-between gap-3">
-                <p className="text-body-s text-muted">
-                  Showing <strong className="text-ink">{places.length}</strong> of {currentState.facets.total} published places
+              {activeBundle && (
+                <ExhibitionHeader bundle={activeBundle} count={places.length} />
+              )}
+
+              {missingExhibition && (
+                <p role="status" className="mt-10 text-body-m text-muted">
+                  We couldn't find that exhibition. Here are the places we do
+                  have.{" "}
+                  <Link to="/explore/places" className="text-heritage-green underline underline-offset-4">
+                    See all places
+                  </Link>
                 </p>
-                {(region || category || query) && (
-                  <button type="button" onClick={() => { setQuery(""); setParams({}); }} className="text-body-s text-heritage-green underline underline-offset-4">
-                    Clear filters
-                  </button>
-                )}
-              </div>
+              )}
+
+              {!activeBundle && !showTiles && (
+                <div className="mt-10 flex flex-wrap items-baseline justify-between gap-3">
+                  <p className="text-body-s text-muted">
+                    Showing <strong className="text-ink">{places.length}</strong> of {currentState.facets.total} published places
+                  </p>
+                  {filtering && (
+                    <button type="button" onClick={() => { setQuery(""); setParams({}); }} className="text-body-s text-heritage-green underline underline-offset-4">
+                      Clear filters
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {showTiles && (
+                <section aria-labelledby="places-exhibitions-heading" className="mt-12">
+                  <p className="text-label uppercase tracking-[0.16em] text-ochre-deep">From the exhibitions</p>
+                  <h2 id="places-exhibitions-heading" className="mt-1 font-display text-heading-m">
+                    Places, grouped by exhibition
+                  </h2>
+                  <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    {tiles.map((bundle) => (
+                      <ExhibitionTile key={bundle.id} bundle={bundle} />
+                    ))}
+                  </div>
+                </section>
+              )}
 
               {markers.length > 0 && (
-                <section aria-labelledby="places-map-heading" className="mt-8">
+                <section aria-labelledby="places-map-heading" className="mt-12">
                   <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
                     <div>
                       <p className="text-label uppercase tracking-[0.16em] text-ochre-deep">Find your way</p>
@@ -215,12 +382,25 @@ export default function Places() {
                 </section>
               )}
 
-              {places.length === 0 ? (
-                <p className="py-16 text-body-m text-muted">No places match those filters. Try another search or clear your filters.</p>
-              ) : (
-                <div className="mt-12 grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
-                  {places.map((place) => <PlaceCardView key={place.id} place={place} selected={String(place.id) === selectedPlaceId} />)}
-                </div>
+              {cards.length === 0 && !showTiles && (
+                <p className="py-16 text-body-m text-muted">
+                  {filtering
+                    ? "No places match those filters. Try another search or clear your filters."
+                    : "No places have been published yet."}
+                </p>
+              )}
+
+              {cards.length > 0 && (
+                <section className="mt-12">
+                  {showTiles && (
+                    <h2 className="font-display text-heading-m">More places to explore</h2>
+                  )}
+                  <div className={`grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3 ${showTiles ? "mt-8" : ""}`}>
+                    {cards.map(({ place, partOf }) => (
+                      <PlaceCardView key={place.id} place={place} partOf={partOf} selected={String(place.id) === selectedPlaceId} />
+                    ))}
+                  </div>
+                </section>
               )}
             </>
           )}

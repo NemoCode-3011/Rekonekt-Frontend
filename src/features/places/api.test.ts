@@ -4,7 +4,12 @@ const httpMock = vi.hoisted(() => ({ get: vi.fn() }));
 
 vi.mock("../../services/api/client", () => ({ http: httpMock }));
 
-import { getPlaceBySlug, getPlaceFacets, listPlaces } from "./api";
+import {
+  getPlaceBundles,
+  getPlaceBySlug,
+  getPlaceFacets,
+  listPlaces,
+} from "./api";
 
 describe("public places API", () => {
   beforeEach(() => {
@@ -31,6 +36,13 @@ describe("public places API", () => {
     await getPlaceFacets();
 
     expect(httpMock.get).toHaveBeenCalledWith("/places/facets");
+  });
+
+  it("gets the exhibitions with the places inside them", async () => {
+    httpMock.get.mockResolvedValue({ data: { data: [{ slug: "aburi-accord" }] } });
+
+    await expect(getPlaceBundles()).resolves.toEqual([{ slug: "aburi-accord" }]);
+    expect(httpMock.get).toHaveBeenCalledWith("/places/bundles");
   });
 
   it("gets a place detail by its URL slug", async () => {
