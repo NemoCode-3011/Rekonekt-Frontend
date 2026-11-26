@@ -36,6 +36,7 @@ import type {
 import AdminEventRelationships from "../../features/admin/components/AdminEventRelationships";
 import AdminEventMedia from "../../features/admin/components/AdminEventMedia";
 import AdminPictures from "../../features/admin/components/AdminPictures";
+import { PLACE_CATEGORIES, PLACE_REGIONS } from "../../features/places/types";
 
 const kindInfo: Record<
   AdminContentKind,
@@ -145,25 +146,79 @@ function fieldsFor(
 
   const place = record as DashboardPlace | undefined;
   return [
-    { name: "name", label: "Name", required: true, initial: place?.name },
+    { name: "name", label: "Name", required: true, initial: place?.name ?? "" },
+    {
+      name: "slug",
+      label: "URL slug (optional)",
+      placeholder: "Leave blank to keep the current slug",
+      initial: place?.slug ?? "",
+      hint: "New places get a slug from their name if this is left blank.",
+    },
+    {
+      name: "summary",
+      label: "Short introduction",
+      kind: "textarea",
+      rows: 3,
+      initial: place?.summary ?? "",
+      hint: "A friendly overview, up to 600 characters.",
+    },
+    {
+      name: "region",
+      label: "Region / state",
+      kind: "select",
+      initial: place?.region ?? "",
+      options: [
+        { value: "", label: "Choose a region (optional)" },
+        ...PLACE_REGIONS.map((region) => ({ value: region, label: region })),
+      ],
+    },
+    {
+      name: "category",
+      label: "Place type",
+      kind: "select",
+      initial: place?.category ?? "",
+      options: [
+        { value: "", label: "Choose a type (optional)" },
+        ...PLACE_CATEGORIES,
+      ],
+    },
     {
       name: "coordinates",
-      label: "Coordinates",
+      label: "Map pin",
+      kind: "location",
       required: true,
-      placeholder: "6.3350, 5.6037",
       initial:
         place?.latitude != null && place.longitude != null
           ? `${place.latitude}, ${place.longitude}`
           : "",
-      hint: "In Google Maps, right-click the spot and copy the coordinates.",
+      hint: "Choose the location on the map or paste coordinates / a Google Maps link.",
     },
     {
       name: "description",
       label: "Description",
-      kind: "textarea",
+      kind: "richtext",
       initial: place?.description ?? "",
+      hint: "Tell the story of this place. Use headings, lists, links and images inserted by URL.",
     },
-    ...(place ? [] : imageFields),
+    {
+      name: "coverImageUrl",
+      label: "Cover image",
+      kind: "image",
+      initial: place?.cover_image_url ?? "",
+      creditField: "coverImageCredit",
+    },
+    {
+      name: "coverImageAlt",
+      label: "Cover image description",
+      initial: place?.cover_image_alt ?? "",
+      hint: "Describe the image for visitors using a screen reader.",
+    },
+    {
+      name: "coverImageCredit",
+      label: "Cover image credit",
+      initial: place?.cover_image_credit ?? "",
+      placeholder: "Photographer, artist or institution",
+    },
   ];
 }
 
@@ -288,11 +343,20 @@ export default function AdminContentLibrary({
   async function update(values: Record<string, string>) {
     if (!id) return;
     const contentId = Number(id);
+    let imageAttachmentError: string | undefined;
     if (kind === "events") await updateAdminEvent(contentId, values);
     else if (kind === "people") await updateAdminPerson(contentId, values);
-    else await updateAdminPlace(contentId, values);
+    else {
+      const result = await updateAdminPlace(contentId, values);
+      imageAttachmentError = result.imageAttachmentError;
+    }
+
+    const label = `${info.singular[0].toUpperCase()}${info.singular.slice(1)}`;
     showToast(
-      `${info.singular[0].toUpperCase()}${info.singular.slice(1)} saved.`,
+      imageAttachmentError
+        ? `${label} saved, but the picture could not be attached: ${imageAttachmentError}`
+        : `${label} saved.`,
+      imageAttachmentError ? "error" : "success",
     );
     await load();
   }

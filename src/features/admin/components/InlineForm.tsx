@@ -1,10 +1,19 @@
-import { useEffect, useState, type FormEvent } from "react";
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import Button from "../../../components/ui/Button";
 import { useAuth } from "../../auth/auth-context";
 import { uploadAdminImage, type UploadedMedia } from "../api/media";
 import RichTextEditor from "./RichTextEditor";
 import LinksField from "./LinksField";
 import { getApiFieldErrors } from "../../../services/api/client";
+
+const LocationPicker = lazy(() => import("./LocationPicker"));
 export interface FormField {
   name: string;
   label: string;
@@ -17,7 +26,8 @@ export interface FormField {
     | "email"
     | "password"
     | "image"
-    | "links"; // a short list of names and web addresses
+    | "links"
+    | "location"; // a short list of names and web addresses
   required?: boolean;
   placeholder?: string;
   hint?: string;
@@ -72,6 +82,7 @@ export default function InlineForm({
   const [uploadProgress, setUploadProgress] = useState<Record<string, number>>(
     {},
   );
+  const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   useEffect(
     () => () => {
@@ -153,14 +164,29 @@ export default function InlineForm({
       }
 
       await onSubmit(submitted);
-      if (!keepValues) {
+
+      if (keepValues) {
+        // Keep the uploaded URL in the form, but consume its media ID so a
+        // later save does not attach the same upload a second time.
+        const imageValues = Object.fromEntries(
+          fields
+            .filter((field) => field.kind === "image")
+            .map((field) => [field.name, submitted[field.name] ?? ""]),
+        );
+        setValues((current) => ({ ...current, ...imageValues }));
+      } else {
         setValues(start());
-        setFiles({});
-        setImageValidationErrors({});
-        setUploadedMedia({});
-        setPreviews({});
-        setUploadProgress({});
       }
+
+      setErrors({});
+      Object.values(fileInputRefs.current).forEach((input) => {
+        if (input) input.value = "";
+      });
+      setFiles({});
+      setImageValidationErrors({});
+      setUploadedMedia({});
+      setPreviews({});
+      setUploadProgress({});
     } catch (error) {
       const apiFieldErrors = getApiFieldErrors(error);
       const formFieldErrors = Object.fromEntries(
@@ -212,7 +238,16 @@ export default function InlineForm({
               {field.required && " *"}
             </label>
 
-            {field.kind === "richtext" ? (
+            {field.kind === "location" ? (
+              <Suspense fallback={<p className="font-sans text-meta text-muted">Loading map…</p>}>
+                <LocationPicker
+                  id={id}
+                  value={values[field.name]}
+                  invalid={!!errors[field.name]}
+                  onChange={change}
+                />
+              </Suspense>
+            ) : field.kind === "richtext" ? (
               <RichTextEditor
                 id={id}
                 label={field.label}
@@ -249,6 +284,9 @@ export default function InlineForm({
             ) : field.kind === "image" ? (
               <div>
                 <input
+                  ref={(element) => {
+                    fileInputRefs.current[field.name] = element;
+                  }}
                   id={id}
                   type="file"
                   accept="image/jpeg,image/png,image/webp"

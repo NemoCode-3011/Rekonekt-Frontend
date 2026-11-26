@@ -13,6 +13,7 @@ import {
   createAdminEvent,
   createAdminPerson,
   createAdminPlace,
+  updateAdminPlace,
   linkEventPerson,
   setEventSection,
 } from "./content";
@@ -106,6 +107,101 @@ describe("admin content API", () => {
       name: "Example Place",
       latitude: 6.335,
       longitude: 5.6037,
+    });
+  });
+
+  it("uses a supplied place slug without sending blank optional fields", async () => {
+    httpMock.post.mockResolvedValue({ data: { data: { id: 10 } } });
+
+    await createAdminPlace({
+      name: "Example Place",
+      slug: "example-place-custom",
+      coordinates: "6.3350, 5.6037",
+      region: "",
+      category: "",
+      summary: "",
+      description: "",
+    });
+
+    expect(httpMock.post).toHaveBeenCalledWith("/places", {
+      name: "Example Place",
+      slug: "example-place-custom",
+      latitude: 6.335,
+      longitude: 5.6037,
+    });
+  });
+
+  it("attaches a newly uploaded place picture", async () => {
+    httpMock.post.mockImplementation((path: string) =>
+      Promise.resolve({
+        data: {
+          data: path === "/places" ? { id: 11 } : { id: 91 },
+        },
+      }),
+    );
+
+    await createAdminPlace({
+      name: "Example Place",
+      coordinates: "6.3350, 5.6037",
+      imageUrl: "https://cdn.example/place.jpg",
+      imageMediaId: "91",
+      imageCredit: "Archive",
+      imageLicense: "CC BY",
+    });
+
+    expect(httpMock.post).toHaveBeenNthCalledWith(
+      2,
+      "/media-attachment",
+      { mediaId: 91, placeId: 11, displayOrder: 0 },
+    );
+  });
+
+  it("omits a blank slug and sends nulls to clear optional place fields", async () => {
+    httpMock.patch.mockResolvedValue({});
+
+    await updateAdminPlace(11, {
+      name: "Example Place",
+      slug: "",
+      coordinates: "6.3350, 5.6037",
+      summary: "",
+      region: "",
+      category: "",
+      description: "",
+      coverImageUrl: "",
+      coverImageAlt: "",
+      coverImageCredit: "",
+    });
+
+    expect(httpMock.patch).toHaveBeenCalledWith("/places/11", {
+      name: "Example Place",
+      summary: null,
+      region: null,
+      category: null,
+      description: null,
+      latitude: 6.335,
+      longitude: 5.6037,
+      coverImageUrl: null,
+      coverImageAlt: null,
+      coverImageCredit: null,
+    });
+  });
+
+  it("attaches a newly uploaded picture when updating a place", async () => {
+    httpMock.patch.mockResolvedValue({});
+    httpMock.post.mockResolvedValue({ data: { data: { id: 92 } } });
+
+    await updateAdminPlace(11, {
+      name: "Example Place",
+      coordinates: "6.3350, 5.6037",
+      coverImageUrl: "https://cdn.example/new-place.jpg",
+      imageMediaId: "92",
+      coverImageCredit: "Archive",
+    });
+
+    expect(httpMock.post).toHaveBeenCalledWith("/media-attachment", {
+      mediaId: 92,
+      placeId: 11,
+      displayOrder: 0,
     });
   });
 

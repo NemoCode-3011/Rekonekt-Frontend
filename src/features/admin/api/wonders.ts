@@ -1,5 +1,6 @@
 import { http } from "../../../services/api/client";
-import { parseCoordinates } from "./coordinates";
+import { parseLocation } from "./location";
+export { parseLocation } from "./location";
 import { clean, withSlug } from "./workspace";
 
 type Values = Record<string, string>;
@@ -45,31 +46,6 @@ export const listAdminWonders = () => get<AdminWonder[]>("/wonders/admin");
 
 export const getAdminWonder = (id: number) =>
   get<AdminWonder>(`/wonders/admin/${id}`);
-
-/**
- * Reads a map location typed or pasted by an admin.
- * Accepts "6.3350, 5.6037" or a full Google Maps link. Empty means no pin.
- */
-export function parseLocation(value: string) {
-  const text = value.trim();
-  if (!text) return null;
-
-  // Google Maps links carry the position in one of these shapes.
-  const fromLink =
-    text.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/) ??
-    text.match(/!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/) ??
-    text.match(/[?&](?:q|ll|query)=(-?\d+(?:\.\d+)?)(?:,|%2C)(-?\d+(?:\.\d+)?)/i);
-
-  try {
-    return parseCoordinates(
-      fromLink ? `${fromLink[1]}, ${fromLink[2]}` : text,
-    );
-  } catch {
-    throw new Error(
-      "Paste coordinates like 6.3350, 5.6037, or a full Google Maps link. Short links (maps.app.goo.gl) can't be read: open the link first and copy the address from the browser.",
-    );
-  }
-}
 
 /** Turns the "Learn more" rows into what the backend expects. Blank rows are skipped. */
 function readJson(json: string | undefined): unknown {

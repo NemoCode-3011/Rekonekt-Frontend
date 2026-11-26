@@ -32,6 +32,8 @@ const ExperienceDetail = lazy(
 );
 const Search = lazy(() => import("./pages/Search/Search"));
 const EventPage = lazy(() => import("./pages/Events/EventPage"));
+const Places = lazy(() => import("./pages/Places/Places"));
+const PlaceDetail = lazy(() => import("./pages/Places/PlaceDetail"));
 const Wonders = lazy(() => import("./pages/Wonders/Wonders"));
 const WonderDetail = lazy(() => import("./pages/Wonders/WonderDetail"));
 const Profile = lazy(() => import("./pages/Account/Profile"));
@@ -87,10 +89,8 @@ function App() {
                   path="/explore/events"
                   element={<CollectionPage kind="events" />}
                 />
-                <Route
-                  path="/explore/places"
-                  element={<CollectionPage kind="places" />}
-                />
+                <Route path="/explore/places" element={<Places />} />
+                <Route path="/places/:slug" element={<PlaceDetail />} />
                 <Route
                   path="/explore/artifacts"
                   element={<CollectionPage kind="artifacts" />}

@@ -4,7 +4,7 @@ import type {
   DashboardPerson,
   DashboardPlace,
 } from "../types/dashboard";
-import { parseCoordinates } from "./coordinates";
+import { parseLocation } from "./location";
 import { attachImage, clean, withSlug } from "./workspace";
 
 type Values = Record<string, string>;
@@ -105,23 +105,83 @@ export function updateAdminPerson(id: number, values: Values) {
 }
 
 export function createAdminPlace(values: Values) {
-  const { latitude, longitude } = parseCoordinates(values.coordinates);
-  return post<DashboardPlace>(
-    paths.places,
-    clean({
-      name: values.name.trim(),
-      description: values.description,
-      latitude,
-      longitude,
-    }),
-  ).then(async (place) => {
+  const location = parseLocation(values.coordinates ?? "");
+  if (!location) {
+    throw new Error("Choose a location on the map or enter coordinates.");
+  }
+
+  const coverImageUrl = values.coverImageUrl || values.imageUrl;
+  const payload = clean({
+    name: values.name.trim(),
+    slug: values.slug?.trim(),
+    summary: values.summary?.trim(),
+    region: values.region,
+    category: values.category,
+    description: values.description,
+    latitude: location.latitude,
+    longitude: location.longitude,
+    coverImageUrl,
+    coverImageAlt: values.coverImageAlt?.trim(),
+    coverImageCredit:
+      values.coverImageCredit?.trim() || values.imageCredit?.trim(),
+  });
+
+  return post<DashboardPlace>(paths.places, payload).then(async (place) => {
     const imageAttachmentError = await attachImageAndReport(
-      values,
+      {
+        ...values,
+        imageUrl: coverImageUrl ?? "",
+        imageCredit: values.coverImageCredit || values.imageCredit || "",
+      },
       values.name,
       { placeId: place.id },
     );
-    return imageAttachmentError ? { ...place, imageAttachmentError } : place;
+
+    return imageAttachmentError
+      ? { ...place, imageAttachmentError }
+      : place;
   });
+}
+
+export async function updateAdminPlace(
+  id: number,
+  values: Values,
+): Promise<{ imageAttachmentError?: string }> {
+  const location = parseLocation(values.coordinates ?? "");
+  if (!location) throw new Error("A place must always have a map location.");
+
+  const coverImageUrl = values.coverImageUrl || values.imageUrl;
+  await http.patch(`${paths.places}/${id}`, {
+    name: values.name.trim(),
+    // A blank slug means "keep the current slug". The API does not accept null.
+    ...(values.slug?.trim() ? { slug: values.slug.trim() } : {}),
+    summary: values.summary?.trim() || null,
+    region: values.region || null,
+    category: values.category || null,
+    description: values.description || null,
+    latitude: location.latitude,
+    longitude: location.longitude,
+    coverImageUrl: coverImageUrl || null,
+    coverImageAlt: values.coverImageAlt?.trim() || null,
+    coverImageCredit:
+      values.coverImageCredit?.trim() || values.imageCredit?.trim() || null,
+  });
+
+  // Only attach a new upload. The existing cover URL is already saved on the
+  // place and must not create another attachment every time the form is saved.
+  if (!values.imageMediaId || !coverImageUrl) return {};
+
+  const imageAttachmentError = await attachImageAndReport(
+    {
+      ...values,
+      imageUrl: coverImageUrl,
+      imageCredit: values.coverImageCredit || values.imageCredit || "",
+    },
+    values.name,
+    { placeId: id },
+  );
+
+  return imageAttachmentError ? { imageAttachmentError } : {};
 }
 
 async function attachImageAndReport(
@@ -134,19 +194,6 @@ async function attachImageAndReport(
   } catch (error) {
     return error instanceof Error ? error.message : "Could not attach the image.";
   }
-}
-
-export function updateAdminPlace(id: number, values: Values) {
-  const { latitude, longitude } = parseCoordinates(values.coordinates);
-  return http.patch(
-    `${paths.places}/${id}`,
-    clean({
-      name: values.name.trim(),
-      description: values.description,
-      latitude,
-      longitude,
-    }),
-  );
 }
 
 export function setAdminContentPublished(

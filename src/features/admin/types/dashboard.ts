@@ -57,9 +57,16 @@ export interface DashboardPerson extends DashboardBaseRecord {
 
 export interface DashboardPlace extends DashboardBaseRecord {
   name: string;
+  slug: string;
+  summary: string | null;
+  region: string | null;
+  category: string | null;
   description: string | null;
-  latitude: string | null;
-  longitude: string | null;
+  latitude: string | number | null;
+  longitude: string | number | null;
+  cover_image_url: string | null;
+  cover_image_alt: string | null;
+  cover_image_credit: string | null;
   kind: "Place";
 }
 
