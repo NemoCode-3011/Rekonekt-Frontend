@@ -17,6 +17,11 @@ import PageLoader from "./components/ui/PageLoader";
 import { Analytics } from "@vercel/analytics/react";
 
 const Home = lazy(() => import("./pages/Home/Home"));
+const SourcesMethodology = lazy(
+  () => import("./pages/Legal/SourcesMethodology"),
+);
+const PrivacyPolicy = lazy(() => import("./pages/Legal/PrivacyPolicy"));
+const TermsOfUse = lazy(() => import("./pages/Legal/TermsOfUse"));
 const SignUp = lazy(() => import("./pages/Auth/SignUp"));
 const Verify = lazy(() => import("./pages/Auth/Verify"));
 const SignIn = lazy(() => import("./pages/Auth/SignIn"));
@@ -101,6 +106,9 @@ function App() {
                 />
                 <Route path="/search" element={<Search />} />
                 <Route path="/about" element={<About />} />
+                <Route path="/sources" element={<SourcesMethodology />} />
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/terms" element={<TermsOfUse />} />
                 <Route path="/stories" element={<Stories />} />
                 <Route path="/stories/:slug" element={<StoryDetail />} />
                 <Route path="/people/:slug" element={<PersonPage />} />

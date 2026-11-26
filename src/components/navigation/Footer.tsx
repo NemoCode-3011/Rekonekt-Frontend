@@ -13,9 +13,9 @@ const exploreLinks = [
 const rekoLinks = [
   { label: "Stories", to: "/stories" },
   { label: "About", to: "/about" },
-  { label: "Sources / Methodology", to: "/sources" },
-  { label: "Privacy", to: "/privacy" },
-  { label: "Terms", to: "/terms" },
+  { label: "Sources & Methodology", to: "/sources" },
+  { label: "Privacy Policy", to: "/privacy" },
+  { label: "Terms of Use", to: "/terms" },
 ];
 
 export default function Footer() {
@@ -46,8 +46,9 @@ export default function Footer() {
             </p>
 
             <p className="mt-8 max-w-md text-body-s leading-relaxed text-ivory/65">
-              Exploring Nigeria's history, culture, and the stories shaping
-              its present.
+              Nigeria’s past is full of stories worth questioning, understanding
+              and carrying forward. REKÒ brings them into view, with the context
+              and sources to look closer.
             </p>
           </motion.div>
 
@@ -112,7 +113,7 @@ export default function Footer() {
         <div className="border-t border-line-light py-6">
           <div className="flex flex-col gap-2 text-meta text-ivory/65 sm:flex-row sm:items-center sm:justify-between">
             <p>© 2026 REKÒ</p>
-            <p>Nigeria's history, culture, and stories.</p>
+            <p>Nigerian history. Cultural heritage. Stories that deserve to be told.</p>
           </div>
         </div>
       </div>
