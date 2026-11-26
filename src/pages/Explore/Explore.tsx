@@ -7,6 +7,7 @@ import peopleImage from "../../assets/images/hero/people4.jpg";
 import eventsImage from "../../assets/images/hero/events1.jpg";
 import placesImage from  "../../assets/images/hero/ex-6.webp";
 import artifactsImage from "../../assets/images/hero/artifact1.jpg";
+import wondersImage from "../../assets/images/hero/obudu5.jpg";
 
 const discoveryRoutes = [
   {
@@ -43,6 +44,14 @@ const discoveryRoutes = [
     description: "Look closer at what survived.",
     to: "/explore/artifacts",
     image: artifactsImage,
+  },
+  {
+    number: "06",
+    label: "Hidden wonders",
+    description:
+      "Waterfalls, festivals, foods and crafts you won't find in a textbook.",
+    to: "/wonders",
+    image: wondersImage,
   },
 ];
 
@@ -110,8 +119,8 @@ export default function Explore() {
             </p>
 
             <p className="mt-5 text-body-l text-muted">
-              Follow a person, place, event, artifact, or exhibition. Every
-              path leads somewhere else.
+              Follow a person, place, event, artifact, exhibition, or hidden
+              wonder. Every path leads somewhere else.
             </p>
           </div>
 

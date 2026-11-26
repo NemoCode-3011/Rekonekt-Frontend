@@ -8,6 +8,7 @@ const groups: { type: SearchResultType; label: string }[] = [
   { type: "person", label: "People" },
   { type: "event", label: "Events" },
   { type: "place", label: "Places" },
+  { type: "wonder", label: "Hidden wonders" },
   { type: "artifact", label: "Objects" },
   { type: "story", label: "Stories" },
 ];
@@ -32,7 +33,8 @@ function SearchResults({
     <div aria-live="polite">
       {status === "idle" && (
         <p className="max-w-md font-sans text-body-l text-muted">
-          Search for people, places, events, objects and stories.
+          Search for people, places, events, objects, stories and hidden
+          wonders.
         </p>
       )}
 

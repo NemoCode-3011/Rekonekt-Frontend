@@ -8,8 +8,20 @@ interface SearchResultGroupProps {
   results: SearchResult[];
 }
 
-// What opens when a result is selected. Exhibitions have their own page,
-// so they return null here and are handled as links below.
+// Exhibitions and hidden wonders have their own pages, so they are links.
+function pathFor(result: SearchResult) {
+  if (!result.slug) return null;
+  if (result.type === "exhibition") {
+    return `/exhibitions/${encodeURIComponent(result.slug)}`;
+  }
+  if (result.type === "wonder") {
+    return `/wonders/${encodeURIComponent(result.slug)}`;
+  }
+  return null;
+}
+
+// What opens in the drawer when a result is selected. Pages that have their
+// own address return null here and are handled as links below.
 function refFor(result: SearchResult): DiscoveryRef | null {
   switch (result.type) {
     case "person":
@@ -67,11 +79,12 @@ function SearchResultGroup({ label, results }: SearchResultGroupProps) {
         {results.map((result) => {
           const key = `${result.type}-${result.id}`;
           const ref = refFor(result);
+          const path = pathFor(result);
 
-          if (result.type === "exhibition" && result.slug) {
+          if (path) {
             return (
               <li key={key}>
-                <Link to={`/exhibitions/${result.slug}`} className={rowClass}>
+                <Link to={path} className={rowClass}>
                   <RowText result={result} />
                 </Link>
               </li>

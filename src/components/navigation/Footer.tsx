@@ -7,6 +7,7 @@ const exploreLinks = [
   { label: "Events", to: "/explore/events" },
   { label: "Places", to: "/explore/places" },
   { label: "Artifacts", to: "/explore/artifacts" },
+  { label: "Hidden wonders", to: "/wonders" },
 ];
 
 const rekoLinks = [

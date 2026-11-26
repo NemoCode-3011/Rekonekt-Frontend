@@ -31,6 +31,8 @@ const ExperienceDetail = lazy(
   () => import("./pages/Experiences/ExperienceDetail"),
 );
 const Search = lazy(() => import("./pages/Search/Search"));
+const Wonders = lazy(() => import("./pages/Wonders/Wonders"));
+const WonderDetail = lazy(() => import("./pages/Wonders/WonderDetail"));
 const Profile = lazy(() => import("./pages/Account/Profile"));
 const Progress = lazy(() => import("./pages/Account/Progress"));
 const Bookmarks = lazy(() => import("./pages/Account/Bookmarks"));
@@ -101,6 +103,8 @@ function App() {
                 <Route path="/stories" element={<Stories />} />
                 <Route path="/stories/:slug" element={<StoryDetail />} />
                 <Route path="/people/:slug" element={<PersonPage />} />
+                <Route path="/wonders" element={<Wonders />} />
+                <Route path="/wonders/:slug" element={<WonderDetail />} />
 
                 {/* Visitor account */}
                 <Route path="/account" element={<RequireAuth />}>

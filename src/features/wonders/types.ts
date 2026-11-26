@@ -38,6 +38,41 @@ const plural: Record<WonderType, string> = {
   other: "Other wonders",
 };
 
+// A wonder as the browse page's cards see it (GET /wonders).
+export interface WonderCard {
+  id: number;
+  title: string;
+  slug: string;
+  wonder_type: string;
+  summary: string | null;
+  region: string | null;
+  // The database sends decimals as text, for example "6.3700000".
+  latitude: string | number | null;
+  longitude: string | number | null;
+  cover_image_url: string | null;
+  cover_image_alt: string | null;
+  cover_image_credit: string | null;
+  published_at: string | null;
+}
+
+// One "Learn more" link.
+export interface WonderLink {
+  id: number;
+  label: string;
+  url: string;
+  note: string | null;
+  display_order: number;
+}
+
+// A whole wonder (GET /wonders/:slug).
+export interface WonderDetail extends WonderCard {
+  content: string | null;
+  video_url: string | null;
+  // A safe youtube-nocookie address for the iframe, or null.
+  video_embed_url: string | null;
+  references: WonderLink[];
+}
+
 export function isWonderType(
   value: string | null | undefined,
 ): value is WonderType {

@@ -7,6 +7,7 @@ import { useScrollLock } from "./useScrollLock";
 const links = [
   { to: "/explore", label: "Explore" },
   { to: "/stories", label: "Stories" },
+  { to: "/wonders", label: "Hidden wonders" },
   { to: "/about", label: "About" },
 ];
 
