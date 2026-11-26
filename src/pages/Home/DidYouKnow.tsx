@@ -124,7 +124,7 @@ export default function DidYouKnow() {
               className="mt-10"
             >
               <ArrowLink to={storyPath(story.slug)} className="text-ink">
-                Explore the story
+                Read the story
               </ArrowLink>
             </motion.div>
           </div>

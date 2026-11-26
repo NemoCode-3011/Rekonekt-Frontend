@@ -79,8 +79,8 @@ export default function CinematicInterlude() {
               },
             }}
           >
-            Look closer: every landscape, memory and voice opens a different
-            way into Nigeria.
+            Every landscape, memory and voice opens another window into Nigeria's
+            past.
           </motion.p>
         </motion.div>
       </div>

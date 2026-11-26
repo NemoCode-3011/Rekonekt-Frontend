@@ -24,7 +24,7 @@ export default function FeaturedExhibition() {
   const title = exhibition?.title ?? "Our exhibitions";
   const teaser =
     exhibition?.subtitle ??
-    "Stories that unfold across time, place and perspective.";
+    "A story told through its people, places and surviving traces.";
   const image = exhibition?.cover_image_url || fallbackImage;
   const href = exhibition
     ? `/exhibitions/${exhibition.slug}`

@@ -162,7 +162,7 @@ export default function HiddenWonders() {
             </p>
 
             <h2 className="mt-5 max-w-3xl font-display text-display-l leading-[0.95]">
-              Some of Nigeria's stories are hiding in plain sight.
+              Some of Nigeria's most remarkable places are hiding in plain sight.
             </h2>
 
             <div className="mt-10">
@@ -181,7 +181,7 @@ export default function HiddenWonders() {
               to={wonder.href}
               className="mt-8 text-ivory"
             >
-              Discover the wonder
+              Visit the wonder
             </ArrowLink>
           </motion.div>
         </AnimatePresence>

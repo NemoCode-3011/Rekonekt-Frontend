@@ -15,36 +15,36 @@ const routes = [
   {
     key: "people",
     label: "People",
-    line: "Meet the people behind the stories.",
+    line: "Meet the lives behind Nigeria's history.",
     to: "/explore/people",
-    link: "Explore People",
+    link: "View People",
     env: "bg-sand text-ink",
     Stage: PeopleStage,
   },
   {
     key: "events",
     label: "Events",
-    line: "Trace the moments that changed things.",
+    line: "Follow the moments that changed the course of history.",
     to: "/explore/events",
-    link: "Explore Events",
+    link: "View Events",
     env: "bg-deep-forest text-ivory",
     Stage: EventsStage,
   },
   {
     key: "places",
     label: "Places",
-    line: "Discover where history happened.",
+    line: "Visit the places where history unfolded.",
     to: "/explore/places",
-    link: "Explore Places",
+    link: "View Places",
     env: "bg-heritage-green text-ivory",
     Stage: PlacesStage,
   },
   {
     key: "artifacts",
     label: "Artifacts",
-    line: "Look closer at what survived.",
+    line: "Examine the objects that carry traces of the past.",
     to: "/explore/artifacts",
-    link: "Explore Artifacts",
+    link: "View Artifacts",
     env: "bg-ivory text-ink",
     Stage: ArtifactsStage,
   },
@@ -76,7 +76,7 @@ export default function DiscoverDifferently() {
     <section className="bg-ivory py-24 lg:py-40">
       <div className="container">
         <p className="text-label font-medium tracking-widest text-heritage-green">
-          DISCOVER DIFFERENTLY
+          FIND YOUR WAY IN
         </p>
 
         <h2 className="mt-6 max-w-4xl font-display text-display-m leading-[1.02]">

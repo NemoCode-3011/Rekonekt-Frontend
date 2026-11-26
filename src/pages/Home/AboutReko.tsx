@@ -1,7 +1,7 @@
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import archive from "../../assets/images/hero/ind61.jpg";
 
-const stages = ["Discover", "Explore", "Connect", "Understand"];
+const stages = ["Discover", "Question", "Connect", "Understand"];
 
 const DRAW = 1.6; // seconds for the line to run through all four stages
 
@@ -46,13 +46,13 @@ export default function AboutReko() {
           <h2 className="font-display text-display-l leading-[1.02] lg:col-span-9">
             History is bigger
             <br className="hidden md:block" /> than what made
-            <br className="hidden md:block" /> the textbook.
+            <br className="hidden md:block" /> it into the textbook.
           </h2>
 
           <p className="mt-10 max-w-reading text-body-l text-muted lg:col-span-4 lg:col-start-6 lg:mt-16">
-            REKÒ explores Nigeria&rsquo;s history and cultural heritage through the
-            people, places, events, objects, and traditions that shaped it —
-            and the stories that connect them.
+            REKÒ explores Nigeria’s history and cultural heritage through the people,
+            places, events, objects, and traditions that shaped it — and the
+            stories that connect them.
           </p>
         </div>
         <figure className="mt-12 md:ml-auto md:-mr-(--gutter) md:w-1/2 lg:absolute lg:right-0 lg:top-24 lg:mr-0 lg:mt-0 lg:w-[30vw]">

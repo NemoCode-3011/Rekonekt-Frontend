@@ -30,7 +30,7 @@ export default function AccountCTA() {
               }}
               className="max-w-4xl font-display text-display-m leading-[0.95] lg:text-display-l"
             >
-              Don't just explore history. Keep it with you.
+              Keep the stories that stay with you.
             </motion.h2>
           </div>
 
@@ -44,8 +44,8 @@ export default function AccountCTA() {
             }}
             className="mt-8 max-w-2xl text-body-l text-ink/75"
           >
-            Save the stories that stay with you. Track your progress. Build your
-            own path through REKÒ.
+            Save the people, places and stories that matter to you. Keep notes, track
+            your progress and return whenever you're ready.
           </motion.p>
 
           <motion.div
