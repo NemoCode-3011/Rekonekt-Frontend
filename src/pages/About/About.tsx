@@ -28,7 +28,7 @@ type Piece = {
   to?: string;
 };
 
-// The opening photograph. It is your about3 file, shown as it is.
+// The opening photograph. This uses about11; about3 appears in the On view gallery.
 // Fill in title, detail and credit to show a small caption on the photograph.
 const heroPiece: Piece = {
   file: "about11",
@@ -50,47 +50,47 @@ const onView: Piece[] = [
 const thenPiece: Piece = { file: "then" };
 const nowPiece: Piece = { file: "now" };
 
-const stages = ["Discover", "Explore", "Connect", "Understand"];
+const stages = ["Look closely", "Question", "Connect", "Understand"];
 
 const galleries = [
   {
     name: "Exhibitions",
-    body: "Walk through a story chapter by chapter, with images, documents and context at every stop.",
+    body: "Follow a subject through carefully arranged chapters, with images, documents and context along the way.",
   },
   {
     name: "People",
-    body: "The individuals behind the history, in the setting they lived in.",
+    body: "Meet the people whose lives, choices and ideas shaped events and communities.",
   },
   {
     name: "Events",
-    body: "The moments that turned things, and the evidence for what happened.",
+    body: "Explore moments of change, and the evidence and competing accounts behind them.",
   },
   {
     name: "Places",
-    body: "Cities, sites and landscapes where history was made.",
+    body: "Visit the cities, sites and landscapes connected to Nigeria’s past and present.",
   },
   {
     name: "Artifacts",
-    body: "Objects to look at closely, and the stories of where they came from.",
+    body: "Look closely at objects, their origins, their uses and the stories they carry.",
   },
 ];
 
 const ways = [
   {
     title: "Wander",
-    body: "Start anywhere. Pick an object, a person or a year and see where it leads.",
+    body: "Begin with a person, place, event or object that interests you, then follow the connections.",
   },
   {
     title: "Step inside an exhibition",
-    body: "Each one runs chapter by chapter. Take it slowly or skim it.",
+    body: "Read the chapters in order or move between them at your own pace.",
   },
   {
     title: "Check the sources",
-    body: "Every chapter lists where its information comes from. Follow the trail yourself.",
+    body: "Look for references and follow them to learn more about the material behind a story.",
   },
   {
     title: "Keep what you find",
-    body: "Make an account to bookmark pieces, write notes and pick up where you left off.",
+    body: "Create an account to bookmark items, keep notes and return to what you have discovered.",
   },
 ];
 
@@ -237,7 +237,7 @@ function Opening() {
             animate={{ y: 0 }}
             transition={{ duration: 1, ease: [0.76, 0, 0.24, 1], delay: 0.5 }}
           >
-            History is bigger than what made the textbook.
+            History is bigger than what made it into the textbook.
           </motion.h1>
         </div>
 
@@ -247,8 +247,9 @@ function Opening() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, ease, delay: 1.1 }}
         >
-          REKÒ is a digital museum of Nigerian history and culture. Walk through exhibitions, look
-          closely at objects, and read the sources behind every chapter.
+          Nigeria’s past is older, richer and more contested than most of us were taught. REKÒ is a digital
+          museum where you can explore the people, places, events and objects behind it, and check the
+          sources for yourself.
         </motion.p>
 
         <div className="mt-8 flex items-end justify-between gap-6 [@media(max-height:520px)]:hidden">
@@ -304,9 +305,9 @@ export default function About() {
 
               <div className="lg:col-span-4 lg:col-start-9 lg:pt-4">
                 <p className="text-body-l text-muted">
-                  REKÒ puts the pieces back together: who was there, where it happened, what
-                  survived, and how we know. Every exhibition is built on sourced evidence,
-                  including the places where accounts disagree.
+                  The stories exist, but they’re scattered across books, archives and community memory. From Nok
+                  terracottas to the Aburi meeting, REKÒ brings stories together and gives each one its
+                  context, so you can see not just what happened, but how we know.
                 </p>
 
                 <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-label font-medium uppercase tracking-widest text-heritage-green">
@@ -324,11 +325,10 @@ export default function About() {
           <section className="overflow-hidden border-b border-line">
             <div className="container py-20 md:py-28">
               <div className="grid gap-6 md:grid-cols-[1fr_2fr] md:gap-24">
-                <h2 className="font-display text-heading-l leading-tight">On view</h2>
+                <h2 className="font-display text-heading-l leading-tight">Our mission</h2>
                 <p className="max-w-xl text-body-m text-muted md:pt-3">
-                  Nigeria has hundreds of ethnic groups and languages, and no single exhibition can
-                  hold them all. Each one here follows a single thread in depth and names who is
-                  telling it.
+                  Each exhibition follows one story at a time, with room for the people and perspectives connected
+                  to it. We want Nigerian history to be something you can step into, not just read about.
                 </p>
               </div>
 
@@ -345,7 +345,7 @@ export default function About() {
                   const tag = `No. ${String(index + 2).padStart(2, "0")}`;
                   const content = (
                     <figure>
-                      <Plate piece={piece} className="aspect-4/5-full" />
+                      <Plate piece={piece} className="aspect-4/5 w-full" />
                       <Label tag={tag} piece={piece} />
                     </figure>
                   );
@@ -375,10 +375,10 @@ export default function About() {
         <section className="border-b border-line">
           <div className="container py-20 md:py-28">
             <div className="grid gap-6 md:grid-cols-[1fr_2fr] md:gap-24">
-              <h2 className="font-display text-heading-l leading-tight">What&rsquo;s inside.</h2>
+              <h2 className="font-display text-heading-l leading-tight">Our approach</h2>
               <p className="max-w-xl text-body-m text-muted md:pt-3">
-                REKÒ is arranged the way a museum is, by what you can look at. There is no right
-                order.
+                Every exhibition combines documented evidence, cultural knowledge and storytelling. Start with a
+                subject, follow the connections, and take your own path through the museum.
               </p>
             </div>
 
@@ -400,13 +400,15 @@ export default function About() {
         <section className="bg-deep-forest text-ivory">
           <div className="container py-20 md:py-28 lg:py-36">
             <h2 className="max-w-5xl font-display text-display-m leading-[0.98]">
-              Every claim comes with its source. Where historians disagree, we say so.
+              History deserves curiosity, context and care.
             </h2>
 
             <p className="mt-8 max-w-2xl text-body-l text-ivory/75">
-              We would rather you check us than trust us. Each chapter lists where its information
-              comes from, and when the evidence supports more than one reading, you will see more
-              than one.
+              We identify sources and acknowledge when accounts differ. Documented evidence, oral
+              histories, folklore and interpretation each have a place, but they are not the same thing.
+              We aim to give each story its context, respect the communities connected to it, and be
+              clear about what is known, what is remembered and what is interpreted. We do not leave
+              difficult histories out because they are contested. Where accounts differ, we say so.
             </p>
           </div>
         </section>
@@ -418,14 +420,14 @@ export default function About() {
               <div className="grid gap-6 md:grid-cols-[1fr_2fr] md:gap-24">
                 <h2 className="font-display text-heading-l leading-tight">Then, and now</h2>
                 <p className="max-w-xl text-body-m text-muted md:pt-3">
-                  Documents from the archive sit beside photographs taken in recent years, so you
-                  can see where one leads to the other.
+                  Put historical records alongside more recent images to explore what has changed,
+                  what has endured and how places and communities connect past and present.
                 </p>
               </div>
 
               <div className="mt-12 grid gap-10 md:grid-cols-2 md:gap-10">
                 <figure>
-                  <Plate piece={thenPiece} className="aspect-5/4-full" />
+                  <Plate piece={thenPiece} className="aspect-5/4 w-full" />
                   <Label tag="Then" piece={thenPiece} />
                 </figure>
 
@@ -464,8 +466,8 @@ export default function About() {
             </h2>
 
             <p className="mt-6 max-w-xl text-body-l text-ivory/75">
-              Begin with one object, one person or one year. Follow it for as long as it holds your
-              interest.
+              Start with one story. Follow its connections and discover how the past continues to
+              shape the world around us.
             </p>
 
             <div className="mt-10">

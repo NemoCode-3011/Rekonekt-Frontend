@@ -50,9 +50,9 @@ export default function AboutReko() {
           </h2>
 
           <p className="mt-10 max-w-reading text-body-l text-muted lg:col-span-4 lg:col-start-6 lg:mt-16">
-            REKÒ is a digital space for discovering Nigeria through the people,
-            places, events, objects, and stories that shaped it — and the
-            connections between them.
+            REKÒ explores Nigeria&rsquo;s history and cultural heritage through the
+            people, places, events, objects, and traditions that shaped it —
+            and the stories that connect them.
           </p>
         </div>
         <figure className="mt-12 md:ml-auto md:-mr-(--gutter) md:w-1/2 lg:absolute lg:right-0 lg:top-24 lg:mr-0 lg:mt-0 lg:w-[30vw]">

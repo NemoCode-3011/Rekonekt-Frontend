@@ -73,8 +73,8 @@ export default function Hero() {
           className="mt-4 max-w-2xl text-body-m text-ivory/80 [@media(max-height:600px)]:hidden"
           {...reveal(1)}
         >
-          REKÒ connects the people, places, events and objects behind
-          Nigeria&rsquo;s stories.
+          Explore the people, places, events, objects and traditions that
+          tell the stories of Nigeria.
         </motion.p>
 
         <motion.div className="mt-5" {...reveal(1.15)}>
