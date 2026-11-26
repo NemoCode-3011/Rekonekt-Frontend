@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 import {
   getCollection,
@@ -127,12 +128,15 @@ export default function CollectionPage({ kind }: { kind: CollectionKind }) {
   const words = copy[kind];
 
   const { openRef } = useDiscovery();
+  const navigate = useNavigate();
 
   const [items, setItems] = useState<CollectionItem[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading",
   );
-  const [loadError, setLoadError] = useState("We couldn't load this collection.");
+  const [loadError, setLoadError] = useState(
+    "We couldn't load this collection.",
+  );
   const [query, setQuery] = useState("");
 
   // Runs again when the visitor moves between People, Events, Places and
@@ -206,9 +210,7 @@ export default function CollectionPage({ kind }: { kind: CollectionKind }) {
       <section className="py-16 md:py-24">
         <div className="container">
           {currentStatus === "loading" && <PageLoader />}
-          {currentStatus === "error" && (
-            <PageError message={loadError} />
-          )}
+          {currentStatus === "error" && <PageError message={loadError} />}
 
           {currentStatus === "ready" && currentItems.length === 0 && (
             <p className="text-body-m text-muted">{words.empty}</p>
@@ -240,7 +242,12 @@ export default function CollectionPage({ kind }: { kind: CollectionKind }) {
                     <Card
                       key={item.id}
                       item={item}
-                      onOpen={() => openRef(item.ref)}
+                      onOpen={() => {
+                        // Events have a page of their own. The rest open in
+                        // the side drawer.
+                        if (kind === "events") navigate(`/events/${item.id}`);
+                        else void openRef(item.ref);
+                      }}
                     />
                   ))}
                 </div>

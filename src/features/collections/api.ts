@@ -13,6 +13,7 @@ import type {
   ExperiencePlace,
 } from "../experience/types";
 import type { DiscoveryRef } from "../experience/discovery/types";
+import { toPlainText } from "../../lib/richText";
 
 export type CollectionKind = "people" | "events" | "places" | "artifacts";
 
@@ -23,7 +24,7 @@ export interface CollectionItem {
   meta: string | null;
   description: string | null;
   image: string | null;
-  credit: string | null; 
+  credit: string | null;
 
   // Extra details omo to dey comment get as e be
   year: string | null;
@@ -34,7 +35,8 @@ export interface CollectionItem {
 }
 
 function makeItem(
-  partial: Pick<CollectionItem, "id" | "ref" |"title"> & Partial<CollectionItem>,
+  partial: Pick<CollectionItem, "id" | "ref" | "title"> &
+    Partial<CollectionItem>,
 ): CollectionItem {
   return {
     meta: null,
@@ -122,7 +124,7 @@ const loaders: Record<CollectionKind, () => Promise<CollectionItem[]>> = {
         title: event.title,
         ref: { kind: "event", id: event.id },
         meta: event.date_display ?? yearOf(event.event_date),
-        description: event.description,
+        description: toPlainText(event.description) || null,
         image: event.image_url,
         year: yearOf(event.event_date),
         dateDisplay: event.date_display,

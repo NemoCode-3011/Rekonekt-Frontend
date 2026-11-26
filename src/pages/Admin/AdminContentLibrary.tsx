@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import PageError from "../../components/ui/PageError";
 import PageLoader from "../../components/ui/PageLoader";
@@ -99,8 +104,9 @@ function fieldsFor(
       {
         name: "description",
         label: "Description",
-        kind: "textarea",
+        kind: "richtext",
         initial: event?.description ?? "",
+        hint: "Add pictures and YouTube videos with the toolbar. Pictures are uploaded, never pasted in.",
       },
       {
         name: "imageUrl",
@@ -178,7 +184,10 @@ function metaOf(kind: AdminContentKind, record: AdminContentRecord) {
       : "Coordinates not set";
   }
   const person = record as DashboardPerson;
-  return [person.birth_date && `Born ${dateValue(person.birth_date)}`, person.death_date && `Died ${dateValue(person.death_date)}`]
+  return [
+    person.birth_date && `Born ${dateValue(person.birth_date)}`,
+    person.death_date && `Died ${dateValue(person.death_date)}`,
+  ]
     .filter(Boolean)
     .join(" · ");
 }
@@ -282,7 +291,9 @@ export default function AdminContentLibrary({
     if (kind === "events") await updateAdminEvent(contentId, values);
     else if (kind === "people") await updateAdminPerson(contentId, values);
     else await updateAdminPlace(contentId, values);
-    showToast(`${info.singular[0].toUpperCase()}${info.singular.slice(1)} saved.`);
+    showToast(
+      `${info.singular[0].toUpperCase()}${info.singular.slice(1)} saved.`,
+    );
     await load();
   }
 
@@ -308,7 +319,9 @@ export default function AdminContentLibrary({
     setBusy(true);
     try {
       await deleteAdminContent(kind, record.id);
-      showToast(`${info.singular[0].toUpperCase()}${info.singular.slice(1)} deleted.`);
+      showToast(
+        `${info.singular[0].toUpperCase()}${info.singular.slice(1)} deleted.`,
+      );
       navigate(`/admin/${kind}`);
     } catch (error) {
       showToast(
@@ -384,8 +397,8 @@ export default function AdminContentLibrary({
                   name={titleOf(record)}
                 />
                 <p className="border border-line p-5 font-sans text-body-s leading-relaxed text-muted">
-                  Relationships are managed from the event or exhibition
-                  chapter where this {info.singular} is featured.
+                  Relationships are managed from the event or exhibition chapter
+                  where this {info.singular} is featured.
                 </p>
               </>
             )}

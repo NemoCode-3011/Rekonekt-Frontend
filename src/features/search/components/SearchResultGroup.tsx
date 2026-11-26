@@ -2,14 +2,17 @@ import { Link } from "react-router-dom";
 import { useDiscovery } from "../../experience/discovery/discovery-context";
 import type { DiscoveryRef } from "../../experience/discovery/types";
 import type { SearchResult } from "../types";
+import { toPlainText } from "../../../lib/richText";
 
 interface SearchResultGroupProps {
   label: string;
   results: SearchResult[];
 }
 
-// Exhibitions and hidden wonders have their own pages, so they are links.
+// Exhibitions, events and hidden wonders have their own pages, so they are
+// links. (Events are found by their number, not their slug.)
 function pathFor(result: SearchResult) {
+  if (result.type === "event") return `/events/${result.id}`;
   if (!result.slug) return null;
   if (result.type === "exhibition") {
     return `/exhibitions/${encodeURIComponent(result.slug)}`;
@@ -40,15 +43,17 @@ const rowClass =
   "group flex w-full items-baseline justify-between gap-6 border-t border-line py-5 text-left";
 
 function RowText({ result }: { result: SearchResult }) {
+  // Event and place summaries can be rich text. Show just the words.
+  const summary = toPlainText(result.summary);
   return (
     <>
       <span>
         <span className="block font-display text-heading-s leading-tight transition-colors group-hover:text-heritage-green">
           {result.title}
         </span>
-        {result.summary && (
+        {summary && (
           <span className="mt-1 line-clamp-2 block font-sans text-body-s text-muted">
-            {result.summary}
+            {summary}
           </span>
         )}
       </span>

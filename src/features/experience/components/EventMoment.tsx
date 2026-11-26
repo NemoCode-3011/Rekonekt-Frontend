@@ -1,5 +1,6 @@
 import type { ExperienceEvent } from "../types";
 import ImageReveal from "./ImageReveal";
+import RichText from "../../../components/ui/RichText";
 
 interface EventMomentProps {
   event: ExperienceEvent;
@@ -13,7 +14,6 @@ function anchorLabel(event: ExperienceEvent) {
 
 function EventMoment({ event }: EventMomentProps) {
   const label = anchorLabel(event);
-  const paragraphs = event.description?.split(/\n+/).filter(Boolean) ?? [];
 
   return (
     <article className="border-t border-line py-14 md:py-20">
@@ -31,14 +31,10 @@ function EventMoment({ event }: EventMomentProps) {
             {event.title}
           </h3>
 
-          {paragraphs.map((paragraph, index) => (
-            <p
-              key={index}
-              className="mt-5 max-w-176 font-sans text-body-m leading-[1.8] text-ink/80"
-            >
-              {paragraph}
-            </p>
-          ))}
+          <RichText
+            html={event.description}
+            className="mt-5 max-w-176 font-sans text-body-m leading-[1.8] text-ink/80"
+          />
 
           {event.image_url && (
             <figure className="mt-10 max-w-3xl">

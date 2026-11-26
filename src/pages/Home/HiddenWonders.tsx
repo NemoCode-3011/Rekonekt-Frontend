@@ -6,37 +6,51 @@ import {
   useReducedMotion,
 } from "framer-motion";
 import ArrowLink from "../../components/ui/ArrowLink";
+import { getWonders } from "../../features/wonders/api";
+import { wonderTypeLabel } from "../../features/wonders/types";
 import awhum from "../../assets/images/hero/awhum-waterfall-and-cave1.png";
 import obudu from "../../assets/images/hero/obudu5.jpg";
 import agbokim from "../../assets/images/hero/Agbokim.jpg";
 
-type Wonder = {
+type Slide = {
+  key: string;
   name: string;
   location: string;
   image: string;
+  alt: string;
   href: string;
 };
 
-const wonders: Wonder[] = [
+// Shown until the real hidden wonders arrive (or if none has a picture yet).
+// They have no page of their own, so they lead to the hidden wonders page.
+const fallbackSlides: Slide[] = [
   {
+    key: "awhum",
     name: "Awhum Waterfall",
     location: "Enugu State",
     image: awhum,
-    href: "/places/awhum-waterfall",
+    alt: "Awhum Waterfall, Enugu State",
+    href: "/wonders",
   },
   {
+    key: "obudu",
     name: "Obudu Cattle Ranch",
-    location: "Cross-River",
+    location: "Cross River State",
     image: obudu,
-    href: "/places/obudu",
+    alt: "Obudu Cattle Ranch, Cross River State",
+    href: "/wonders",
   },
   {
+    key: "agbokim",
     name: "Agbokim Waterfalls",
     location: "Cross River State",
     image: agbokim,
-    href: "/places/agbokim-waterfalls",
+    alt: "Agbokim Waterfalls, Cross River State",
+    href: "/wonders",
   },
 ];
+
+const MAX_SLIDES = 5;
 
 const INTERVAL = 6000;
 
@@ -45,18 +59,59 @@ export default function HiddenWonders() {
   const sectionRef = useRef<HTMLElement>(null);
   const inView = useInView(sectionRef, { margin: "100px" });
   const [active, setActive] = useState(0);
+  const [slides, setSlides] = useState<Slide[]>(fallbackSlides);
+
+  // The slides are real hidden wonders, each linking to its own page.
+  useEffect(() => {
+    let cancelled = false;
+
+    getWonders()
+      .then((items) => {
+        if (cancelled) return;
+
+        const real = items.flatMap((item): Slide[] =>
+          item.cover_image_url
+            ? [
+                {
+                  key: item.slug,
+                  name: item.title,
+                  location:
+                    item.region ?? wonderTypeLabel(item.wonder_type) ?? "",
+                  image: item.cover_image_url,
+                  alt:
+                    item.cover_image_alt ??
+                    [item.title, item.region].filter(Boolean).join(", "),
+                  href: `/wonders/${item.slug}`,
+                },
+              ]
+            : [],
+        );
+
+        if (real.length > 0) {
+          setSlides(real.slice(0, MAX_SLIDES));
+          setActive(0);
+        }
+      })
+      .catch(() => {
+        // Keep the slides we already have.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
-    if (reduce || !inView) return;
+    if (reduce || !inView || slides.length < 2) return;
 
     const timer = window.setInterval(() => {
-      setActive((current) => (current + 1) % wonders.length);
+      setActive((current) => (current + 1) % slides.length);
     }, INTERVAL);
 
     return () => window.clearInterval(timer);
-  }, [inView, reduce]);
+  }, [inView, reduce, slides.length]);
 
-  const wonder = wonders[active];
+  const wonder = slides[active] ?? slides[0];
 
   return (
     <section
@@ -65,7 +120,7 @@ export default function HiddenWonders() {
     >
       <AnimatePresence mode="sync">
         <motion.div
-          key={wonder.image}
+          key={wonder.key}
           initial={reduce ? { opacity: 1 } : { opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -74,7 +129,7 @@ export default function HiddenWonders() {
         >
           <motion.img
             src={wonder.image}
-            alt={`${wonder.name}, ${wonder.location}`}
+            alt={wonder.alt}
             loading="lazy"
             decoding="async"
             className="h-full w-full object-cover"
@@ -115,9 +170,11 @@ export default function HiddenWonders() {
                 {wonder.name}
               </p>
 
-              <p className="mt-2 text-meta uppercase tracking-widest text-sand">
-                {wonder.location}
-              </p>
+              {wonder.location && (
+                <p className="mt-2 text-meta uppercase tracking-widest text-sand">
+                  {wonder.location}
+                </p>
+              )}
             </div>
 
             <ArrowLink
@@ -131,9 +188,9 @@ export default function HiddenWonders() {
 
         {/* Wonder navigation */}
         <div className="mt-12 flex items-center gap-3">
-          {wonders.map((item, index) => (
+          {slides.map((item, index) => (
             <button
-              key={item.name}
+              key={item.key}
               type="button"
               onClick={() => setActive(index)}
               aria-label={`Show ${item.name}`}
@@ -153,7 +210,7 @@ export default function HiddenWonders() {
 
           <span className="ml-2 text-meta tracking-widest text-ivory/70">
             {String(active + 1).padStart(2, "0")} /{" "}
-            {String(wonders.length).padStart(2, "0")}
+            {String(slides.length).padStart(2, "0")}
           </span>
         </div>
       </div>

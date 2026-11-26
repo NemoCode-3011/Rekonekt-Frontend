@@ -24,7 +24,6 @@ export interface Experience {
   sections: ExperienceSection[];
 }
 
-
 // (published events only, ordered by event_date, undated last).
 export interface ExperienceEvent {
   id: number;
@@ -60,6 +59,9 @@ export interface ExperienceMedia {
   description: string | null;
   source_credit: string | null;
   license: string | null;
+  // Only videos have these. A YouTube video comes with an embed address.
+  video_provider?: "youtube" | null;
+  embed_url?: string | null;
 }
 
 // artifact / person / place". Returned by GET /media-attachment.
@@ -69,6 +71,7 @@ export interface MediaAttachment {
   artifact_id: number | null;
   person_id: number | null;
   place_id: number | null;
+  event_id?: number | null;
   display_order: number | null;
 }
 
@@ -108,6 +111,6 @@ export interface ExperienceSource {
   citation: string | null;
   rights_statement: string | null;
   perspective_note: string | null;
-  cover_image_url: string | null; 
+  cover_image_url: string | null;
   relationship: string | null;
 }

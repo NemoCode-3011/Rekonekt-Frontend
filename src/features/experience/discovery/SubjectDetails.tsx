@@ -116,7 +116,8 @@ function SourcesBlock({
   if (status === "error") {
     return (
       <p className="mt-12 font-sans text-body-s text-muted">
-        {error ?? "We couldn't load the sources. Close this panel and try again."}
+        {error ??
+          "We couldn't load the sources. Close this panel and try again."}
       </p>
     );
   }
@@ -203,8 +204,13 @@ function PlaceDetails({ place }: { place: ExperiencePlace }) {
     </article>
   );
 }
-
-function EventDetails({ event }: { event: ExperienceEvent }) {
+function EventDetails({
+  event,
+  onClose,
+}: {
+  event: ExperienceEvent;
+  onClose: () => void;
+}) {
   const { items: sources, status, error } = useEventSources(event.id);
 
   return (
@@ -220,7 +226,18 @@ function EventDetails({ event }: { event: ExperienceEvent }) {
         <img src={event.image_url} alt={event.title} className="mt-8 w-full" />
       )}
 
-      <Description text={event.description} />
+      <RichText
+        html={event.description}
+        className="mt-5 font-sans text-body-m leading-[1.75] text-ink/80"
+      />
+
+      <Link
+        to={`/events/${event.id}`}
+        onClick={onClose}
+        className="mt-8 inline-flex items-center gap-2 border-b border-ink font-sans text-body-m font-medium transition-colors hover:text-heritage-green"
+      >
+        Open the full event <span aria-hidden>→</span>
+      </Link>
       <SourcesBlock sources={sources} status={status} error={error} />
     </article>
   );
@@ -314,7 +331,7 @@ function SubjectDetails({
     case "place":
       return <PlaceDetails place={subject.place} />;
     case "event":
-      return <EventDetails event={subject.event} />;
+      return <EventDetails event={subject.event} onClose={onClose} />;
     case "artifact":
       return <ArtifactDetails artifact={subject.artifact} />;
     case "story":

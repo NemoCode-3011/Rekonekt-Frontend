@@ -254,3 +254,20 @@ html[data-hall-focus] .hide-in-hall {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---------- Pictures and videos in rich text ---------- */
+.rte .ql-editor img,
+.rich-text img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.rte .ql-editor .ql-video,
+.rich-text iframe {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border: 0;
+}

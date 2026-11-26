@@ -16,7 +16,6 @@ async function get<T>(path: string) {
   const res = await http.get<{ message: string; data: T }>(path);
   return res.data.data;
 }
-
 // ---------- The experience, and a chapter's events ----------
 
 export function getExperienceBySlug(slug: string) {
@@ -25,6 +24,10 @@ export function getExperienceBySlug(slug: string) {
 
 export function getSectionEvents(sectionId: number) {
   return get<ExperienceEvent[]>(`/events/sections/${sectionId}`);
+}
+// One published event, for its own page.
+export function getEvent(id: number) {
+  return get<ExperienceEvent>(`/events/${id}`);
 }
 
 // ---------- Files (images, documents...) ----------
@@ -55,8 +58,7 @@ function getMediaLibrary() {
   return mediaLibraryRequest;
 }
 
-type MediaOwner = "artifact" | "person" | "place";
-
+type MediaOwner = "artifact" | "event" | "person" | "place";
 // Finds the files attached to one artifact, person or place, in the order
 // the editor set.
 function findMedia(owner: MediaOwner, ownerId: number, library: MediaLibrary) {
@@ -91,6 +93,19 @@ export async function getPersonMedia(personId: number) {
 
 export async function getPlaceMedia(placeId: number) {
   return findMedia("place", placeId, await getMediaLibrary());
+}
+
+// Pictures, videos (YouTube or uploaded) and files attached to an event.
+export async function getEventMedia(eventId: number) {
+  return findMedia("event", eventId, await getMediaLibrary());
+}
+
+export function getEventPeople(eventId: number) {
+  return get<ExperiencePerson[]>(`/events/${eventId}/people`);
+}
+
+export function getEventPlaces(eventId: number) {
+  return get<ExperiencePlace[]>(`/events/${eventId}/places`);
 }
 
 // ---------- People, places and sources ----------
