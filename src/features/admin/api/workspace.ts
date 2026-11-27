@@ -25,6 +25,13 @@ export function clean(values: Record<string, unknown>) {
   );
 }
 
+// For updates: a blank field is sent as null so the server clears it.
+// (clean() drops blanks, which is right when creating but keeps the old value
+// when editing.)
+export function orNull(value: string | undefined) {
+  return value && value.trim() !== "" ? value : null;
+}
+
 export function slugify(text: string) {
   const slug = text
     .toLowerCase()

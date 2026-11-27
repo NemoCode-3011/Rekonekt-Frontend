@@ -6,7 +6,7 @@ import type {
   DashboardPlace,
 } from "../types/dashboard";
 import { parseLocation } from "./location";
-import { attachImage, clean, withSlug } from "./workspace";
+import { attachImage, clean, withSlug, orNull } from "./workspace";
 
 type Values = Record<string, string>;
 type Reply<T> = { message: string; data: T };
@@ -58,16 +58,13 @@ export function createAdminEvent(values: Values) {
 }
 
 export function updateAdminEvent(id: number, values: Values) {
-  return http.patch(
-    `${paths.events}/${id}`,
-    clean({
-      title: values.title.trim(),
-      description: values.description,
-      eventDate: values.eventDate,
-      dateDisplay: values.dateDisplay,
-      imageUrl: values.imageUrl,
-    }),
-  );
+  return http.patch(`${paths.events}/${id}`, {
+    title: values.title.trim(),
+    description: orNull(values.description),
+    eventDate: orNull(values.eventDate),
+    dateDisplay: orNull(values.dateDisplay),
+    imageUrl: orNull(values.imageUrl),
+  });
 }
 
 export function setEventSection(id: number, sectionId: number | null) {
@@ -99,15 +96,12 @@ export function createAdminPerson(values: Values) {
 }
 
 export function updateAdminPerson(id: number, values: Values) {
-  return http.patch(
-    `${paths.people}/${id}`,
-    clean({
-      name: values.name.trim(),
-      description: values.description,
-      birthDate: values.birthDate,
-      deathDate: values.deathDate,
-    }),
-  );
+  return http.patch(`${paths.people}/${id}`, {
+    name: values.name.trim(),
+    description: orNull(values.description),
+    birthDate: orNull(values.birthDate),
+    deathDate: orNull(values.deathDate),
+  });
 }
 
 export function createAdminArtifact(values: Values) {
@@ -136,16 +130,13 @@ export function createAdminArtifact(values: Values) {
 }
 
 export function updateAdminArtifact(id: number, values: Values) {
-  return http.patch(
-    `${paths.artifacts}/${id}`,
-    clean({
-      title: values.title.trim(),
-      artifactType: values.artifactType.trim(),
-      description: values.description,
-      historicalContext: values.historicalContext,
-      dateDisplay: values.dateDisplay,
-    }),
-  );
+  return http.patch(`${paths.artifacts}/${id}`, {
+    title: values.title.trim(),
+    artifactType: values.artifactType.trim(),
+    description: orNull(values.description),
+    historicalContext: orNull(values.historicalContext),
+    dateDisplay: orNull(values.dateDisplay),
+  });
 }
 
 export function createAdminPlace(values: Values) {
