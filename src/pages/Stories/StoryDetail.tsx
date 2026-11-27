@@ -10,6 +10,7 @@ import { ApiError, getApiErrorMessage } from "../../services/api/client";
 import { splitStoryHtml } from "../../lib/richText";
 import PageLoader from "../../components/ui/PageLoader";
 import PageError from "../../components/ui/PageError";
+import AdaptiveImage from "../../components/ui/AdaptiveImage";
 // The story image appears after this many paragraphs or headings.
 const BODY_IMAGE_AFTER = 57;
 
@@ -68,7 +69,8 @@ export default function StoryDetail() {
       : state;
 
   // Put the story's title in the browser tab.
-  const title = currentState.status === "ready" ? currentState.story.title : null;
+  const title =
+    currentState.status === "ready" ? currentState.story.title : null;
   useEffect(() => {
     if (!title) return;
     const previous = document.title;
@@ -139,11 +141,11 @@ export default function StoryDetail() {
 
       {story.cover_image_url && (
         <figure className="container mt-12">
-          <img
+          <AdaptiveImage
             src={story.cover_image_url}
             alt={story.cover_image_alt ?? ""}
-            decoding="async"
-            className="max-h-[75svh] w-full object-cover"
+            loading="eager"
+            maxHeight="max-h-[75svh]"
           />
           {story.cover_image_credit && (
             <figcaption className="mt-3 max-w-3xl text-label text-muted">
@@ -170,12 +172,10 @@ export default function StoryDetail() {
 
           {story.body_image_url && (
             <figure className="my-12">
-              <img
+              <AdaptiveImage
                 src={story.body_image_url}
                 alt={story.body_image_alt ?? ""}
-                loading="lazy"
-                decoding="async"
-                className="max-h-[70svh] w-full object-cover"
+                maxHeight="max-h-[70svh]"
               />
               {story.body_image_credit && (
                 <figcaption className="mt-3 text-label text-muted">

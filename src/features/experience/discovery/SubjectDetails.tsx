@@ -23,6 +23,7 @@ import type { DiscoverySubject, ExperienceStory } from "./types";
 import SaveButton from "../../bookmarks/components/SaveButton";
 import RichText from "../../../components/ui/RichText";
 import { Link } from "react-router-dom";
+import AdaptiveImage from "../../../components/ui/AdaptiveImage";
 
 // "1933–1999", "Born 1933", "Died 1999", or nothing if no dates are known.
 function lifeSpan(person: ExperiencePerson) {
@@ -38,25 +39,13 @@ function lifeSpan(person: ExperiencePerson) {
 // ---------- Small pieces shared by every kind of subject ----------
 
 // The first picture attached to the subject, with its credit.
-function Picture({
-  media,
-  alt,
-  shape,
-}: {
-  media: ExperienceMedia[];
-  alt: string;
-  shape: string;
-}) {
+function Picture({ media, alt }: { media: ExperienceMedia[]; alt: string }) {
   const image = media.find((item) => item.media_type === "image");
   if (!image) return null;
 
   return (
     <figure className="mb-8">
-      <img
-        src={image.file_url}
-        alt={alt}
-        className={`w-full object-cover object-top ${shape}`}
-      />
+      <AdaptiveImage src={image.file_url} alt={alt} />
       {image.source_credit && (
         <figcaption className="mt-2 font-sans text-label text-muted">
           Credit: {image.source_credit}
@@ -150,7 +139,7 @@ function PersonDetails({
 
   return (
     <article>
-      <Picture media={media} alt={person.name} shape="aspect-[4/5]" />
+      <Picture media={media} alt={person.name}/>
 
       {years && (
         <p className="font-display text-heading-s text-ochre-deep">{years}</p>
@@ -184,7 +173,7 @@ function PlaceDetails({ place }: { place: ExperiencePlace }) {
 
   return (
     <article>
-      <Picture media={media} alt={place.name} shape="aspect-[4/3]" />
+      <Picture media={media} alt={place.name} />
 
       <h2 className="text-heading-l leading-[1.05]">{place.name}</h2>
       <Description text={place.description} />
@@ -250,7 +239,7 @@ function ArtifactDetails({ artifact }: { artifact: ExperienceArtifact }) {
 
   return (
     <article>
-      <Picture media={media} alt={artifact.title} shape="" />
+      <Picture media={media} alt={artifact.title}/>
 
       {artifact.date_display && (
         <p className="font-display text-heading-s text-ochre-deep">

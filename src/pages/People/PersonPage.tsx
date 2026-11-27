@@ -12,6 +12,7 @@ import { formatYear } from "../../lib/dates";
 import { toParagraphs } from "../../lib/text";
 import { ApiError, getApiErrorMessage } from "../../services/api/client";
 import { getData } from "../../services/api/request";
+import AdaptiveImage from "../../components/ui/AdaptiveImage";
 
 type PersonState =
   | { status: "loading" }
@@ -44,8 +45,11 @@ function initials(name: string) {
 
 function PersonStory({ person }: { person: ExperiencePerson }) {
   const { items: media } = usePersonMedia(person.id);
-  const { items: sources, status, error: sourcesError } =
-    usePersonSources(person.id);
+  const {
+    items: sources,
+    status,
+    error: sourcesError,
+  } = usePersonSources(person.id);
 
   const [lead, ...rest] = toParagraphs(person.description);
   const image = media.find((item) => item.media_type === "image");
@@ -75,10 +79,11 @@ function PersonStory({ person }: { person: ExperiencePerson }) {
           <aside className="lg:sticky lg:top-28 lg:self-start">
             {image ? (
               <figure>
-                <img
+                <AdaptiveImage
                   src={image.file_url}
                   alt={person.name}
-                  className="aspect-4/5 w-full max-w-sm object-cover object-top lg:max-w-none"
+                  maxHeight="max-h-[70svh]"
+                  className="max-w-sm lg:max-w-none"
                 />
                 {image.source_credit && (
                   <figcaption className="mt-2 font-sans text-label text-muted">
@@ -101,7 +106,9 @@ function PersonStory({ person }: { person: ExperiencePerson }) {
             {years && (
               <p className="font-display text-heading-s text-ochre">{years}</p>
             )}
-            <h1 className="mt-2 text-heading-l leading-[1.05]">{person.name}</h1>
+            <h1 className="mt-2 text-heading-l leading-[1.05]">
+              {person.name}
+            </h1>
 
             {lead && (
               <p className="mt-8 max-w-176 font-display text-heading-s leading-snug">
@@ -195,9 +202,7 @@ export default function PersonPage() {
           <PageLoader label="Loading their story…" />
         )}
 
-        {state.status === "error" && (
-          <PageError message={state.message} />
-        )}
+        {state.status === "error" && <PageError message={state.message} />}
 
         {state.status === "not-found" && (
           <div role="alert">
