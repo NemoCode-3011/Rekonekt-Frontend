@@ -14,6 +14,7 @@ import InlineForm, {
 } from "../../features/admin/components/InlineForm";
 import { useAuth } from "../../features/auth/auth-context";
 import {
+  createAdminArtifact,
   createAdminEvent,
   createAdminPerson,
   createAdminPlace,
@@ -21,6 +22,7 @@ import {
   getAdminContent,
   listAdminContent,
   setAdminContentPublished,
+  updateAdminArtifact,
   updateAdminEvent,
   updateAdminPerson,
   updateAdminPlace,
@@ -29,6 +31,7 @@ import {
 } from "../../features/admin/api/content";
 import { getApiErrorMessage } from "../../services/api/client";
 import type {
+  DashboardArtifact,
   DashboardEvent,
   DashboardPerson,
   DashboardPlace,
@@ -38,6 +41,9 @@ import AdminEventMedia from "../../features/admin/components/AdminEventMedia";
 import AdminPictures from "../../features/admin/components/AdminPictures";
 import AdminSources from "../../features/admin/components/AdminSources";
 import { PLACE_CATEGORIES, PLACE_REGIONS } from "../../features/places/types";
+import { matchesSearch } from "../../lib/searchText";
+
+const PAGE_SIZE = 50;
 
 const kindInfo: Record<
   AdminContentKind,
@@ -57,6 +63,11 @@ const kindInfo: Record<
     singular: "place",
     description:
       "Create places independently. Add them to events or exhibition chapters when useful.",
+  },
+  artifacts: {
+    singular: "artifact",
+    description:
+      "Create artifacts independently, or find the ones already attached to exhibition chapters.",
   },
 };
 
@@ -142,6 +153,45 @@ function fieldsFor(
         initial: dateValue(person?.death_date ?? null),
       },
       ...(person ? [] : imageFields),
+    ];
+  }
+
+  if (kind === "artifacts") {
+    const artifact = record as DashboardArtifact | undefined;
+    return [
+      {
+        name: "title",
+        label: "Title",
+        required: true,
+        initial: artifact?.title ?? "",
+      },
+      {
+        name: "artifactType",
+        label: "Type",
+        required: true,
+        placeholder: "Document, photograph, object, map…",
+        initial: artifact?.artifact_type ?? "",
+      },
+      {
+        name: "dateDisplay",
+        label: "Date as readers see it",
+        placeholder: "1914",
+        initial: artifact?.date_display ?? "",
+      },
+      {
+        name: "description",
+        label: "Description",
+        kind: "textarea",
+        initial: artifact?.description ?? "",
+      },
+      {
+        name: "historicalContext",
+        label: "Historical context",
+        kind: "textarea",
+        initial: artifact?.historical_context ?? "",
+        hint: "Why this artifact matters and what was happening around it.",
+      },
+      ...(artifact ? [] : imageFields),
     ];
   }
 
@@ -233,6 +283,16 @@ function metaOf(kind: AdminContentKind, record: AdminContentRecord) {
       .filter(Boolean)
       .join(" · ");
   }
+  if (kind === "artifacts") {
+    const artifact = record as DashboardArtifact;
+    return [
+      artifact.artifact_type,
+      artifact.date_display,
+      artifact.section_id ? "Connected to a chapter" : "Standalone",
+    ]
+      .filter(Boolean)
+      .join(" · ");
+  }
   if (kind === "places") {
     const place = record as DashboardPlace;
     return place.latitude != null && place.longitude != null
@@ -246,6 +306,143 @@ function metaOf(kind: AdminContentKind, record: AdminContentRecord) {
   ]
     .filter(Boolean)
     .join(" · ");
+}
+
+type StatusFilter = "all" | "published" | "draft";
+
+const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "published", label: "Published" },
+  { value: "draft", label: "Drafts" },
+];
+
+// The list, with search and a status filter. It is its own component so the
+// search resets when you move between People, Places, Events and Artifacts.
+function ContentList({
+  kind,
+  items,
+}: {
+  kind: AdminContentKind;
+  items: AdminContentRecord[];
+}) {
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [limit, setLimit] = useState(PAGE_SIZE);
+
+  const matches = items.filter((item) => {
+    if (statusFilter === "published" && item.status !== "published") {
+      return false;
+    }
+    if (statusFilter === "draft" && item.status === "published") return false;
+
+    return matchesSearch(search, titleOf(item), item.description);
+  });
+  const visible = matches.slice(0, limit);
+
+  return (
+    <div className="py-10">
+      {items.length === 0 ? (
+        <p className="font-sans text-body-m text-muted">
+          No {kind} yet. Create the first one above.
+        </p>
+      ) : (
+        <>
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="w-full max-w-sm">
+              <label htmlFor="admin-search" className="sr-only">
+                Search {kind}
+              </label>
+              <input
+                id="admin-search"
+                type="search"
+                value={search}
+                onChange={(event) => {
+                  setSearch(event.target.value);
+                  setLimit(PAGE_SIZE);
+                }}
+                placeholder={`Search ${kind}`}
+                className="h-11 w-full border border-line bg-transparent px-4 font-sans text-body-s transition-colors focus:border-heritage-green"
+              />
+            </div>
+
+            <div className="flex gap-2" role="group" aria-label="Filter by status">
+              {STATUS_FILTERS.map((filter) => (
+                <button
+                  key={filter.value}
+                  type="button"
+                  aria-pressed={statusFilter === filter.value}
+                  onClick={() => {
+                    setStatusFilter(filter.value);
+                    setLimit(PAGE_SIZE);
+                  }}
+                  className={`h-11 border px-4 font-sans text-body-s transition-colors ${
+                    statusFilter === filter.value
+                      ? "border-heritage-green bg-heritage-green text-ivory"
+                      : "border-line text-muted hover:text-ink"
+                  }`}
+                >
+                  {filter.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <p
+            role="status"
+            className="mt-3 font-sans text-meta text-muted"
+          >
+            {matches.length} of {items.length}. Search ignores accents and tone
+            marks, so “oyo” finds “Ọ̀yọ́”.
+          </p>
+
+          {matches.length === 0 ? (
+            <p className="mt-8 font-sans text-body-m text-muted">
+              Nothing matches. Try fewer letters or change the filter.
+            </p>
+          ) : (
+            <ul className="mt-6 divide-y divide-line border-y border-line">
+              {visible.map((item) => (
+                <li key={item.id}>
+                  <Link
+                    to={`/admin/${kind}/${item.id}`}
+                    className="flex items-center justify-between gap-4 py-5 transition-colors hover:bg-heritage-green/5"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate font-display text-heading-s">
+                        {titleOf(item)}
+                      </p>
+                      <p className="truncate font-sans text-body-s text-muted">
+                        {metaOf(kind, item)}
+                      </p>
+                    </div>
+                    <span
+                      className={`shrink-0 border px-2 py-0.5 font-sans text-meta capitalize ${
+                        item.status === "published"
+                          ? "border-heritage-green/40 text-heritage-green"
+                          : "border-line text-muted"
+                      }`}
+                    >
+                      {item.status}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {matches.length > visible.length && (
+            <button
+              type="button"
+              onClick={() => setLimit((count) => count + PAGE_SIZE)}
+              className="mt-6 h-11 border border-line px-6 font-sans text-body-s transition-colors hover:border-heritage-green hover:text-heritage-green"
+            >
+              Show {Math.min(PAGE_SIZE, matches.length - visible.length)} more
+            </button>
+          )}
+        </>
+      )}
+    </div>
+  );
 }
 
 export default function AdminContentLibrary({
@@ -318,6 +515,8 @@ export default function AdminContentLibrary({
   const creating = !id && params.get("new") === "1";
   const info = kindInfo[kind];
   const published = record?.status === "published";
+  const owner =
+    kind === "people" ? "person" : kind === "artifacts" ? "artifact" : "place";
 
   function setCreating(open: boolean) {
     setParams(open ? { new: "1" } : {}, { replace: true });
@@ -327,6 +526,7 @@ export default function AdminContentLibrary({
     let created: { id: number; imageAttachmentError?: string };
     if (kind === "events") created = await createAdminEvent(values);
     else if (kind === "people") created = await createAdminPerson(values);
+    else if (kind === "artifacts") created = await createAdminArtifact(values);
     else created = await createAdminPlace(values);
 
     const label = `${info.singular[0].toUpperCase()}${info.singular.slice(1)}`;
@@ -347,6 +547,7 @@ export default function AdminContentLibrary({
     let imageAttachmentError: string | undefined;
     if (kind === "events") await updateAdminEvent(contentId, values);
     else if (kind === "people") await updateAdminPerson(contentId, values);
+    else if (kind === "artifacts") await updateAdminArtifact(contentId, values);
     else {
       const result = await updateAdminPlace(contentId, values);
       imageAttachmentError = result.imageAttachmentError;
@@ -458,14 +659,11 @@ export default function AdminContentLibrary({
             ) : (
               <>
                 <AdminPictures
-                  owner={kind === "people" ? "person" : "place"}
+                  owner={owner}
                   id={record.id}
                   name={titleOf(record)}
                 />
-                <AdminSources
-                  owner={kind === "people" ? "person" : "place"}
-                  id={record.id}
-                />
+                <AdminSources owner={owner} id={record.id} />
                 <p className="border border-line p-5 font-sans text-body-s leading-relaxed text-muted">
                   Relationships are managed from the event or exhibition
                   chapter where this {info.singular} is featured.
@@ -554,42 +752,7 @@ export default function AdminContentLibrary({
         </div>
       )}
 
-      <div className="py-10">
-        {items.length === 0 ? (
-          <p className="font-sans text-body-m text-muted">
-            No {kind} yet. Create the first one above.
-          </p>
-        ) : (
-          <ul className="divide-y divide-line border-y border-line">
-            {items.map((item) => (
-              <li key={item.id}>
-                <Link
-                  to={`/admin/${kind}/${item.id}`}
-                  className="flex items-center justify-between gap-4 py-5 transition-colors hover:bg-heritage-green/5"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate font-display text-heading-s">
-                      {titleOf(item)}
-                    </p>
-                    <p className="truncate font-sans text-body-s text-muted">
-                      {metaOf(kind, item)}
-                    </p>
-                  </div>
-                  <span
-                    className={`shrink-0 border px-2 py-0.5 font-sans text-meta capitalize ${
-                      item.status === "published"
-                        ? "border-heritage-green/40 text-heritage-green"
-                        : "border-line text-muted"
-                    }`}
-                  >
-                    {item.status}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <ContentList key={kind} kind={kind} items={items} />
     </div>
   );
 }

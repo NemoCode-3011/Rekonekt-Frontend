@@ -29,7 +29,7 @@ interface SignInProps {
 
 export default function SignIn({ mode = "visitor" }: SignInProps) {
   const navigate = useNavigate();
-  const { logout, refreshUser, showToast } = useAuth();
+  const { refreshUser, showToast } = useAuth();
 
   const state = useLocation().state as {
     email?: string;
@@ -53,7 +53,10 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
 
   useEffect(() => {
     if (wait <= 0) return;
-    const timer = window.setTimeout(() => setWait((seconds) => seconds - 1), 1000);
+    const timer = window.setTimeout(
+      () => setWait((seconds) => seconds - 1),
+      1000,
+    );
     return () => window.clearTimeout(timer);
   }, [wait]);
 
@@ -76,25 +79,16 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
     setLoading(true);
 
     try {
-      const response = await signIn(email, form.password);
+      const response = await signIn(email, form.password, mode);
       if (response.code !== "LOGIN_SUCCESS") {
         setError("We couldn't complete sign in. Please try again.");
         return;
       }
 
-      const user = await refreshUser();
-
-      const isAdmin = user.role === "admin" || user.role === "super admin";
-
-      if (isAdminLogin && !isAdmin) {
-        await logout();
-        setError("This account does not have admin access.");
-        return;
-      }
-
+      await refreshUser();
       showToast("You're signed in.");
 
-      if (isAdmin) {
+      if (isAdminLogin) {
         navigate("/admin/dashboard", { replace: true });
       } else {
         navigate(state?.from ?? "/", { replace: true });
@@ -103,7 +97,10 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
       const apiError =
         err instanceof ApiError
           ? err
-          : new ApiError(0, "We’re having trouble connecting. Try again shortly.");
+          : new ApiError(
+              0,
+              "We’re having trouble connecting. Try again shortly.",
+            );
       setFieldErrors(getApiFieldErrors(err));
 
       if (apiError.code === "EMAIL_NOT_VERIFIED") {
@@ -124,6 +121,10 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
         setError(getApiErrorMessage(apiError, "Sign in failed."));
       } else if (apiError.status >= 500) {
         setError(getApiErrorMessage(apiError, "Sign in failed."));
+      } else if (apiError.code === "WRONG_SIGN_IN_PAGE") {
+        setError(
+          getApiErrorMessage(apiError, "Please use the correct sign-in page."),
+        );
       } else {
         setError(
           getApiErrorMessage(
@@ -190,7 +191,7 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
         aria-busy={loading}
         className="mt-10 space-y-5"
       >
-        {(
+        {
           <Input
             label="Email"
             name="email"
@@ -202,7 +203,7 @@ export default function SignIn({ mode = "visitor" }: SignInProps) {
             onChange={handleChange}
             error={fieldErrors.email}
           />
-        )}
+        }
 
         <Input
           label="Password"

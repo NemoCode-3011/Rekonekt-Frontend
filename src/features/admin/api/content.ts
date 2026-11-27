@@ -1,5 +1,6 @@
 import { http } from "../../../services/api/client";
 import type {
+  DashboardArtifact,
   DashboardEvent,
   DashboardPerson,
   DashboardPlace,
@@ -10,8 +11,12 @@ import { attachImage, clean, withSlug } from "./workspace";
 type Values = Record<string, string>;
 type Reply<T> = { message: string; data: T };
 
-export type AdminContentKind = "events" | "people" | "places";
-export type AdminContentRecord = DashboardEvent | DashboardPerson | DashboardPlace;
+export type AdminContentKind = "events" | "people" | "places" | "artifacts";
+export type AdminContentRecord =
+  | DashboardEvent
+  | DashboardPerson
+  | DashboardPlace
+  | DashboardArtifact;
 
 async function get<T>(path: string) {
   return (await http.get<Reply<T>>(path)).data.data;
@@ -25,6 +30,7 @@ const paths: Record<AdminContentKind, string> = {
   events: "/events",
   people: "/people",
   places: "/places",
+  artifacts: "/artifacts",
 };
 
 export function listAdminContent(kind: AdminContentKind) {
@@ -104,6 +110,44 @@ export function updateAdminPerson(id: number, values: Values) {
   );
 }
 
+export function createAdminArtifact(values: Values) {
+  return withSlug(values.title, (slug) =>
+    post<DashboardArtifact>(
+      paths.artifacts,
+      clean({
+        title: values.title.trim(),
+        slug,
+        artifactType: values.artifactType.trim(),
+        description: values.description,
+        historicalContext: values.historicalContext,
+        dateDisplay: values.dateDisplay,
+      }),
+    ).then(async (artifact) => {
+      const imageAttachmentError = await attachImageAndReport(
+        values,
+        values.title,
+        { artifactId: artifact.id },
+      );
+      return imageAttachmentError
+        ? { ...artifact, imageAttachmentError }
+        : artifact;
+    }),
+  );
+}
+
+export function updateAdminArtifact(id: number, values: Values) {
+  return http.patch(
+    `${paths.artifacts}/${id}`,
+    clean({
+      title: values.title.trim(),
+      artifactType: values.artifactType.trim(),
+      description: values.description,
+      historicalContext: values.historicalContext,
+      dateDisplay: values.dateDisplay,
+    }),
+  );
+}
+
 export function createAdminPlace(values: Values) {
   const location = parseLocation(values.coordinates ?? "");
   if (!location) {
@@ -137,9 +181,7 @@ export function createAdminPlace(values: Values) {
       { placeId: place.id },
     );
 
-    return imageAttachmentError
-      ? { ...place, imageAttachmentError }
-      : place;
+    return imageAttachmentError ? { ...place, imageAttachmentError } : place;
   });
 }
 
@@ -192,7 +234,9 @@ async function attachImageAndReport(
   try {
     await attachImage(values, title, target);
   } catch (error) {
-    return error instanceof Error ? error.message : "Could not attach the image.";
+    return error instanceof Error
+      ? error.message
+      : "Could not attach the image.";
   }
 }
 
@@ -233,4 +277,3 @@ export function linkEventPlace(eventId: number, placeId: number) {
 export function unlinkEventPlace(eventId: number, placeId: number) {
   return http.delete(`/events/${eventId}/places/${placeId}`);
 }
-

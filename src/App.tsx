@@ -175,6 +175,15 @@ function App() {
                     path="places/:id"
                     element={<AdminContentLibrary kind="places" />}
                   />
+
+                  <Route
+                    path="artifacts"
+                    element={<AdminContentLibrary kind="artifacts" />}
+                  />
+                  <Route
+                    path="artifacts/:id"
+                    element={<AdminContentLibrary kind="artifacts" />}
+                  />
                   <Route path="settings" element={<AdminSettings />} />
                   <Route element={<RequireSuperAdmin />}>
                     <Route path="team" element={<Team />} />

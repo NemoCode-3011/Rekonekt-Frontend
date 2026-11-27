@@ -50,14 +50,14 @@ export async function resendOtp(email: string) {
   return res.data;
 }
 
-export async function signIn(email: string, password: string) {
+export async function signIn( email: string,password: string,portal: "visitor" | "admin" = "visitor",) {
   const res = await http.post<AuthResponse<User>>("/auth/signin", {
     email: cleanEmail(email),
     password,
+    portal,
   });
   return res.data;
 }
-
 export async function forgotPassword(email: string) {
   const res = await http.post<AuthResponse<null>>("/auth/forgot-password", {
     email: cleanEmail(email),
@@ -111,7 +111,10 @@ export async function updateProfile(input: {
   return res.data.data;
 }
 
-export async function changePassword(currentPassword: string, newPassword: string) {
+export async function changePassword(
+  currentPassword: string,
+  newPassword: string,
+) {
   const res = await http.post<AuthResponse<null>>("/auth/change-password", {
     currentPassword,
     newPassword,
@@ -126,7 +129,10 @@ export async function getCulturalGroups() {
   return res.data.data;
 }
 
-export async function googleSignIn( credential: string, mode: "signin" | "signup",) {
+export async function googleSignIn(
+  credential: string,
+  mode: "signin" | "signup",
+) {
   const res = await http.post<{ message: string; data: User }>("/auth/google", {
     credential,
     mode,

@@ -28,7 +28,11 @@ describe("session auth API contract", () => {
     const response = {
       code: "OTP_SENT",
       message: "sent",
-      data: { expiresInSeconds: 300, resendAfterSeconds: 45, nextStep: "verify" },
+      data: {
+        expiresInSeconds: 300,
+        resendAfterSeconds: 45,
+        nextStep: "verify",
+      },
     };
     httpMock.post.mockResolvedValue({ data: response });
 
@@ -64,6 +68,7 @@ describe("session auth API contract", () => {
     expect(httpMock.post).toHaveBeenNthCalledWith(1, "/auth/signin", {
       email: "user@example.com",
       password: "password",
+      portal: "visitor",
     });
     expect(httpMock.post).toHaveBeenNthCalledWith(2, "/auth/verify-otp", {
       email: "user@example.com",

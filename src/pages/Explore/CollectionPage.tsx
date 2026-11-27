@@ -22,6 +22,7 @@ import { useDiscovery } from "../../features/experience/discovery/discovery-cont
 import PageLoader from "../../components/ui/PageLoader";
 import PageError from "../../components/ui/PageError";
 import { getApiErrorMessage } from "../../services/api/client";
+import { matchesSearch } from "../../lib/searchText";
 
 const NO_BUNDLES: Bundle[] = [];
 const NO_ITEMS: CollectionItem[] = [];
@@ -236,18 +237,15 @@ export default function CollectionPage({ kind }: { kind: CollectionKind }) {
   const currentItems = loadedKind === kind ? items : NO_ITEMS;
   const currentBundles = loadedKind === kind ? bundles : NO_BUNDLES;
 
-  const search = query.trim().toLowerCase();
-  const searching = search !== "";
+  const searching = query.trim() !== "";
   const matches = useMemo(
     () =>
       searching
         ? currentItems.filter((item) =>
-            `${item.title} ${item.description ?? ""}`
-              .toLowerCase()
-              .includes(search),
+            matchesSearch(query, item.title, item.description),
           )
         : currentItems,
-    [searching, search, currentItems],
+    [searching, query, currentItems],
   );
 
   // A search always shows the plain list, never tiles or one exhibition.
@@ -278,7 +276,14 @@ export default function CollectionPage({ kind }: { kind: CollectionKind }) {
       return standaloneItems(currentItems, currentBundles);
     }
     return matches.map((item) => ({ item, partOf: null as string | null }));
-  }, [activeBundle, plainPage, bundleInfo, currentItems, currentBundles, matches]);
+  }, [
+    activeBundle,
+    plainPage,
+    bundleInfo,
+    currentItems,
+    currentBundles,
+    matches,
+  ]);
 
   const open = (item: CollectionItem) => {
     // Events have a page of their own. The rest open in the side drawer.
