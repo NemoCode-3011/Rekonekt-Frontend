@@ -16,23 +16,6 @@ interface AdminPicturesProps {
   name: string;
 }
 
-interface Attachment {
-  id: number;
-  media_id: number;
-  display_order: number | null;
-  person_id?: number | null;
-  place_id?: number | null;
-  artifact_id?: number | null;
-}
-
-interface MediaFile {
-  id: number;
-  title: string;
-  media_type: string;
-  file_url: string;
-  source_credit: string | null;
-  license: string | null;
-}
 
 interface Picture {
   attachmentId: number;
@@ -60,30 +43,32 @@ async function get<T>(path: string) {
   return (await http.get<{ data: T }>(path)).data.data;
 }
 
+interface AdminPicture {
+  attachment_id: number;
+  title: string;
+  file_url: string;
+  source_credit: string | null;
+  license: string | null;
+}
+
+const OWNER_PATHS: Record<Owner, string> = {
+  person: "people",
+  place: "places",
+  artifact: "artifacts",
+};
+
 async function loadPictures(owner: Owner, id: number): Promise<Picture[]> {
-  const [attachments, files] = await Promise.all([
-    get<Attachment[]>("/media-attachment"),
-    get<MediaFile[]>("/media"),
-  ]);
-  const ownerKey = `${owner}_id` as const;
+  const rows = await get<AdminPicture[]>(
+    `/admin/${OWNER_PATHS[owner]}/${id}/pictures`,
+  );
 
-  return attachments
-    .filter((attachment) => attachment[ownerKey] === id)
-    .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
-    .flatMap((attachment) => {
-      const file = files.find((item) => item.id === attachment.media_id);
-      if (!file || file.media_type !== "image") return [];
-
-      return [
-        {
-          attachmentId: attachment.id,
-          title: file.title,
-          url: file.file_url,
-          credit: file.source_credit,
-          license: file.license,
-        },
-      ];
-    });
+  return rows.map((row) => ({
+    attachmentId: row.attachment_id,
+    title: row.title,
+    url: row.file_url,
+    credit: row.source_credit,
+    license: row.license,
+  }));
 }
 
 export default function AdminPictures({ owner, id, name }: AdminPicturesProps) {

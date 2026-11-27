@@ -38,7 +38,10 @@ export function slugify(text: string) {
 }
 
 // Slugs are made from the title. If one is already taken, try title-2, title-3...
-export async function withSlug<T>(title: string, send: (slug: string) => Promise<T>) {
+export async function withSlug<T>(
+  title: string,
+  send: (slug: string) => Promise<T>,
+) {
   const base = slugify(title);
 
   for (let attempt = 1; attempt <= 4; attempt++) {
@@ -293,7 +296,10 @@ export function unlinkSectionContent(
   return http.delete(`/sections/${sectionId}/${kind}/${id}`);
 }
 
-export async function addSource(sectionId: number, values: Values) {
+export async function addSourceFor(
+  target: Record<string, number>,
+  values: Values,
+) {
   const source = await post<{ id: number }>(
     "/sources",
     clean({
@@ -306,12 +312,16 @@ export async function addSource(sectionId: number, values: Values) {
 
   await post("/source-links", {
     sourceId: source.id,
-    sectionId,
+    ...target,
     relationship: "cited",
     displayOrder: 0,
   });
 
   return source;
+}
+
+export function addSource(sectionId: number, values: Values) {
+  return addSourceFor({ sectionId }, values);
 }
 
 // ---------- Publishing ----------
