@@ -36,8 +36,8 @@ import type {
 import AdminEventRelationships from "../../features/admin/components/AdminEventRelationships";
 import AdminEventMedia from "../../features/admin/components/AdminEventMedia";
 import AdminPictures from "../../features/admin/components/AdminPictures";
-import { PLACE_CATEGORIES, PLACE_REGIONS } from "../../features/places/types";
 import AdminSources from "../../features/admin/components/AdminSources";
+import { PLACE_CATEGORIES, PLACE_REGIONS } from "../../features/places/types";
 
 const kindInfo: Record<
   AdminContentKind,
@@ -466,21 +466,12 @@ export default function AdminContentLibrary({
                   owner={kind === "people" ? "person" : "place"}
                   id={record.id}
                 />
+                <p className="border border-line p-5 font-sans text-body-s leading-relaxed text-muted">
+                  Relationships are managed from the event or exhibition
+                  chapter where this {info.singular} is featured.
+                </p>
               </>
             )}
-            : (
-            <>
-              <AdminPictures
-                owner={kind === "people" ? "person" : "place"}
-                id={record.id}
-                name={titleOf(record)}
-              />
-              <p className="border border-line p-5 font-sans text-body-s leading-relaxed text-muted">
-                Relationships are managed from the event or exhibition chapter
-                where this {info.singular} is featured.
-              </p>
-            </>
-            )
           </div>
 
           <aside className="space-y-6">
