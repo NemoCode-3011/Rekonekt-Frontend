@@ -10,7 +10,8 @@ import { DiscoveryProvider } from "./features/experience/discovery/DiscoveryProv
 import RequireSuperAdmin from "./features/admin/components/RequireSuperAdmin";
 import Scrolltotop from "./components/navigation/ScrollToTop";
 import PageChange from "./components/navigation/PageChange";
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
+import { lazyWithReload as lazy } from "./lib/lazyWithReload";
 import { SplashProvider } from "./components/splash/SplashProvider";
 import { SplashLayer } from "./components/splash/SplashScreen";
 import PageLoader from "./components/ui/PageLoader";

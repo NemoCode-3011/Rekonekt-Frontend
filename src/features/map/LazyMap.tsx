@@ -1,5 +1,6 @@
-import { lazy, Suspense } from "react";
+import {Suspense } from "react";
 import type { MapViewProps } from "./types";
+import { lazyWithReload as lazy } from "../../lib/lazyWithReload";
 
 // Leaflet is big, so it is only downloaded when a page really shows a map.
 const MapView = lazy(() => import("./MapView"));

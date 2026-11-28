@@ -1,4 +1,5 @@
-import { Component, lazy, Suspense, type ReactNode } from "react";
+import { Component, Suspense, type ReactNode } from "react";
+import { lazyWithReload as lazy } from "../../../lib/lazyWithReload";
 import { Link } from "react-router-dom";
 import type { ObjectConfig } from "../../object-viewer/objects";
 

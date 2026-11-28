@@ -1,5 +1,4 @@
 import {
-  lazy,
   Suspense,
   useEffect,
   useRef,
@@ -12,6 +11,7 @@ import { uploadAdminImage, type UploadedMedia } from "../api/media";
 import RichTextEditor from "./RichTextEditor";
 import LinksField from "./LinksField";
 import { getApiFieldErrors } from "../../../services/api/client";
+import { lazyWithReload as lazy } from "../../../lib/lazyWithReload";
 
 const LocationPicker = lazy(() => import("./LocationPicker"));
 export interface FormField {
